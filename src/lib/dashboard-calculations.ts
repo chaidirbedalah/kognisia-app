@@ -1,4 +1,4 @@
-import { DailyChallengeData, MarathonData, ProgressData } from './dashboard-api'
+import { DailyChallengeData, MarathonData, TryOutData, ProgressData } from './dashboard-api'
 
 // ============================================================================
 // TYPES & INTERFACES
@@ -65,6 +65,7 @@ export interface AssessmentTypeBreakdown {
   tryOut: {
     total: number
     accuracy: number
+    layerBreakdown: LayerBreakdown
   }
 }
 
@@ -268,7 +269,8 @@ export function compareWeeklyProgress(dailyChallengeData: DailyChallengeData[]):
 
 export function groupByAssessmentType(
   dailyData: DailyChallengeData[],
-  marathonData: MarathonData[]
+  marathonData: MarathonData[],
+  tryOutData: TryOutData[]
 ): AssessmentTypeBreakdown {
   // Daily Challenge stats
   const dcTotal = dailyData.length
@@ -293,6 +295,19 @@ export function groupByAssessmentType(
   const marathonHint = marathonData.reduce((sum, m) => sum + m.hintUsed, 0)
   const marathonSolution = marathonData.reduce((sum, m) => sum + m.solutionViewed, 0)
   
+  // Try Out stats
+  const tryOutTotal = tryOutData.length
+  const tryOutTotalQuestions = tryOutData.reduce((sum, t) => 
+    sum + t.subtestScores.reduce((s, sub) => s + sub.total, 0), 0)
+  const tryOutCorrect = tryOutData.reduce((sum, t) => sum + t.totalScore, 0)
+  const tryOutAccuracy = tryOutTotalQuestions > 0 
+    ? Math.round((tryOutCorrect / tryOutTotalQuestions) * 100) 
+    : 0
+  
+  const tryOutDirect = tryOutData.reduce((sum, t) => sum + t.directAnswers, 0)
+  const tryOutHint = tryOutData.reduce((sum, t) => sum + t.hintUsed, 0)
+  const tryOutSolution = tryOutData.reduce((sum, t) => sum + t.solutionViewed, 0)
+  
   return {
     dailyChallenge: {
       total: dcTotal,
@@ -309,8 +324,9 @@ export function groupByAssessmentType(
       accuracy: 0
     },
     tryOut: {
-      total: 0,
-      accuracy: 0
+      total: tryOutTotal,
+      accuracy: tryOutAccuracy,
+      layerBreakdown: calculate3LayerBreakdown(tryOutDirect, tryOutHint, tryOutSolution)
     }
   }
 }

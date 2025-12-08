@@ -1,14 +1,14 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { MarathonData } from '@/lib/dashboard-api'
+import { TryOutData } from '@/lib/dashboard-api'
 import { calculate3LayerBreakdown, formatDateReadable } from '@/lib/dashboard-calculations'
 
-interface MarathonTabProps {
-  data: MarathonData[]
+interface TryOutTabProps {
+  data: TryOutData[]
   loading?: boolean
 }
 
-export function MarathonTab({ data, loading }: MarathonTabProps) {
+export function TryOutTab({ data, loading }: TryOutTabProps) {
   if (loading) {
     return (
       <div className="space-y-6">
@@ -33,23 +33,23 @@ export function MarathonTab({ data, loading }: MarathonTabProps) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Riwayat Try Out UTBK</CardTitle>
+          <CardTitle>Riwayat Mini Try Out</CardTitle>
           <CardDescription>Belum ada riwayat</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="text-center py-12">
-            <div className="text-6xl mb-4">📝</div>
+            <div className="text-6xl mb-4">⚡</div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              Belum ada Try Out UTBK
+              Belum ada Mini Try Out
             </h3>
             <p className="text-gray-600 mb-6">
-              Coba simulasi UTBK lengkap dengan 70 soal!
+              Mini Try Out adalah latihan cepat 49 soal (7 subtest × 7 soal) untuk persiapan berkala!
             </p>
             <button
-              onClick={() => window.location.href = '/marathon'}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              onClick={() => alert('Fitur Mini Try Out akan segera hadir! 🚀')}
+              className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
             >
-              Mulai Try Out UTBK
+              Segera Hadir
             </button>
           </div>
         </CardContent>
@@ -58,12 +58,12 @@ export function MarathonTab({ data, loading }: MarathonTabProps) {
   }
 
   // Calculate overall stats
-  const totalMarathons = data.length
-  const totalQuestions = data.reduce((sum, m) => 
-    sum + m.subtestScores.reduce((s, sub) => s + sub.total, 0), 0)
-  const totalCorrect = data.reduce((sum, m) => sum + m.totalScore, 0)
+  const totalTryOuts = data.length
+  const totalQuestions = data.reduce((sum, t) => 
+    sum + t.subtestScores.reduce((s, sub) => s + sub.total, 0), 0)
+  const totalCorrect = data.reduce((sum, t) => sum + t.totalScore, 0)
   const avgAccuracy = Math.round((totalCorrect / totalQuestions) * 100)
-  const avgScore = Math.round(totalCorrect / totalMarathons)
+  const avgScore = Math.round(totalCorrect / totalTryOuts)
 
   return (
     <div className="space-y-6">
@@ -72,8 +72,8 @@ export function MarathonTab({ data, loading }: MarathonTabProps) {
         <Card>
           <CardContent className="pt-6">
             <div className="text-center">
-              <p className="text-sm text-gray-600 mb-1">Total Try Out</p>
-              <p className="text-3xl font-bold text-blue-600">{totalMarathons}</p>
+              <p className="text-sm text-gray-600 mb-1">Total Mini Try Out</p>
+              <p className="text-3xl font-bold text-purple-600">{totalTryOuts}</p>
             </div>
           </CardContent>
         </Card>
@@ -108,26 +108,26 @@ export function MarathonTab({ data, loading }: MarathonTabProps) {
         </Card>
       </div>
 
-      {/* Try Out UTBK History */}
+      {/* Mini Try Out History */}
       <Card>
         <CardHeader>
-          <CardTitle>Riwayat Try Out UTBK 📝</CardTitle>
+          <CardTitle>Riwayat Mini Try Out ⚡</CardTitle>
           <CardDescription>
-            {data.length} try out sudah selesai
+            {data.length} mini try out sudah selesai
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {data.map((marathon, idx) => {
+            {data.map((tryout, idx) => {
               const breakdown = calculate3LayerBreakdown(
-                marathon.directAnswers,
-                marathon.hintUsed,
-                marathon.solutionViewed
+                tryout.directAnswers,
+                tryout.hintUsed,
+                tryout.solutionViewed
               )
               
               // Sort subtests by standard order
               const subtestOrder = ['PU', 'PPU', 'PBM', 'PK', 'LIT_INDO', 'LIT_ING', 'PM']
-              const sortedSubtests = [...marathon.subtestScores].sort((a, b) => {
+              const sortedSubtests = [...tryout.subtestScores].sort((a, b) => {
                 const indexA = subtestOrder.indexOf(a.subtest)
                 const indexB = subtestOrder.indexOf(b.subtest)
                 return indexA - indexB
@@ -136,28 +136,28 @@ export function MarathonTab({ data, loading }: MarathonTabProps) {
               return (
                 <div
                   key={idx}
-                  className="p-5 border-2 rounded-xl hover:shadow-lg transition-all bg-gradient-to-br from-white to-blue-50/30"
+                  className="p-5 border-2 rounded-xl hover:shadow-lg transition-all bg-gradient-to-br from-white to-purple-50/30"
                 >
                   {/* Header */}
                   <div className="flex justify-between items-start mb-4">
                     <div>
                       <p className="font-bold text-lg text-gray-900">
-                        {formatDateReadable(marathon.date)}
+                        {formatDateReadable(tryout.date)}
                       </p>
                       <p className="text-sm text-gray-600">
-                        Skor: {marathon.totalScore} | Akurasi: {marathon.accuracy}%
+                        Skor: {tryout.totalScore} | Akurasi: {tryout.accuracy}%
                       </p>
                     </div>
                     <Badge
                       className={
-                        marathon.accuracy >= 70
+                        tryout.accuracy >= 70
                           ? 'bg-green-500 hover:bg-green-600'
-                          : marathon.accuracy >= 50
+                          : tryout.accuracy >= 50
                           ? 'bg-yellow-500 hover:bg-yellow-600'
                           : 'bg-red-500 hover:bg-red-600'
                       }
                     >
-                      {marathon.accuracy}%
+                      {tryout.accuracy}%
                     </Badge>
                   </div>
 
@@ -221,15 +221,15 @@ export function MarathonTab({ data, loading }: MarathonTabProps) {
           <CardHeader>
             <CardTitle>Performa per Subtest 📊</CardTitle>
             <CardDescription>
-              Rata-rata akurasi di setiap subtest
+              Rata-rata akurasi di setiap subtest (Mini Try Out)
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
               {['PU', 'PPU', 'PBM', 'PK', 'LIT_INDO', 'LIT_ING', 'PM'].map(subtestName => {
-                // Calculate average for this subtest across all marathons
+                // Calculate average for this subtest across all mini try outs
                 const subtestData = data
-                  .flatMap(m => m.subtestScores)
+                  .flatMap(t => t.subtestScores)
                   .filter(s => s.subtest === subtestName)
                 
                 if (subtestData.length === 0) return null
