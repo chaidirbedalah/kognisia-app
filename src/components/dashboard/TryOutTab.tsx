@@ -43,13 +43,13 @@ export function TryOutTab({ data, loading }: TryOutTabProps) {
               Belum ada Mini Try Out
             </h3>
             <p className="text-gray-600 mb-6">
-              Mini Try Out adalah latihan cepat 49 soal (7 subtest × 7 soal) untuk persiapan berkala!
+              Mini Try Out adalah latihan cepat 70 soal (10 per subtest) untuk persiapan berkala!
             </p>
             <button
-              onClick={() => alert('Fitur Mini Try Out akan segera hadir! 🚀')}
+              onClick={() => window.location.href = '/mini-tryout'}
               className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
             >
-              Segera Hadir
+              Mulai Mini Try Out
             </button>
           </div>
         </CardContent>

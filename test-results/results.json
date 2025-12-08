@@ -1,0 +1,1351 @@
+{
+  "config": {
+    "configFile": "/Volumes/Business/StartUp/kognisia/kognisia-app/playwright.config.ts",
+    "rootDir": "/Volumes/Business/StartUp/kognisia/kognisia-app/tests/e2e",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "html",
+        {
+          "outputFolder": "playwright-report"
+        }
+      ],
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results/results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/Volumes/Business/StartUp/kognisia/kognisia-app/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/Volumes/Business/StartUp/kognisia/kognisia-app/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.57.0",
+    "workers": 1,
+    "webServer": {
+      "command": "npm run dev",
+      "url": "http://localhost:3000",
+      "reuseExistingServer": true,
+      "timeout": 120000
+    }
+  },
+  "suites": [
+    {
+      "title": "auth.spec.ts",
+      "file": "auth.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Authentication",
+          "file": "auth.spec.ts",
+          "line": 18,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should redirect to login page when accessing protected route",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 82,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 655,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-08T14:49:38.912Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Volumes/Business/StartUp/kognisia/kognisia-app/test-results/auth-Authentication-should-d0445-n-accessing-protected-route-chromium/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d748ac400d08b85935ef-bd206994a575ee132369",
+              "file": "auth.spec.ts",
+              "line": 23,
+              "column": 7
+            },
+            {
+              "title": "should login successfully with valid credentials",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 82,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3005,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-08T14:49:39.898Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Volumes/Business/StartUp/kognisia/kognisia-app/test-results/auth-Authentication-should-3852b-ully-with-valid-credentials-chromium/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d748ac400d08b85935ef-c6a87ca646f462f7faf1",
+              "file": "auth.spec.ts",
+              "line": 31,
+              "column": 7
+            },
+            {
+              "title": "should show error with invalid email",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 82,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3589,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-08T14:49:43.001Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Volumes/Business/StartUp/kognisia/kognisia-app/test-results/auth-Authentication-should-show-error-with-invalid-email-chromium/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d748ac400d08b85935ef-b8191a403a4492f30eb1",
+              "file": "auth.spec.ts",
+              "line": 51,
+              "column": 7
+            },
+            {
+              "title": "should show error with invalid password",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 82,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3625,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-08T14:49:46.674Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Volumes/Business/StartUp/kognisia/kognisia-app/test-results/auth-Authentication-should-show-error-with-invalid-password-chromium/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d748ac400d08b85935ef-9060938d0b91c4c361f3",
+              "file": "auth.spec.ts",
+              "line": 73,
+              "column": 7
+            },
+            {
+              "title": "should logout successfully",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 82,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2097,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-08T14:49:50.379Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Volumes/Business/StartUp/kognisia/kognisia-app/test-results/auth-Authentication-should-logout-successfully-chromium/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d748ac400d08b85935ef-e4d5ddc7448b856855a2",
+              "file": "auth.spec.ts",
+              "line": 95,
+              "column": 7
+            },
+            {
+              "title": "should redirect teacher to teacher portal",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 82,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 842,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-08T14:49:52.583Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Volumes/Business/StartUp/kognisia/kognisia-app/test-results/auth-Authentication-should-3da59-t-teacher-to-teacher-portal-chromium/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d748ac400d08b85935ef-ff91bc1e5b168646e5c7",
+              "file": "auth.spec.ts",
+              "line": 111,
+              "column": 7
+            },
+            {
+              "title": "should validate empty fields",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 82,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 487,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-08T14:49:53.518Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Volumes/Business/StartUp/kognisia/kognisia-app/test-results/auth-Authentication-should-validate-empty-fields-chromium/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d748ac400d08b85935ef-291fffa799ef1771cb82",
+              "file": "auth.spec.ts",
+              "line": 123,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "daily-challenge.spec.ts",
+      "file": "daily-challenge.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Daily Challenge",
+          "file": "daily-challenge.spec.ts",
+          "line": 13,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should show mode selection",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/Volumes/Business/StartUp/kognisia/kognisia-app/tests/e2e/daily-challenge.spec.ts",
+                        "line": 45,
+                        "column": 12
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 82,
+                      "parallelIndex": 0,
+                      "status": "skipped",
+                      "duration": 779,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-08T14:49:54.081Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/Volumes/Business/StartUp/kognisia/kognisia-app/tests/e2e/daily-challenge.spec.ts",
+                            "line": 45,
+                            "column": 12
+                          }
+                        }
+                      ],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Volumes/Business/StartUp/kognisia/kognisia-app/test-results/daily-challenge-Daily-Challenge-should-show-mode-selection-chromium/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "823c634cf3ae12835bcd-42c7dde313b949e9aa86",
+              "file": "daily-challenge.spec.ts",
+              "line": 23,
+              "column": 7
+            },
+            {
+              "title": "should start balanced mode with 21 questions",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/Volumes/Business/StartUp/kognisia/kognisia-app/tests/e2e/daily-challenge.spec.ts",
+                        "line": 87,
+                        "column": 12
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 82,
+                      "parallelIndex": 0,
+                      "status": "skipped",
+                      "duration": 755,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-08T14:49:54.949Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/Volumes/Business/StartUp/kognisia/kognisia-app/tests/e2e/daily-challenge.spec.ts",
+                            "line": 87,
+                            "column": 12
+                          }
+                        }
+                      ],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Volumes/Business/StartUp/kognisia/kognisia-app/test-results/daily-challenge-Daily-Chal-7cae6-nced-mode-with-21-questions-chromium/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "823c634cf3ae12835bcd-070a3c18e5d9ddff9b5a",
+              "file": "daily-challenge.spec.ts",
+              "line": 60,
+              "column": 7
+            },
+            {
+              "title": "should show subtest selector in focus mode",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/Volumes/Business/StartUp/kognisia/kognisia-app/tests/e2e/daily-challenge.spec.ts",
+                        "line": 115,
+                        "column": 12
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 82,
+                      "parallelIndex": 0,
+                      "status": "skipped",
+                      "duration": 1275,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-08T14:49:55.798Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/Volumes/Business/StartUp/kognisia/kognisia-app/tests/e2e/daily-challenge.spec.ts",
+                            "line": 115,
+                            "column": 12
+                          }
+                        }
+                      ],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Volumes/Business/StartUp/kognisia/kognisia-app/test-results/daily-challenge-Daily-Chal-63eb5-test-selector-in-focus-mode-chromium/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "823c634cf3ae12835bcd-90921c6b16650d7cabe5",
+              "file": "daily-challenge.spec.ts",
+              "line": 91,
+              "column": 7
+            },
+            {
+              "title": "should start focus mode with 10 questions",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/Volumes/Business/StartUp/kognisia/kognisia-app/tests/e2e/daily-challenge.spec.ts",
+                        "line": 121,
+                        "column": 10
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 82,
+                      "parallelIndex": 0,
+                      "status": "skipped",
+                      "duration": 769,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-08T14:49:57.165Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/Volumes/Business/StartUp/kognisia/kognisia-app/tests/e2e/daily-challenge.spec.ts",
+                            "line": 121,
+                            "column": 10
+                          }
+                        }
+                      ],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Volumes/Business/StartUp/kognisia/kognisia-app/test-results/daily-challenge-Daily-Chal-bc135-ocus-mode-with-10-questions-chromium/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "823c634cf3ae12835bcd-fae95fd542dc712ed4e3",
+              "file": "daily-challenge.spec.ts",
+              "line": 119,
+              "column": 7
+            },
+            {
+              "title": "should allow answering questions",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/Volumes/Business/StartUp/kognisia/kognisia-app/tests/e2e/daily-challenge.spec.ts",
+                        "line": 126,
+                        "column": 10
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 82,
+                      "parallelIndex": 0,
+                      "status": "skipped",
+                      "duration": 785,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-08T14:49:58.028Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/Volumes/Business/StartUp/kognisia/kognisia-app/tests/e2e/daily-challenge.spec.ts",
+                            "line": 126,
+                            "column": 10
+                          }
+                        }
+                      ],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Volumes/Business/StartUp/kognisia/kognisia-app/test-results/daily-challenge-Daily-Chal-e4172-d-allow-answering-questions-chromium/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "823c634cf3ae12835bcd-970c49cf47daad0d5c5d",
+              "file": "daily-challenge.spec.ts",
+              "line": 124,
+              "column": 7
+            },
+            {
+              "title": "should allow navigation between questions",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/Volumes/Business/StartUp/kognisia/kognisia-app/tests/e2e/daily-challenge.spec.ts",
+                        "line": 131,
+                        "column": 10
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 82,
+                      "parallelIndex": 0,
+                      "status": "skipped",
+                      "duration": 761,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-08T14:49:58.891Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/Volumes/Business/StartUp/kognisia/kognisia-app/tests/e2e/daily-challenge.spec.ts",
+                            "line": 131,
+                            "column": 10
+                          }
+                        }
+                      ],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Volumes/Business/StartUp/kognisia/kognisia-app/test-results/daily-challenge-Daily-Chal-6406d-avigation-between-questions-chromium/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "823c634cf3ae12835bcd-5b40f95953abb7b158fd",
+              "file": "daily-challenge.spec.ts",
+              "line": 129,
+              "column": 7
+            },
+            {
+              "title": "should show timer",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/Volumes/Business/StartUp/kognisia/kognisia-app/tests/e2e/daily-challenge.spec.ts",
+                        "line": 136,
+                        "column": 10
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 82,
+                      "parallelIndex": 0,
+                      "status": "skipped",
+                      "duration": 792,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-08T14:49:59.748Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/Volumes/Business/StartUp/kognisia/kognisia-app/tests/e2e/daily-challenge.spec.ts",
+                            "line": 136,
+                            "column": 10
+                          }
+                        }
+                      ],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Volumes/Business/StartUp/kognisia/kognisia-app/test-results/daily-challenge-Daily-Challenge-should-show-timer-chromium/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "823c634cf3ae12835bcd-89095e4c176947434b5c",
+              "file": "daily-challenge.spec.ts",
+              "line": 134,
+              "column": 7
+            },
+            {
+              "title": "should allow submission",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/Volumes/Business/StartUp/kognisia/kognisia-app/tests/e2e/daily-challenge.spec.ts",
+                        "line": 141,
+                        "column": 10
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 82,
+                      "parallelIndex": 0,
+                      "status": "skipped",
+                      "duration": 787,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-08T14:50:00.618Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/Volumes/Business/StartUp/kognisia/kognisia-app/tests/e2e/daily-challenge.spec.ts",
+                            "line": 141,
+                            "column": 10
+                          }
+                        }
+                      ],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Volumes/Business/StartUp/kognisia/kognisia-app/test-results/daily-challenge-Daily-Challenge-should-allow-submission-chromium/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "823c634cf3ae12835bcd-63ff4d533776943798fc",
+              "file": "daily-challenge.spec.ts",
+              "line": 139,
+              "column": 7
+            },
+            {
+              "title": "should display results after completion",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/Volumes/Business/StartUp/kognisia/kognisia-app/tests/e2e/daily-challenge.spec.ts",
+                        "line": 147,
+                        "column": 10
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 82,
+                      "parallelIndex": 0,
+                      "status": "skipped",
+                      "duration": 748,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-08T14:50:01.498Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/Volumes/Business/StartUp/kognisia/kognisia-app/tests/e2e/daily-challenge.spec.ts",
+                            "line": 147,
+                            "column": 10
+                          }
+                        }
+                      ],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Volumes/Business/StartUp/kognisia/kognisia-app/test-results/daily-challenge-Daily-Chal-f2c9b-ay-results-after-completion-chromium/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "823c634cf3ae12835bcd-fcea1607d2e3db469701",
+              "file": "daily-challenge.spec.ts",
+              "line": 144,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "dashboard.spec.ts",
+      "file": "dashboard.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Dashboard",
+          "file": "dashboard.spec.ts",
+          "line": 13,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should load dashboard without critical errors",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 82,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1919,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Console errors found: [\n  \u001b[32m'TypeError: Failed to fetch\\n'\u001b[39m +\n    \u001b[32m'    at http://localhost:3000/_next/static/chunks/node_modules_62156476._.js:11372:23\\n'\u001b[39m +\n    \u001b[32m'    at _handleRequest (http://localhost:3000/_next/static/chunks/node_modules_62156476._.js:11726:24)\\n'\u001b[39m +\n    \u001b[32m'    at _request (http://localhost:3000/_next/static/chunks/node_modules_62156476._.js:11713:24)\\n'\u001b[39m +\n    \u001b[32m'    at http://localhost:3000/_next/static/chunks/node_modules_62156476._.js:14948:220\\n'\u001b[39m +\n    \u001b[32m'    at SupabaseAuthClient._useSession (http://localhost:3000/_next/static/chunks/node_modules_62156476._.js:14817:26)\\n'\u001b[39m +\n    \u001b[32m'    at async SupabaseAuthClient._getUser (http://localhost:3000/_next/static/chunks/node_modules_62156476._.js:14933:20)\\n'\u001b[39m +\n    \u001b[32m'    at async http://localhost:3000/_next/static/chunks/node_modules_62156476._.js:14917:20'\u001b[39m,\n  \u001b[32m'Failed to load resource: the server responded with a status of 400 ()'\u001b[39m\n]\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-08T14:50:02.343Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Volumes/Business/StartUp/kognisia/kognisia-app/test-results/dashboard-Dashboard-should-89fb8-ard-without-critical-errors-chromium/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "90cda532ab82d274b30b-80e629588fe133e0f52c",
+              "file": "dashboard.spec.ts",
+              "line": 25,
+              "column": 7
+            },
+            {
+              "title": "should display all stat cards",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 82,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1634,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-08T14:50:04.367Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Volumes/Business/StartUp/kognisia/kognisia-app/test-results/dashboard-Dashboard-should-display-all-stat-cards-chromium/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "90cda532ab82d274b30b-7770841ef884b9ea7b9a",
+              "file": "dashboard.spec.ts",
+              "line": 55,
+              "column": 7
+            },
+            {
+              "title": "should display current streak",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 82,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2950,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Found streak with selector: text=Streak Harian\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-08T14:50:06.097Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Volumes/Business/StartUp/kognisia/kognisia-app/test-results/dashboard-Dashboard-should-display-current-streak-chromium/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "90cda532ab82d274b30b-addfa41b43448e3a1167",
+              "file": "dashboard.spec.ts",
+              "line": 63,
+              "column": 7
+            },
+            {
+              "title": "should display total questions answered",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 82,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2917,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Found total questions with selector: text=Total Soal\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-08T14:50:09.148Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Volumes/Business/StartUp/kognisia/kognisia-app/test-results/dashboard-Dashboard-should-display-total-questions-answered-chromium/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "90cda532ab82d274b30b-12a49d9211adcdf3cda9",
+              "file": "dashboard.spec.ts",
+              "line": 98,
+              "column": 7
+            },
+            {
+              "title": "should display overall accuracy",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 82,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2882,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Found accuracy with selector: text=/akurasi.*\\d+%/i\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-08T14:50:12.159Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Volumes/Business/StartUp/kognisia/kognisia-app/test-results/dashboard-Dashboard-should-display-overall-accuracy-chromium/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "90cda532ab82d274b30b-13512956bcf7b820a2d9",
+              "file": "dashboard.spec.ts",
+              "line": 131,
+              "column": 7
+            },
+            {
+              "title": "should have all tabs accessible",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 82,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 757,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-08T14:50:15.138Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Volumes/Business/StartUp/kognisia/kognisia-app/test-results/dashboard-Dashboard-should-have-all-tabs-accessible-chromium/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "90cda532ab82d274b30b-2dba34fdae62647ff553",
+              "file": "dashboard.spec.ts",
+              "line": 166,
+              "column": 7
+            },
+            {
+              "title": "should display progress by subtest",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 82,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 797,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-08T14:50:15.986Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Volumes/Business/StartUp/kognisia/kognisia-app/test-results/dashboard-Dashboard-should-display-progress-by-subtest-chromium/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "90cda532ab82d274b30b-92ae747c8ed5a405332a",
+              "file": "dashboard.spec.ts",
+              "line": 196,
+              "column": 7
+            },
+            {
+              "title": "should display daily challenge history",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 82,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 761,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-08T14:50:16.875Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Volumes/Business/StartUp/kognisia/kognisia-app/test-results/dashboard-Dashboard-should-display-daily-challenge-history-chromium/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "90cda532ab82d274b30b-9bd9f88ebfabc78fa1e3",
+              "file": "dashboard.spec.ts",
+              "line": 234,
+              "column": 7
+            },
+            {
+              "title": "should handle navigation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 82,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 779,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-08T14:50:17.725Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Volumes/Business/StartUp/kognisia/kognisia-app/test-results/dashboard-Dashboard-should-handle-navigation-chromium/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "90cda532ab82d274b30b-ab7f39803c198dd6c3af",
+              "file": "dashboard.spec.ts",
+              "line": 260,
+              "column": 7
+            },
+            {
+              "title": "should load within acceptable time",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 82,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1911,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-08T14:50:18.592Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Volumes/Business/StartUp/kognisia/kognisia-app/test-results/dashboard-Dashboard-should-load-within-acceptable-time-chromium/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "90cda532ab82d274b30b-f1b1a7102f386143bd85",
+              "file": "dashboard.spec.ts",
+              "line": 284,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2025-12-08T14:49:38.432Z",
+    "duration": 42220.5419999999,
+    "expected": 17,
+    "skipped": 9,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

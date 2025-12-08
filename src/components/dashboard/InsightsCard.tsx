@@ -1,5 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { getSubtestDisplayName } from '@/lib/backward-compatibility'
 
 interface SubtestInsight {
   subtest: string
@@ -41,7 +42,7 @@ export function InsightsCard({ strongest, weakest, loading }: InsightsCardProps)
         <CardContent>
           <div className="text-center py-8 text-gray-500">
             <p className="mb-2">Mulai latihan untuk melihat insight performa kamu!</p>
-            <p className="text-sm">Kerjakan Daily Challenge atau Marathon untuk mendapatkan analisis mendalam.</p>
+            <p className="text-sm">Kerjakan Daily Challenge atau Try Out UTBK untuk mendapatkan analisis mendalam.</p>
           </div>
         </CardContent>
       </Card>
@@ -74,7 +75,7 @@ export function InsightsCard({ strongest, weakest, loading }: InsightsCardProps)
               <span className="text-3xl">🏆</span>
             </div>
             <p className="text-2xl font-bold text-green-700 mb-2">
-              {strongest.subtest}
+              {getSubtestDisplayName(strongest.subtest)}
             </p>
             <div className="flex items-center gap-2 mb-3">
               <Badge className="bg-green-600 hover:bg-green-700">
@@ -96,7 +97,7 @@ export function InsightsCard({ strongest, weakest, loading }: InsightsCardProps)
               <span className="text-3xl">📈</span>
             </div>
             <p className="text-2xl font-bold text-orange-700 mb-2">
-              {weakest.subtest}
+              {getSubtestDisplayName(weakest.subtest)}
             </p>
             <div className="flex items-center gap-2 mb-3">
               <Badge className="bg-orange-600 hover:bg-orange-700">

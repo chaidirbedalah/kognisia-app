@@ -1,4 +1,4 @@
-import { DailyChallengeData, MarathonData, TryOutData, ProgressData } from './dashboard-api'
+import { DailyChallengeData, TryOutUTBKData, TryOutData, ProgressData } from './dashboard-api'
 
 // ============================================================================
 // TYPES & INTERFACES
@@ -53,7 +53,7 @@ export interface AssessmentTypeBreakdown {
     accuracy: number
     layerBreakdown: LayerBreakdown
   }
-  marathon: {
+  tryOutUTBK: {
     total: number
     accuracy: number
     layerBreakdown: LayerBreakdown
@@ -120,7 +120,7 @@ export function calculateAccuracyTrend(data: DailyChallengeData[]): TrendDataPoi
 
 export function calculateOverallTrend(
   dailyData: DailyChallengeData[],
-  marathonData: MarathonData[]
+  tryOutUTBKData: TryOutUTBKData[]
 ): TrendDataPoint[] {
   const allData: TrendDataPoint[] = []
   
@@ -134,8 +134,8 @@ export function calculateOverallTrend(
     })
   })
   
-  // Add marathon data
-  marathonData.forEach(m => {
+  // Add Try Out UTBK data
+  tryOutUTBKData.forEach(m => {
     allData.push({
       date: m.date,
       accuracy: m.accuracy,
@@ -269,8 +269,8 @@ export function compareWeeklyProgress(dailyChallengeData: DailyChallengeData[]):
 
 export function groupByAssessmentType(
   dailyData: DailyChallengeData[],
-  marathonData: MarathonData[],
-  tryOutData: TryOutData[]
+  tryOutUTBKData: TryOutUTBKData[],
+  miniTryOutData: TryOutData[]
 ): AssessmentTypeBreakdown {
   // Daily Challenge stats
   const dcTotal = dailyData.length
@@ -282,31 +282,31 @@ export function groupByAssessmentType(
   const dcHint = dailyData.reduce((sum, d) => sum + d.hintUsed, 0)
   const dcSolution = dailyData.reduce((sum, d) => sum + d.solutionViewed, 0)
   
-  // Marathon stats
-  const marathonTotal = marathonData.length
-  const marathonTotalQuestions = marathonData.reduce((sum, m) => 
+  // Try Out UTBK stats
+  const tryOutUTBKTotal = tryOutUTBKData.length
+  const tryOutUTBKTotalQuestions = tryOutUTBKData.reduce((sum, m) => 
     sum + m.subtestScores.reduce((s, sub) => s + sub.total, 0), 0)
-  const marathonCorrect = marathonData.reduce((sum, m) => sum + m.totalScore, 0)
-  const marathonAccuracy = marathonTotalQuestions > 0 
-    ? Math.round((marathonCorrect / marathonTotalQuestions) * 100) 
+  const tryOutUTBKCorrect = tryOutUTBKData.reduce((sum, m) => sum + m.totalScore, 0)
+  const tryOutUTBKAccuracy = tryOutUTBKTotalQuestions > 0 
+    ? Math.round((tryOutUTBKCorrect / tryOutUTBKTotalQuestions) * 100) 
     : 0
   
-  const marathonDirect = marathonData.reduce((sum, m) => sum + m.directAnswers, 0)
-  const marathonHint = marathonData.reduce((sum, m) => sum + m.hintUsed, 0)
-  const marathonSolution = marathonData.reduce((sum, m) => sum + m.solutionViewed, 0)
+  const tryOutUTBKDirect = tryOutUTBKData.reduce((sum, m) => sum + m.directAnswers, 0)
+  const tryOutUTBKHint = tryOutUTBKData.reduce((sum, m) => sum + m.hintUsed, 0)
+  const tryOutUTBKSolution = tryOutUTBKData.reduce((sum, m) => sum + m.solutionViewed, 0)
   
-  // Try Out stats
-  const tryOutTotal = tryOutData.length
-  const tryOutTotalQuestions = tryOutData.reduce((sum, t) => 
+  // Mini Try Out stats (using miniTryOutData instead of tryOutData)
+  const miniTryOutTotal = miniTryOutData.length
+  const miniTryOutTotalQuestions = miniTryOutData.reduce((sum, t) => 
     sum + t.subtestScores.reduce((s, sub) => s + sub.total, 0), 0)
-  const tryOutCorrect = tryOutData.reduce((sum, t) => sum + t.totalScore, 0)
-  const tryOutAccuracy = tryOutTotalQuestions > 0 
-    ? Math.round((tryOutCorrect / tryOutTotalQuestions) * 100) 
+  const miniTryOutCorrect = miniTryOutData.reduce((sum, t) => sum + t.totalScore, 0)
+  const miniTryOutAccuracy = miniTryOutTotalQuestions > 0 
+    ? Math.round((miniTryOutCorrect / miniTryOutTotalQuestions) * 100) 
     : 0
   
-  const tryOutDirect = tryOutData.reduce((sum, t) => sum + t.directAnswers, 0)
-  const tryOutHint = tryOutData.reduce((sum, t) => sum + t.hintUsed, 0)
-  const tryOutSolution = tryOutData.reduce((sum, t) => sum + t.solutionViewed, 0)
+  const miniTryOutDirect = miniTryOutData.reduce((sum, t) => sum + t.directAnswers, 0)
+  const miniTryOutHint = miniTryOutData.reduce((sum, t) => sum + t.hintUsed, 0)
+  const miniTryOutSolution = miniTryOutData.reduce((sum, t) => sum + t.solutionViewed, 0)
   
   return {
     dailyChallenge: {
@@ -314,19 +314,19 @@ export function groupByAssessmentType(
       accuracy: dcAccuracy,
       layerBreakdown: calculate3LayerBreakdown(dcDirect, dcHint, dcSolution)
     },
-    marathon: {
-      total: marathonTotal,
-      accuracy: marathonAccuracy,
-      layerBreakdown: calculate3LayerBreakdown(marathonDirect, marathonHint, marathonSolution)
+    tryOutUTBK: {
+      total: tryOutUTBKTotal,
+      accuracy: tryOutUTBKAccuracy,
+      layerBreakdown: calculate3LayerBreakdown(tryOutUTBKDirect, tryOutUTBKHint, tryOutUTBKSolution)
     },
     squadBattle: {
       total: 0,
       accuracy: 0
     },
     tryOut: {
-      total: tryOutTotal,
-      accuracy: tryOutAccuracy,
-      layerBreakdown: calculate3LayerBreakdown(tryOutDirect, tryOutHint, tryOutSolution)
+      total: miniTryOutTotal,
+      accuracy: miniTryOutAccuracy,
+      layerBreakdown: calculate3LayerBreakdown(miniTryOutDirect, miniTryOutHint, miniTryOutSolution)
     }
   }
 }

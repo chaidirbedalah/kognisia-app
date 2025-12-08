@@ -212,6 +212,11 @@ export function DailyChallengeTab({ data, loading }: DailyChallengeTabProps) {
                 day.hintUsed,
                 day.solutionViewed
               )
+              
+              // Determine mode based on question count (Requirement 9.4)
+              const mode = day.totalQuestions === 21 ? 'balanced' : day.totalQuestions === 10 ? 'focus' : 'unknown'
+              const modeLabel = mode === 'balanced' ? 'Balanced (7 Subtest)' : mode === 'focus' ? 'Focus (1 Subtest)' : `${day.totalQuestions} soal`
+              
               return (
                 <div
                   key={idx}
@@ -222,9 +227,14 @@ export function DailyChallengeTab({ data, loading }: DailyChallengeTabProps) {
                       <p className="font-semibold text-gray-900">
                         {formatDateReadable(day.date)}
                       </p>
-                      <p className="text-sm text-gray-600">
-                        {day.correctAnswers}/{day.totalQuestions} benar
-                      </p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <p className="text-sm text-gray-600">
+                          {day.correctAnswers}/{day.totalQuestions} benar
+                        </p>
+                        <Badge variant="outline" className="text-xs">
+                          {modeLabel}
+                        </Badge>
+                      </div>
                     </div>
                     <Badge
                       className={

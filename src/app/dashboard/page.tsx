@@ -13,12 +13,13 @@ import { ProgressTab } from '@/components/dashboard/ProgressTab'
 import { 
   fetchUserStats, 
   fetchDailyChallengeData, 
-  fetchMarathonData, 
+  fetchTryOutUTBKData, 
+  fetchMiniTryOutData,
   fetchTryOutData,
   fetchProgressBySubtest,
   type UserStats,
   type DailyChallengeData,
-  type MarathonData,
+  type TryOutUTBKData,
   type TryOutData,
   type ProgressData
 } from '@/lib/dashboard-api'
@@ -35,10 +36,11 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [userStats, setUserStats] = useState<UserStats | null>(null)
   const [dailyChallengeData, setDailyChallengeData] = useState<DailyChallengeData[]>([])
-  const [marathonData, setMarathonData] = useState<MarathonData[]>([])
+  const [tryOutUTBKData, setTryOutUTBKData] = useState<TryOutUTBKData[]>([])
+  const [miniTryOutData, setMiniTryOutData] = useState<TryOutData[]>([])
   const [tryOutData, setTryOutData] = useState<TryOutData[]>([])
   const [progressData, setProgressData] = useState<ProgressData[]>([])
-  const [activeTab, setActiveTab] = useState<'overview' | 'daily' | 'marathon' | 'tryout' | 'progress'>('overview')
+  const [activeTab, setActiveTab] = useState<'overview' | 'daily' | 'marathon' | 'minitryout' | 'tryout' | 'progress'>('overview')
 
   useEffect(() => {
     checkUser()
@@ -76,17 +78,19 @@ export default function DashboardPage() {
   const loadDashboardDataWithRetry = async (userId: string, retries = 3) => {
     for (let attempt = 1; attempt <= retries; attempt++) {
       try {
-        const [stats, dailyData, marathonDataResult, tryOutDataResult, progressDataResult] = await Promise.all([
+        const [stats, dailyData, tryOutUTBKDataResult, miniTryOutDataResult, tryOutDataResult, progressDataResult] = await Promise.all([
           fetchUserStats(userId),
           fetchDailyChallengeData(userId),
-          fetchMarathonData(userId),
+          fetchTryOutUTBKData(userId),
+          fetchMiniTryOutData(userId),
           fetchTryOutData(userId),
           fetchProgressBySubtest(userId)
         ])
         
         setUserStats(stats)
         setDailyChallengeData(dailyData)
-        setMarathonData(marathonDataResult)
+        setTryOutUTBKData(tryOutUTBKDataResult)
+        setMiniTryOutData(miniTryOutDataResult)
         setTryOutData(tryOutDataResult)
         setProgressData(progressDataResult)
         return // Success, exit retry loop
@@ -123,7 +127,7 @@ export default function DashboardPage() {
   // Calculate additional metrics
   const strongestWeakest = progressData.length > 0 ? findStrongestWeakest(progressData) : null
   const weeklyComparison = dailyChallengeData.length > 0 ? compareWeeklyProgress(dailyChallengeData) : null
-  const assessmentBreakdown = groupByAssessmentType(dailyChallengeData, marathonData, tryOutData)
+  const assessmentBreakdown = groupByAssessmentType(dailyChallengeData, tryOutUTBKData, miniTryOutData)
   
   // Calculate overall 3-layer breakdown
   const totalDirect = dailyChallengeData.reduce((sum, d) => sum + d.directAnswers, 0)
@@ -133,8 +137,8 @@ export default function DashboardPage() {
   
   // Calculate accuracies
   const dcAccuracy = assessmentBreakdown.dailyChallenge.accuracy
-  const marathonAccuracy = assessmentBreakdown.marathon.accuracy
-  const tryOutAccuracy = assessmentBreakdown.tryOut.accuracy
+  const tryOutUTBKAccuracy = assessmentBreakdown.tryOutUTBK.accuracy
+  const miniTryOutAccuracy = assessmentBreakdown.tryOut.accuracy
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -186,9 +190,9 @@ export default function DashboardPage() {
               Daily Challenge
             </button>
             <button
-              onClick={() => setActiveTab('tryout')}
+              onClick={() => setActiveTab('minitryout')}
               className={`px-4 py-2 font-medium border-b-2 transition-colors ${
-                activeTab === 'tryout'
+                activeTab === 'minitryout'
                   ? 'border-blue-600 text-blue-600'
                   : 'border-transparent text-gray-600 hover:text-gray-900'
               }`}
@@ -242,18 +246,18 @@ export default function DashboardPage() {
               />
               <StatsCard
                 title="Mini Try Out"
-                value={userStats?.totalTryOuts || 0}
+                value={miniTryOutData.length}
                 icon="⚡"
-                description={tryOutAccuracy > 0 ? `Akurasi: ${tryOutAccuracy}%` : 'Belum ada data'}
+                description={miniTryOutAccuracy > 0 ? `Akurasi: ${miniTryOutAccuracy}%` : 'Belum ada data'}
                 loading={loading}
                 variant="primary"
-                onClick={() => setActiveTab('tryout')}
+                onClick={() => setActiveTab('minitryout')}
               />
               <StatsCard
                 title="Try Out UTBK"
-                value={userStats?.totalMarathons || 0}
+                value={userStats?.totalTryOutUTBK || 0}
                 icon="📝"
-                description={marathonAccuracy > 0 ? `Akurasi: ${marathonAccuracy}%` : 'Belum ada data'}
+                description={tryOutUTBKAccuracy > 0 ? `Akurasi: ${tryOutUTBKAccuracy}%` : 'Belum ada data'}
                 loading={loading}
                 variant="primary"
                 onClick={() => setActiveTab('marathon')}
@@ -379,16 +383,16 @@ export default function DashboardPage() {
                 <CardHeader>
                   <CardTitle>Mini Try Out ⚡</CardTitle>
                   <CardDescription>
-                    Latihan cepat 49 soal (7×7)
+                    Latihan cepat 70 soal (10 per subtest)
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Button 
                     className="w-full"
                     variant="outline"
-                    onClick={() => alert('Fitur Mini Try Out akan segera hadir! 🚀')}
+                    onClick={() => window.location.href = '/mini-tryout'}
                   >
-                    Segera Hadir
+                    Mulai Mini Try Out
                   </Button>
                 </CardContent>
               </Card>
@@ -397,7 +401,7 @@ export default function DashboardPage() {
                 <CardHeader>
                   <CardTitle>Try Out UTBK 📝</CardTitle>
                   <CardDescription>
-                    Simulasi UTBK lengkap 70 soal
+                    Simulasi UTBK lengkap 160 soal
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -419,13 +423,13 @@ export default function DashboardPage() {
         )}
 
         {/* Mini Try Out Tab */}
-        {activeTab === 'tryout' && (
-          <TryOutTab data={tryOutData} loading={loading} />
+        {activeTab === 'minitryout' && (
+          <TryOutTab data={miniTryOutData} loading={loading} />
         )}
 
         {/* Try Out UTBK Tab */}
         {activeTab === 'marathon' && (
-          <MarathonTab data={marathonData} loading={loading} />
+          <MarathonTab data={tryOutUTBKData} loading={loading} />
         )}
 
         {/* Progress Tab */}

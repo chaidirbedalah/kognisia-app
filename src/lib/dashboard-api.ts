@@ -8,7 +8,7 @@ export interface UserStats {
   currentStreak: number
   longestStreak: number
   totalDailyChallenges: number
-  totalMarathons: number
+  totalTryOutUTBK: number
   totalSquadBattles: number
   totalTryOuts: number
   totalQuestions: number
@@ -26,7 +26,7 @@ export interface DailyChallengeData {
   solutionViewed: number
 }
 
-export interface MarathonData {
+export interface TryOutUTBKData {
   id: string
   date: string
   totalScore: number
@@ -111,7 +111,7 @@ export async function fetchUserStats(userId: string): Promise<UserStats> {
         currentStreak: 0,
         longestStreak: 0,
         totalDailyChallenges: 0,
-        totalMarathons: 0,
+        totalTryOutUTBK: 0,
         totalSquadBattles: 0,
         totalTryOuts: 0,
         totalQuestions: 0,
@@ -120,29 +120,8 @@ export async function fetchUserStats(userId: string): Promise<UserStats> {
       }
     }
 
-  // Get all question IDs to fetch their assessment types
-  const questionIds = progressData.map(p => p.question_id).filter(Boolean)
-  
-  // Fetch question bank data separately
-  const { data: questionBankData } = await supabase
-    .from('question_bank')
-    .select('id, assessment_type')
-    .in('id', questionIds)
-  
-  // Create a map of question_id to assessment_type
-  const questionTypeMap = new Map<string, string>()
-  questionBankData?.forEach(q => {
-    questionTypeMap.set(q.id, q.assessment_type)
-  })
-  
-  // Add assessment_type to progress data
-  const enrichedProgressData = progressData.map(p => ({
-    ...p,
-    assessment_type: questionTypeMap.get(p.question_id) || 'unknown'
-  }))
-  
-  // Calculate streaks
-  const dailyChallengeProgress = enrichedProgressData.filter(
+  // Calculate streaks - assessment_type is already in student_progress
+  const dailyChallengeProgress = progressData.filter(
     p => p.assessment_type === 'daily_challenge'
   )
   
@@ -155,8 +134,6 @@ export async function fetchUserStats(userId: string): Promise<UserStats> {
   let currentStreak = 0
   let longestStreak = 0
   let tempStreak = 0
-  
-  const today = new Date().toISOString().split('T')[0]
   
   // Calculate current streak
   for (let i = 0; i < sortedDates.length; i++) {
@@ -192,19 +169,19 @@ export async function fetchUserStats(userId: string): Promise<UserStats> {
   longestStreak = Math.max(longestStreak, tempStreak)
 
   // Count assessment types
-  const marathonProgress = enrichedProgressData.filter(
-    p => p.assessment_type === 'marathon'
+  const tryOutUTBKProgress = progressData.filter(
+    p => p.assessment_type === 'tryout_utbk'
   )
-  const squadProgress = enrichedProgressData.filter(
+  const squadProgress = progressData.filter(
     p => p.assessment_type === 'squad_battle'
   )
-  const tryOutProgress = enrichedProgressData.filter(
+  const tryOutProgress = progressData.filter(
     p => p.assessment_type === 'try_out'
   )
 
   // Count unique sessions (group by date for daily challenge, by session for others)
-  const uniqueMarathonDates = new Set(
-    marathonProgress.map(p => new Date(p.created_at).toISOString().split('T')[0])
+  const uniqueTryOutUTBKDates = new Set(
+    tryOutUTBKProgress.map(p => new Date(p.created_at).toISOString().split('T')[0])
   )
   const uniqueSquadDates = new Set(
     squadProgress.map(p => new Date(p.created_at).toISOString().split('T')[0])
@@ -214,12 +191,12 @@ export async function fetchUserStats(userId: string): Promise<UserStats> {
   )
 
   // Calculate overall stats
-  const totalQuestions = enrichedProgressData.length
-  const totalCorrect = enrichedProgressData.filter(p => p.is_correct).length
+  const totalQuestions = progressData.length
+  const totalCorrect = progressData.filter(p => p.is_correct).length
   const overallAccuracy = Math.round((totalCorrect / totalQuestions) * 100)
   
   // Calculate average time per question (if time_spent exists)
-  const itemsWithTime = enrichedProgressData.filter(p => p.time_spent != null)
+  const itemsWithTime = progressData.filter(p => p.time_spent != null)
   const avgTimePerQuestion = itemsWithTime.length > 0
     ? Math.round(itemsWithTime.reduce((sum, p) => sum + (p.time_spent || 0), 0) / itemsWithTime.length)
     : null
@@ -228,7 +205,7 @@ export async function fetchUserStats(userId: string): Promise<UserStats> {
     currentStreak,
     longestStreak,
     totalDailyChallenges: uniqueDates.size,
-    totalMarathons: uniqueMarathonDates.size,
+    totalTryOutUTBK: uniqueTryOutUTBKDates.size,
     totalSquadBattles: uniqueSquadDates.size,
     totalTryOuts: uniqueTryOutDates.size,
     totalQuestions,
@@ -259,21 +236,9 @@ export async function fetchDailyChallengeData(userId: string): Promise<DailyChal
       return []
     }
 
-    // Get question types
-    const questionIds = progressData.map(p => p.question_id).filter(Boolean)
-    const { data: questionBankData } = await supabase
-      .from('question_bank')
-      .select('id, assessment_type')
-      .in('id', questionIds)
-    
-    const questionTypeMap = new Map<string, string>()
-    questionBankData?.forEach(q => {
-      questionTypeMap.set(q.id, q.assessment_type)
-    })
-
-    // Filter for daily challenge only
+    // Filter for daily challenge only - assessment_type is in student_progress
     const dailyChallengeProgress = progressData.filter(
-      p => questionTypeMap.get(p.question_id) === 'daily_challenge'
+      p => p.assessment_type === 'daily_challenge'
     )
 
     if (dailyChallengeProgress.length === 0) {
@@ -299,9 +264,9 @@ export async function fetchDailyChallengeData(userId: string): Promise<DailyChal
     const correctAnswers = items.filter(p => p.is_correct).length
     const accuracy = Math.round((correctAnswers / totalQuestions) * 100)
     
-    const directAnswers = items.filter(p => p.layer_accessed === 1).length
-    const hintUsed = items.filter(p => p.layer_accessed === 2).length
-    const solutionViewed = items.filter(p => p.layer_accessed === 3).length
+    const hintUsedCount = items.filter(p => p.hint_used === true).length
+    const solutionViewedCount = items.filter(p => p.solution_viewed === true).length
+    const directAnswers = totalQuestions - hintUsedCount - solutionViewedCount
     
     result.push({
       date,
@@ -309,14 +274,110 @@ export async function fetchDailyChallengeData(userId: string): Promise<DailyChal
       correctAnswers,
       accuracy,
       directAnswers,
-      hintUsed,
-      solutionViewed
+      hintUsed: hintUsedCount,
+      solutionViewed: solutionViewedCount
     })
   })
 
   return result.sort((a, b) => b.date.localeCompare(a.date))
   } catch (error) {
     console.error('Error in fetchDailyChallengeData:', error)
+    throw error
+  }
+}
+
+export async function fetchMiniTryOutData(userId: string): Promise<TryOutData[]> {
+  try {
+    // First get all student progress
+    const { data: progressData, error } = await supabase
+      .from('student_progress')
+      .select('*')
+      .eq('student_id', userId)
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      console.error('Error fetching mini try out data:', error.message || error)
+      throw new Error(`Failed to fetch mini try out data: ${error.message || 'Unknown error'}`)
+    }
+
+    if (!progressData || progressData.length === 0) {
+      return []
+    }
+
+    // Filter for mini_tryout only - assessment_type is in student_progress
+    const miniTryOutProgress = progressData.filter(
+      p => p.assessment_type === 'mini_tryout'
+    )
+
+    if (miniTryOutProgress.length === 0) {
+      return []
+    }
+
+    // Group by assessment_id (session)
+    const sessionMap = new Map<string, any[]>()
+    
+    miniTryOutProgress.forEach(p => {
+      const sessionId = p.assessment_id || new Date(p.created_at).toISOString().split('T')[0]
+      if (!sessionMap.has(sessionId)) {
+        sessionMap.set(sessionId, [])
+      }
+      sessionMap.get(sessionId)!.push(p)
+    })
+
+    // Calculate stats per session
+    const result: TryOutData[] = []
+    
+    sessionMap.forEach((items, sessionId) => {
+      const totalQuestions = items.length
+      const correctAnswers = items.filter(p => p.is_correct).length
+      const accuracy = Math.round((correctAnswers / totalQuestions) * 100)
+      
+      const hintUsedCount = items.filter(p => p.hint_used === true).length
+      const solutionViewedCount = items.filter(p => p.solution_viewed === true).length
+      const directAnswers = totalQuestions - hintUsedCount - solutionViewedCount
+      
+      // Calculate subtest scores
+      const subtestMap = new Map<string, any[]>()
+      items.forEach(p => {
+        const subtest = p.subtest_code || 'Unknown'
+        if (!subtestMap.has(subtest)) {
+          subtestMap.set(subtest, [])
+        }
+        subtestMap.get(subtest)!.push(p)
+      })
+      
+      const subtestScores: SubtestScore[] = []
+      subtestMap.forEach((subtestItems, subtest) => {
+        const total = subtestItems.length
+        const correct = subtestItems.filter(p => p.is_correct).length
+        const subtestAccuracy = Math.round((correct / total) * 100)
+        
+        subtestScores.push({
+          subtest,
+          score: correct,
+          total,
+          accuracy: subtestAccuracy
+        })
+      })
+      
+      // Use first item's created_at as date
+      const date = new Date(items[0].created_at).toISOString().split('T')[0]
+      
+      result.push({
+        id: sessionId,
+        date,
+        totalScore: correctAnswers,
+        accuracy,
+        subtestScores,
+        directAnswers,
+        hintUsed: hintUsedCount,
+        solutionViewed: solutionViewedCount
+      })
+    })
+
+    return result.sort((a, b) => b.date.localeCompare(a.date))
+  } catch (error) {
+    console.error('Error in fetchMiniTryOutData:', error)
     throw error
   }
 }
@@ -339,26 +400,27 @@ export async function fetchTryOutData(userId: string): Promise<TryOutData[]> {
       return []
     }
 
-    // Get question types and subtests
-    const questionIds = progressData.map(p => p.question_id).filter(Boolean)
-    const { data: questionBankData } = await supabase
-      .from('question_bank')
-      .select('id, assessment_type, subtest')
-      .in('id', questionIds)
-    
-    const questionDataMap = new Map<string, any>()
-    questionBankData?.forEach(q => {
-      questionDataMap.set(q.id, { assessment_type: q.assessment_type, subtest: q.subtest })
-    })
-
-    // Filter for try out only
+    // Filter for try out only - assessment_type is in student_progress
     const tryOutProgress = progressData.filter(
-      p => questionDataMap.get(p.question_id)?.assessment_type === 'try_out'
+      p => p.assessment_type === 'try_out'
     )
 
     if (tryOutProgress.length === 0) {
       return []
     }
+
+    // Get subtests from question_bank
+    // Note: question_bank uses 'subtest_utbk' column, not 'subtest_code'
+    const questionIds = tryOutProgress.map(p => p.question_id).filter(Boolean)
+    const { data: questionBankData } = await supabase
+      .from('question_bank')
+      .select('id, subtest_utbk')
+      .in('id', questionIds)
+    
+    const questionDataMap = new Map<string, any>()
+    questionBankData?.forEach(q => {
+      questionDataMap.set(q.id, { subtest_code: q.subtest_utbk })
+    })
 
   // Group by date (assuming one try out per day)
   const dateMap = new Map<string, any[]>()
@@ -379,14 +441,14 @@ export async function fetchTryOutData(userId: string): Promise<TryOutData[]> {
     const correctAnswers = items.filter(p => p.is_correct).length
     const accuracy = Math.round((correctAnswers / totalQuestions) * 100)
     
-    const directAnswers = items.filter(p => p.layer_accessed === 1).length
-    const hintUsed = items.filter(p => p.layer_accessed === 2).length
-    const solutionViewed = items.filter(p => p.layer_accessed === 3).length
+    const hintUsedCount = items.filter(p => p.hint_used === true).length
+    const solutionViewedCount = items.filter(p => p.solution_viewed === true).length
+    const directAnswers = totalQuestions - hintUsedCount - solutionViewedCount
     
     // Calculate subtest scores
     const subtestMap = new Map<string, any[]>()
     items.forEach(p => {
-      const subtest = questionDataMap.get(p.question_id)?.subtest || 'Unknown'
+      const subtest = questionDataMap.get(p.question_id)?.subtest_code || 'Unknown'
       if (!subtestMap.has(subtest)) {
         subtestMap.set(subtest, [])
       }
@@ -414,8 +476,8 @@ export async function fetchTryOutData(userId: string): Promise<TryOutData[]> {
       accuracy,
       subtestScores,
       directAnswers,
-      hintUsed,
-      solutionViewed
+      hintUsed: hintUsedCount,
+      solutionViewed: solutionViewedCount
     })
   })
 
@@ -426,7 +488,7 @@ export async function fetchTryOutData(userId: string): Promise<TryOutData[]> {
   }
 }
 
-export async function fetchMarathonData(userId: string): Promise<MarathonData[]> {
+export async function fetchTryOutUTBKData(userId: string): Promise<TryOutUTBKData[]> {
   try {
     // First get all student progress
     const { data: progressData, error } = await supabase
@@ -436,7 +498,7 @@ export async function fetchMarathonData(userId: string): Promise<MarathonData[]>
       .order('created_at', { ascending: false })
 
     if (error) {
-      console.error('Error fetching marathon data:', error)
+      console.error('Error fetching Try Out UTBK data:', error)
       throw error
     }
 
@@ -444,31 +506,32 @@ export async function fetchMarathonData(userId: string): Promise<MarathonData[]>
       return []
     }
 
-    // Get question types and subtests
-    const questionIds = progressData.map(p => p.question_id).filter(Boolean)
+    // Filter for Try Out UTBK only - assessment_type is in student_progress
+    const tryOutUTBKProgress = progressData.filter(
+      p => p.assessment_type === 'tryout_utbk'
+    )
+
+    if (tryOutUTBKProgress.length === 0) {
+      return []
+    }
+
+    // Get subtests from question_bank
+    // Note: question_bank uses 'subtest_utbk' column, not 'subtest_code'
+    const questionIds = tryOutUTBKProgress.map(p => p.question_id).filter(Boolean)
     const { data: questionBankData } = await supabase
       .from('question_bank')
-      .select('id, assessment_type, subtest')
+      .select('id, subtest_utbk')
       .in('id', questionIds)
     
     const questionDataMap = new Map<string, any>()
     questionBankData?.forEach(q => {
-      questionDataMap.set(q.id, { assessment_type: q.assessment_type, subtest: q.subtest })
+      questionDataMap.set(q.id, { subtest_code: q.subtest_utbk })
     })
 
-    // Filter for marathon only
-    const marathonProgress = progressData.filter(
-      p => questionDataMap.get(p.question_id)?.assessment_type === 'marathon'
-    )
-
-    if (marathonProgress.length === 0) {
-      return []
-    }
-
-  // Group by date (assuming one marathon per day)
+  // Group by date (assuming one Try Out UTBK per day)
   const dateMap = new Map<string, any[]>()
   
-  marathonProgress.forEach(p => {
+  tryOutUTBKProgress.forEach(p => {
     const date = new Date(p.created_at).toISOString().split('T')[0]
     if (!dateMap.has(date)) {
       dateMap.set(date, [])
@@ -476,22 +539,22 @@ export async function fetchMarathonData(userId: string): Promise<MarathonData[]>
     dateMap.get(date)!.push(p)
   })
 
-  // Calculate stats per marathon
-  const result: MarathonData[] = []
+  // Calculate stats per Try Out UTBK
+  const result: TryOutUTBKData[] = []
   
   dateMap.forEach((items, date) => {
     const totalQuestions = items.length
     const correctAnswers = items.filter(p => p.is_correct).length
     const accuracy = Math.round((correctAnswers / totalQuestions) * 100)
     
-    const directAnswers = items.filter(p => p.layer_accessed === 1).length
-    const hintUsed = items.filter(p => p.layer_accessed === 2).length
-    const solutionViewed = items.filter(p => p.layer_accessed === 3).length
+    const hintUsedCount = items.filter(p => p.hint_used === true).length
+    const solutionViewedCount = items.filter(p => p.solution_viewed === true).length
+    const directAnswers = totalQuestions - hintUsedCount - solutionViewedCount
     
     // Calculate subtest scores
     const subtestMap = new Map<string, any[]>()
     items.forEach(p => {
-      const subtest = questionDataMap.get(p.question_id)?.subtest || 'Unknown'
+      const subtest = questionDataMap.get(p.question_id)?.subtest_code || 'Unknown'
       if (!subtestMap.has(subtest)) {
         subtestMap.set(subtest, [])
       }
@@ -519,14 +582,14 @@ export async function fetchMarathonData(userId: string): Promise<MarathonData[]>
       accuracy,
       subtestScores,
       directAnswers,
-      hintUsed,
-      solutionViewed
+      hintUsed: hintUsedCount,
+      solutionViewed: solutionViewedCount
     })
   })
 
   return result
   } catch (error) {
-    console.error('Error in fetchMarathonData:', error)
+    console.error('Error in fetchTryOutUTBKData:', error)
     throw error
   }
 }
@@ -548,10 +611,11 @@ export async function fetchProgressBySubtest(userId: string): Promise<ProgressDa
     }
 
     // Get question data with subtest and topic
+    // Note: question_bank uses 'subtest_utbk' column, not 'subtest_code'
     const questionIds = progressData.map(p => p.question_id).filter(Boolean)
     const { data: questionBankData } = await supabase
       .from('question_bank')
-      .select('id, subtest, topic_id')
+      .select('id, subtest_utbk, topic_id')
       .in('id', questionIds)
     
     // Get topic names
@@ -569,7 +633,7 @@ export async function fetchProgressBySubtest(userId: string): Promise<ProgressDa
     const questionDataMap = new Map<string, any>()
     questionBankData?.forEach(q => {
       questionDataMap.set(q.id, { 
-        subtest: q.subtest, 
+        subtest_code: q.subtest_utbk, // Map subtest_utbk to subtest_code
         topic_name: topicNameMap.get(q.topic_id) || 'Unknown'
       })
     })
@@ -578,7 +642,7 @@ export async function fetchProgressBySubtest(userId: string): Promise<ProgressDa
   const subtestMap = new Map<string, any[]>()
   
   progressData.forEach(p => {
-    const subtest = questionDataMap.get(p.question_id)?.subtest || 'Unknown'
+    const subtest = questionDataMap.get(p.question_id)?.subtest_code || 'Unknown'
     if (!subtestMap.has(subtest)) {
       subtestMap.set(subtest, [])
     }
@@ -644,23 +708,23 @@ export async function fetchProgressBySubtest(userId: string): Promise<ProgressDa
 export interface DashboardData {
   userStats: UserStats
   dailyChallengeData: DailyChallengeData[]
-  marathonData: MarathonData[]
+  tryOutUTBKData: TryOutUTBKData[]
   progressData: ProgressData[]
 }
 
 export async function loadDashboardData(userId: string): Promise<DashboardData> {
   try {
-    const [userStats, dailyChallengeData, marathonData, progressData] = await Promise.all([
+    const [userStats, dailyChallengeData, tryOutUTBKData, progressData] = await Promise.all([
       fetchUserStats(userId),
       fetchDailyChallengeData(userId),
-      fetchMarathonData(userId),
+      fetchTryOutUTBKData(userId),
       fetchProgressBySubtest(userId)
     ])
 
     return {
       userStats,
       dailyChallengeData,
-      marathonData,
+      tryOutUTBKData,
       progressData
     }
   } catch (error) {

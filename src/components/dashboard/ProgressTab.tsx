@@ -136,7 +136,7 @@ export function ProgressTab({ data, loading }: ProgressTabProps) {
         <CardHeader>
           <CardTitle>Progress per Subtest 📚</CardTitle>
           <CardDescription>
-            Performa kamu di setiap subtest UTBK
+            Performa kamu di 7 subtest UTBK 2026
           </CardDescription>
         </CardHeader>
         <CardContent>

@@ -1,13 +1,22 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { MarathonData } from '@/lib/dashboard-api'
+import { TryOutUTBKData } from '@/lib/dashboard-api'
 import { calculate3LayerBreakdown, formatDateReadable } from '@/lib/dashboard-calculations'
 
 interface MarathonTabProps {
-  data: MarathonData[]
+  data: TryOutUTBKData[]
   loading?: boolean
 }
 
+/**
+ * TryOutUTBKTab Component
+ * 
+ * Displays Try Out UTBK history and performance
+ * Updated for UTBK 2026: 160 questions across 7 subtests, 195 minutes
+ * 
+ * Note: Component name kept as MarathonTab for backward compatibility
+ * but represents Try Out UTBK functionality
+ */
 export function MarathonTab({ data, loading }: MarathonTabProps) {
   if (loading) {
     return (
@@ -43,10 +52,10 @@ export function MarathonTab({ data, loading }: MarathonTabProps) {
               Belum ada Try Out UTBK
             </h3>
             <p className="text-gray-600 mb-6">
-              Coba simulasi UTBK lengkap dengan 70 soal!
+              Coba simulasi UTBK lengkap dengan 160 soal (195 menit)!
             </p>
             <button
-              onClick={() => window.location.href = '/marathon'}
+              onClick={() => window.location.href = '/tryout-utbk'}
               className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               Mulai Try Out UTBK
@@ -58,12 +67,12 @@ export function MarathonTab({ data, loading }: MarathonTabProps) {
   }
 
   // Calculate overall stats
-  const totalMarathons = data.length
+  const totalTryOuts = data.length
   const totalQuestions = data.reduce((sum, m) => 
     sum + m.subtestScores.reduce((s, sub) => s + sub.total, 0), 0)
   const totalCorrect = data.reduce((sum, m) => sum + m.totalScore, 0)
   const avgAccuracy = Math.round((totalCorrect / totalQuestions) * 100)
-  const avgScore = Math.round(totalCorrect / totalMarathons)
+  const avgScore = Math.round(totalCorrect / totalTryOuts)
 
   return (
     <div className="space-y-6">
@@ -73,7 +82,7 @@ export function MarathonTab({ data, loading }: MarathonTabProps) {
           <CardContent className="pt-6">
             <div className="text-center">
               <p className="text-sm text-gray-600 mb-1">Total Try Out</p>
-              <p className="text-3xl font-bold text-blue-600">{totalMarathons}</p>
+              <p className="text-3xl font-bold text-blue-600">{totalTryOuts}</p>
             </div>
           </CardContent>
         </Card>
@@ -118,16 +127,16 @@ export function MarathonTab({ data, loading }: MarathonTabProps) {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {data.map((marathon, idx) => {
+            {data.map((tryOut, idx) => {
               const breakdown = calculate3LayerBreakdown(
-                marathon.directAnswers,
-                marathon.hintUsed,
-                marathon.solutionViewed
+                tryOut.directAnswers,
+                tryOut.hintUsed,
+                tryOut.solutionViewed
               )
               
               // Sort subtests by standard order
               const subtestOrder = ['PU', 'PPU', 'PBM', 'PK', 'LIT_INDO', 'LIT_ING', 'PM']
-              const sortedSubtests = [...marathon.subtestScores].sort((a, b) => {
+              const sortedSubtests = [...tryOut.subtestScores].sort((a, b) => {
                 const indexA = subtestOrder.indexOf(a.subtest)
                 const indexB = subtestOrder.indexOf(b.subtest)
                 return indexA - indexB
@@ -142,22 +151,22 @@ export function MarathonTab({ data, loading }: MarathonTabProps) {
                   <div className="flex justify-between items-start mb-4">
                     <div>
                       <p className="font-bold text-lg text-gray-900">
-                        {formatDateReadable(marathon.date)}
+                        {formatDateReadable(tryOut.date)}
                       </p>
                       <p className="text-sm text-gray-600">
-                        Skor: {marathon.totalScore} | Akurasi: {marathon.accuracy}%
+                        Skor: {tryOut.totalScore} | Akurasi: {tryOut.accuracy}%
                       </p>
                     </div>
                     <Badge
                       className={
-                        marathon.accuracy >= 70
+                        tryOut.accuracy >= 70
                           ? 'bg-green-500 hover:bg-green-600'
-                          : marathon.accuracy >= 50
+                          : tryOut.accuracy >= 50
                           ? 'bg-yellow-500 hover:bg-yellow-600'
                           : 'bg-red-500 hover:bg-red-600'
                       }
                     >
-                      {marathon.accuracy}%
+                      {tryOut.accuracy}%
                     </Badge>
                   </div>
 
@@ -227,7 +236,7 @@ export function MarathonTab({ data, loading }: MarathonTabProps) {
           <CardContent>
             <div className="space-y-3">
               {['PU', 'PPU', 'PBM', 'PK', 'LIT_INDO', 'LIT_ING', 'PM'].map(subtestName => {
-                // Calculate average for this subtest across all marathons
+                // Calculate average for this subtest across all Try Outs
                 const subtestData = data
                   .flatMap(m => m.subtestScores)
                   .filter(s => s.subtest === subtestName)
@@ -265,3 +274,7 @@ export function MarathonTab({ data, loading }: MarathonTabProps) {
     </div>
   )
 }
+
+
+// Export alias for new naming convention
+export { MarathonTab as TryOutUTBKTab }

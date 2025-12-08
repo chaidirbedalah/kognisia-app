@@ -1,10 +1,14 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { DailyChallengeModeSelectorComponent } from '@/components/daily-challenge/DailyChallengeModeSelectorComponent'
+import { SubtestSelectorComponent } from '@/components/daily-challenge/SubtestSelectorComponent'
+import { UTBK_2026_SUBTESTS } from '@/lib/utbk-constants'
+import type { DailyChallengeMode, SubtestCode } from '@/lib/types'
 
 type Question = {
   id: string
@@ -18,32 +22,81 @@ type Question = {
   hint_text: string
   solution_steps: string
   difficulty: string
+  subtest_code: SubtestCode
 }
 
-export default function DailyChallengeePage() {
+type FlowStep = 'mode-selection' | 'subtest-selection' | 'questions'
+
+export default function DailyChallengePage() {
+  // Flow state
+  const [flowStep, setFlowStep] = useState<FlowStep>('mode-selection')
+  const [selectedMode, setSelectedMode] = useState<DailyChallengeMode | null>(null)
+  const [selectedSubtest, setSelectedSubtest] = useState<SubtestCode | null>(null)
+  
+  // Question state
   const [questions, setQuestions] = useState<Question[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
   const [showHint, setShowHint] = useState(false)
   const [showSolution, setShowSolution] = useState(false)
-  const [score, setScore] = useState(0)
   const [answers, setAnswers] = useState<Record<number, string>>({})
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
 
-  useEffect(() => {
-    loadQuestions()
-  }, [])
-
-  const loadQuestions = async () => {
-    const { data, error } = await supabase
-      .from('question_bank')
-      .select('*')
-      .limit(10)
+  // Handle mode selection
+  const handleModeSelect = (mode: DailyChallengeMode) => {
+    setSelectedMode(mode)
     
-    if (data) {
-      setQuestions(data)
+    if (mode === 'focus') {
+      // Show subtest selector for Focus mode
+      setFlowStep('subtest-selection')
+    } else {
+      // Balanced mode: directly fetch questions
+      fetchQuestions(mode, null)
     }
-    setLoading(false)
+  }
+
+  // Handle subtest selection (for Focus mode)
+  const handleSubtestSelect = (subtestCode: string) => {
+    setSelectedSubtest(subtestCode as SubtestCode)
+    fetchQuestions('focus', subtestCode as SubtestCode)
+  }
+
+  // Fetch questions from API
+  const fetchQuestions = async (mode: DailyChallengeMode, subtestCode: SubtestCode | null) => {
+    setLoading(true)
+    
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      
+      if (!user) {
+        alert('Kamu harus login dulu!')
+        setLoading(false)
+        return
+      }
+
+      const response = await fetch('/api/daily-challenge/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mode,
+          subtestCode,
+          userId: user.id
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch questions')
+      }
+
+      const data = await response.json()
+      setQuestions(data.questions)
+      setFlowStep('questions')
+    } catch (error) {
+      console.error('Error fetching questions:', error)
+      alert('Gagal memuat soal. Silakan coba lagi.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const currentQuestion = questions[currentIndex]
@@ -86,62 +139,156 @@ export default function DailyChallengeePage() {
       return
     }
 
-    let totalScore = 0
-    const progressData = []
+    setLoading(true)
 
-    // Calculate score and prepare data
-    for (let idx = 0; idx < questions.length; idx++) {
-      const q = questions[idx]
-      const userAnswer = answers[idx] || 'skip'
-      const isCorrect = userAnswer === q.correct_answer
-      const questionScore = isCorrect ? 10 : 0
-      
-      totalScore += questionScore
-
-      progressData.push({
-        student_id: user.id,
-        question_id: q.id,
-        selected_answer: userAnswer,
-        is_correct: isCorrect,
-        score: questionScore,
-        time_spent_seconds: 60, // placeholder
-        hint_accessed: false, // we'll track this later
-        solution_accessed: false,
+    try {
+      const response = await fetch('/api/daily-challenge/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: user.id,
+          mode: selectedMode,
+          subtestCode: selectedSubtest,
+          answers,
+          questions: questions.map(q => ({
+            id: q.id,
+            correct_answer: q.correct_answer,
+            subtest_code: q.subtest_code
+          })),
+          timeSpent: 0 // TODO: Track actual time
+        })
       })
-    }
 
-    // Save to database
-    const { error } = await supabase
-      .from('student_progress')
-      .insert(progressData)
+      if (!response.ok) {
+        throw new Error('Failed to submit answers')
+      }
 
-    if (error) {
-      console.error('Error saving progress:', error)
-      alert('Gagal menyimpan progress: ' + error.message)
-    } else {
-      alert(`🎉 Selesai! Skor kamu: ${totalScore}/${questions.length * 10}\n\nProgress sudah tersimpan!`)
-      window.location.href = '/dashboard'
+      const result = await response.json()
+      
+      // Redirect to results page with data
+      const params = new URLSearchParams({
+        mode: result.mode,
+        score: result.totalScore.toString(),
+        questions: result.totalQuestions.toString(),
+        accuracy: result.accuracy.toString(),
+      })
+      
+      if (result.subtestCode) {
+        params.append('subtest', result.subtestCode)
+      }
+      
+      if (result.subtestResults && result.subtestResults.length > 0) {
+        params.append('results', encodeURIComponent(JSON.stringify(result.subtestResults)))
+      }
+      
+      window.location.href = `/daily-challenge/results?${params.toString()}`
+    } catch (error) {
+      console.error('Error submitting answers:', error)
+      alert('Gagal menyimpan progress. Silakan coba lagi.')
+    } finally {
+      setLoading(false)
     }
   }
 
+  // Get subtest name for display
+  const getSubtestName = (code: SubtestCode) => {
+    return UTBK_2026_SUBTESTS.find(s => s.code === code)?.name || code
+  }
+
+  // Render mode selection step
+  if (flowStep === 'mode-selection') {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="mb-8 text-center">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Daily Challenge 📚</h1>
+            <p className="text-gray-600">Pilih mode latihan harianmu</p>
+          </div>
+          
+          <DailyChallengeModeSelectorComponent
+            onModeSelect={handleModeSelect}
+          />
+        </div>
+      </div>
+    )
+  }
+
+  // Render subtest selection step (for Focus mode)
+  if (flowStep === 'subtest-selection') {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="mb-8">
+            <Button 
+              variant="outline" 
+              onClick={() => setFlowStep('mode-selection')}
+              className="mb-4"
+            >
+              ← Kembali
+            </Button>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Pilih Subtest</h1>
+            <p className="text-gray-600">Fokus latihan pada satu subtest (10 soal)</p>
+          </div>
+          
+          <SubtestSelectorComponent
+            onSelect={handleSubtestSelect}
+          />
+        </div>
+      </div>
+    )
+  }
+
+  // Loading state
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center">Loading soal...</div>
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Memuat soal...</p>
+        </div>
+      </div>
+    )
   }
 
+  // No questions available
   if (!currentQuestion) {
-    return <div className="min-h-screen flex items-center justify-center">Tidak ada soal tersedia</div>
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-600 mb-4">Tidak ada soal tersedia</p>
+          <Button onClick={() => setFlowStep('mode-selection')}>
+            Kembali ke Pilihan Mode
+          </Button>
+        </div>
+      </div>
+    )
   }
 
+  // Render questions step
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4">
         {/* Header */}
         <div className="mb-6 flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Daily Challenge 📚</h1>
-            <p className="text-gray-600">Soal {currentIndex + 1} dari {questions.length}</p>
+            <h1 className="text-2xl font-bold text-gray-900">
+              Daily Challenge 📚
+              {selectedMode === 'focus' && selectedSubtest && (
+                <span className="text-lg font-normal text-gray-600 ml-2">
+                  - {getSubtestName(selectedSubtest)}
+                </span>
+              )}
+            </h1>
+            <p className="text-gray-600">
+              Soal {currentIndex + 1} dari {questions.length}
+              {selectedMode === 'balanced' && ' (Mode: Balanced - Semua Subtest)'}
+              {selectedMode === 'focus' && ' (Mode: Focus)'}
+            </p>
           </div>
-          <Badge variant="secondary">{currentQuestion.difficulty}</Badge>
+          <div className="flex gap-2 items-center">
+            <Badge variant="secondary">{currentQuestion.difficulty}</Badge>
+            <Badge variant="outline">{getSubtestName(currentQuestion.subtest_code)}</Badge>
+          </div>
         </div>
 
         {/* Progress Bar */}

@@ -224,12 +224,12 @@ export default function MarathonPage() {
           <CardContent>
             <div className="space-y-4 mb-6">
               <p className="text-gray-600">
-                Simulasi UTBK lengkap dengan 7 subtest dan 70 soal total.
+                Simulasi UTBK lengkap dengan 7 subtest dan 160 soal total.
               </p>
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                 <h3 className="font-semibold mb-2">⚠️ Perhatian:</h3>
                 <ul className="text-sm text-gray-700 space-y-1">
-                  <li>• Total durasi: ~170 menit (2 jam 50 menit)</li>
+                  <li>• Total durasi: 195 menit (3 jam 15 menit)</li>
                   <li>• Tidak bisa keluar di tengah jalan</li>
                   <li>• Timer per subtest, auto-advance</li>
                   <li>• Feedback hanya di akhir</li>
