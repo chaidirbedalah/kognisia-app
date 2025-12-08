@@ -20,42 +20,56 @@ export default function DashboardPage() {
     checkUser()
   }, [])
 
-  const checkUser = async () => {
-    const { data: { user } } = await supabase.auth.getUser()
-    setUser(user)
-    
-    if (user) {
-      // Fetch user stats
-      const { data: progressData } = await supabase
-        .from('student_progress')
-        .select('*')
-        .eq('student_id', user.id)
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      setUser(user)
       
-      if (progressData && progressData.length > 0) {
-        const total = progressData.length
-        const correct = progressData.filter(p => p.is_correct).length
-        const accuracy = Math.round((correct / total) * 100)
+      if (user) {
+        // Check user role from database
+        const { data: userData } = await supabase
+          .from('users')
+          .select('role')
+          .eq('id', user.id)
+          .single()
         
-        // Calculate streak (simple: check if user did challenge today)
-        const today = new Date().toISOString().split('T')[0]
-        const todayProgress = progressData.filter(p => {
-          const progressDate = new Date(p.created_at).toISOString().split('T')[0]
-          return progressDate === today
-        })
+        // Redirect teacher to teacher portal
+        if (userData?.role === 'teacher') {
+          window.location.href = '/teacher'
+          return
+        }
         
-        const currentStreak = todayProgress.length > 0 ? 1 : 0
+        // Fetch user stats (existing code for students)
+        const { data: progressData } = await supabase
+          .from('student_progress')
+          .select('*')
+          .eq('student_id', user.id)
         
-        setStats({
-          totalQuestions: total,
-          correctAnswers: correct,
-          accuracy: accuracy,
-          streak: currentStreak
-        })
+        if (progressData && progressData.length > 0) {
+          const total = progressData.length
+          const correct = progressData.filter(p => p.is_correct).length
+          const accuracy = Math.round((correct / total) * 100)
+          
+          // Calculate streak
+          const today = new Date().toISOString().split('T')[0]
+          const todayProgress = progressData.filter(p => {
+            const progressDate = new Date(p.created_at).toISOString().split('T')[0]
+            return progressDate === today
+          })
+          
+          const currentStreak = todayProgress.length > 0 ? 1 : 0
+          
+          setStats({
+            totalQuestions: total,
+            correctAnswers: correct,
+            accuracy: accuracy,
+            streak: currentStreak
+          })
+        }
       }
+      
+      setLoading(false)
     }
-    
-    setLoading(false)
-  }
+
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -192,7 +206,7 @@ export default function DashboardPage() {
               <Button 
                 variant="outline" 
                 className="w-full"
-                onClick={() => alert('Marathon Mode coming soon!')}
+                onClick={() => window.location.href = '/marathon'}
               >
                 Mulai Marathon
               </Button>
