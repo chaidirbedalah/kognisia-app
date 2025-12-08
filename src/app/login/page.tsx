@@ -24,8 +24,12 @@ export default function LoginPage() {
     if (error) {
       alert('Login gagal: ' + error.message)
     } else {
-      alert('Login berhasil!')
-      window.location.href = '/dashboard'
+      // Check user role from email (temporary simple solution)
+      if (email.includes('guru')) {
+        window.location.href = '/teacher'
+      } else {
+        window.location.href = '/dashboard'
+      }
     }
     
     setLoading(false)
