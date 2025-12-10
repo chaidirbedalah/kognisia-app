@@ -88,54 +88,129 @@ export async function POST(request: NextRequest) {
         role: 'leader'
       })
 
-    // Get questions for the battle
-    let questionQuery = supabase
-      .from('question_bank')
-      .select('*')
-
-    if (battle_type === 'subtest' && subtest_code) {
-      // Try subtest_code first, fallback to subtest_utbk
-      questionQuery = questionQuery.eq('subtest_utbk', subtest_code)
-    }
-
-    // Filter for HOTS questions if HOTS mode is enabled
-    if (hots_mode) {
-      questionQuery = questionQuery.eq('is_hots', true)
-    }
-
+    // Get questions for the battle with smart distribution
     const questionLimit = battle_type === 'subtest' 
       ? (question_count || 10)
       : 20
+
+    let finalQuestions: any[] = []
+
+    if (hots_mode) {
+      // ELITE Mode: 100% HOTS questions
+      let hotsQuery = supabase
+        .from('question_bank')
+        .select('*')
+        .eq('is_hots', true)
+
+      if (battle_type === 'subtest' && subtest_code) {
+        hotsQuery = hotsQuery.eq('subtest_utbk', subtest_code)
+      }
+
+      const { data: hotsQuestions, error: hotsError } = await hotsQuery.limit(questionLimit)
+
+      if (hotsError) {
+        console.error('HOTS questions error:', hotsError)
+        throw new Error(`Database error: ${hotsError.message}`)
+      }
+
+      if (!hotsQuestions || hotsQuestions.length === 0) {
+        throw new Error(`No HOTS questions found for ${subtest_code ? `subtest: ${subtest_code}` : 'mini tryout'}`)
+      }
+
+      finalQuestions = hotsQuestions
+      console.log('ELITE Mode - HOTS questions:', {
+        total: finalQuestions.length,
+        hots: finalQuestions.length,
+        regular: 0
+      })
+
+    } else {
+      // Regular Mode: 70% Regular + 30% HOTS distribution
+      const hotsCount = Math.ceil(questionLimit * 0.3) // 30% HOTS
+      const regularCount = questionLimit - hotsCount   // 70% Regular
+
+      // Get HOTS questions (30%)
+      let hotsQuery = supabase
+        .from('question_bank')
+        .select('*')
+        .eq('is_hots', true)
+
+      if (battle_type === 'subtest' && subtest_code) {
+        hotsQuery = hotsQuery.eq('subtest_utbk', subtest_code)
+      }
+
+      const { data: hotsQuestions, error: hotsError } = await hotsQuery.limit(hotsCount)
+
+      // Get Regular questions (70%)
+      let regularQuery = supabase
+        .from('question_bank')
+        .select('*')
+        .eq('is_hots', false)
+
+      if (battle_type === 'subtest' && subtest_code) {
+        regularQuery = regularQuery.eq('subtest_utbk', subtest_code)
+      }
+
+      const { data: regularQuestions, error: regularError } = await regularQuery.limit(regularCount)
+
+      if (hotsError || regularError) {
+        console.error('Questions error:', { hotsError, regularError })
+        throw new Error(`Database error: ${hotsError?.message || regularError?.message}`)
+      }
+
+      // Combine questions
+      const availableHots = hotsQuestions || []
+      const availableRegular = regularQuestions || []
+      
+      // If we don't have enough HOTS questions, fill with regular questions
+      if (availableHots.length < hotsCount) {
+        const additionalRegularNeeded = hotsCount - availableHots.length
+        const additionalRegularQuery = supabase
+          .from('question_bank')
+          .select('*')
+          .eq('is_hots', false)
+
+        if (battle_type === 'subtest' && subtest_code) {
+          additionalRegularQuery.eq('subtest_utbk', subtest_code)
+        }
+
+        const { data: additionalRegular } = await additionalRegularQuery
+          .limit(regularCount + additionalRegularNeeded)
+
+        finalQuestions = [
+          ...availableHots,
+          ...(additionalRegular || []).slice(0, questionLimit - availableHots.length)
+        ]
+      } else {
+        finalQuestions = [...availableHots.slice(0, hotsCount), ...availableRegular.slice(0, regularCount)]
+      }
+
+      console.log('Regular Mode - Question distribution:', {
+        total: finalQuestions.length,
+        hots: availableHots.slice(0, hotsCount).length,
+        regular: finalQuestions.length - availableHots.slice(0, hotsCount).length,
+        targetHots: hotsCount,
+        targetRegular: regularCount
+      })
+    }
 
     console.log('Question query params:', {
       battle_type,
       subtest_code,
       questionLimit,
-      hots_mode
+      hots_mode,
+      finalQuestionsCount: finalQuestions.length
     })
 
-    const { data: questions, error: questionsError } = await questionQuery.limit(questionLimit)
-
-    console.log('Questions result:', {
-      questionsCount: questions?.length || 0,
-      questionsError,
-      hasQuestions: !!questions
-    })
-
-    if (questionsError) {
-      console.error('Questions error:', questionsError)
-      throw new Error(`Database error: ${questionsError.message}`)
-    }
-
-    if (!questions || questions.length === 0) {
+    if (!finalQuestions || finalQuestions.length === 0) {
       const errorMsg = hots_mode 
         ? `No HOTS questions found for ${subtest_code ? `subtest: ${subtest_code}` : 'mini tryout'}`
-        : `No questions found for subtest: ${subtest_code || 'all'}`
+        : `No questions found for ${subtest_code ? `subtest: ${subtest_code}` : 'mini tryout'}`
       throw new Error(errorMsg)
     }
 
     // Shuffle questions
-    const shuffled = questions.sort(() => Math.random() - 0.5)
+    const shuffled = finalQuestions.sort(() => Math.random() - 0.5)
 
     // Create battle
     const { data: battle, error: battleError } = await supabase
