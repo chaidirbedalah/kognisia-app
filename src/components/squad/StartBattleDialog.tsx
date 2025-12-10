@@ -25,6 +25,7 @@ export function StartBattleDialog({
   const [battleType, setBattleType] = useState<'subtest' | 'mini_tryout'>('subtest')
   const [subtestCode, setSubtestCode] = useState('')
   const [questionCount, setQuestionCount] = useState(10)
+  const [hotsMode, setHotsMode] = useState(false)
   const [scheduleType, setScheduleType] = useState<'10min' | '30min' | 'custom'>('10min')
   const [customDate, setCustomDate] = useState('')
   const [customTime, setCustomTime] = useState('')
@@ -43,6 +44,7 @@ export function StartBattleDialog({
       setBattleInfo(null)
       setCopied(false)
       setError('')
+      setHotsMode(false)
       loadSubtests()
     }
   }, [open])
@@ -118,7 +120,8 @@ export function StartBattleDialog({
           battle_type: battleType,
           subtest_code: battleType === 'subtest' ? subtestCode : undefined,
           question_count: battleType === 'subtest' ? questionCount : undefined,
-          scheduled_start_at: scheduledStartAt
+          scheduled_start_at: scheduledStartAt,
+          hots_mode: hotsMode
         })
       })
 
@@ -138,7 +141,8 @@ export function StartBattleDialog({
         battleType,
         subtestCode,
         subtestName: subtests.find(s => s.code === subtestCode)?.name,
-        questionCount
+        questionCount,
+        hotsMode
       })
     } catch (err: any) {
       setError(err.message)
@@ -151,6 +155,7 @@ export function StartBattleDialog({
     setBattleName('')
     setBattleType('subtest')
     setQuestionCount(10)
+    setHotsMode(false)
     setError('')
     setBattleCreated(false)
     setBattleInfo(null)
@@ -165,11 +170,21 @@ export function StartBattleDialog({
       ? `${battleInfo.subtestName || battleInfo.subtestCode} - ${battleInfo.questionCount} soal`
       : 'Mini Try Out'
     
-    const message = `🎯 Squad Battle Challenge! 🎯
+    const battleTitle = battleInfo.hotsMode 
+      ? `🔥 Squad Battle ELITE Challenge! 🔥`
+      : `🎯 Squad Battle Challenge! 🎯`
+    
+    const hotsInfo = battleInfo.hotsMode 
+      ? `\n🧠 PREMIUM HOTS Mode - Higher Order Thinking Skills Only!
+🏆 Tantangan eksklusif untuk pemikir tingkat tinggi
+⚡ Soal analisis, evaluasi & problem solving kompleks\n`
+      : ''
+    
+    const message = `${battleTitle}
 
 Squad: ${battleInfo.squadName}
 Invite Code: ${battleInfo.inviteCode}
-
+${hotsInfo}
 📚 Materi: ${subtestInfo}
 🕐 Waktu Battle: ${new Date(battleInfo.scheduledStartAt).toLocaleString('id-ID', {
       weekday: 'long',
@@ -183,7 +198,7 @@ Invite Code: ${battleInfo.inviteCode}
 ⚠️ Battle akan auto-start tepat waktu!
 Join squad ini jika waktu battle cocok dengan jadwalmu.
 
-Buktikan kemampuanmu! 💪`
+${battleInfo.hotsMode ? 'Siap untuk tantangan ELITE? 🧠🔥' : 'Buktikan kemampuanmu! 💪'}`
     
     navigator.clipboard.writeText(message)
     setCopied(true)
@@ -196,8 +211,8 @@ Buktikan kemampuanmu! 💪`
   if (battleCreated && battleInfo) {
     console.log('Showing battle info screen')
     const subtestInfo = battleInfo.battleType === 'subtest' 
-      ? `${battleInfo.subtestName || battleInfo.subtestCode} - ${battleInfo.questionCount} soal`
-      : 'Mini Try Out'
+      ? `${battleInfo.subtestName || battleInfo.subtestCode} - ${battleInfo.questionCount} soal${battleInfo.hotsMode ? ' (ELITE - HOTS Only)' : ''}`
+      : `Mini Try Out${battleInfo.hotsMode ? ' (ELITE - HOTS Only)' : ''}`
     
     return (
       <div className={`fixed inset-0 z-50 ${open ? 'block' : 'hidden'}`}>
@@ -299,12 +314,20 @@ Buktikan kemampuanmu! 💪`
       {/* Dialog */}
       <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-white rounded-lg shadow-xl border-4 border-purple-500 p-6 z-50">
         <div className="mb-4">
-          <h2 className="text-xl font-bold text-purple-600 flex items-center gap-2">
+          <h2 className={`text-xl font-bold flex items-center gap-2 ${hotsMode ? 'text-amber-600' : 'text-purple-600'}`}>
             <Swords className="h-5 w-5" />
-            Create Squad Battle
+            {hotsMode ? 'Create Squad Battle ELITE' : 'Create Squad Battle'}
+            {hotsMode && (
+              <span className="bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs px-2 py-1 rounded-full font-bold">
+                PREMIUM
+              </span>
+            )}
           </h2>
           <p className="text-gray-600 text-sm mt-1">
-            Pilih materi dan jadwalkan waktu battle
+            {hotsMode 
+              ? 'Tantangan eksklusif dengan soal HOTS - Higher Order Thinking Skills'
+              : 'Pilih materi dan jadwalkan waktu battle'
+            }
           </p>
         </div>
 
@@ -363,6 +386,35 @@ Buktikan kemampuanmu! 💪`
                   <div className="text-xs text-gray-500">Semua subtest digabung - 20 soal campuran</div>
                 </div>
               </label>
+            </div>
+          </div>
+
+          {/* HOTS Mode Toggle */}
+          <div className="bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200 rounded-lg p-4">
+            <div className="flex items-start gap-3">
+              <input
+                type="checkbox"
+                id="hotsMode"
+                checked={hotsMode}
+                onChange={(e) => setHotsMode(e.target.checked)}
+                className="mt-1 h-4 w-4 text-amber-600 focus:ring-amber-500 border-amber-300 rounded"
+              />
+              <div className="flex-1">
+                <label htmlFor="hotsMode" className="flex items-center gap-2 cursor-pointer">
+                  <span className="font-bold text-amber-800">Squad Battle ELITE</span>
+                  <span className="bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs px-2 py-1 rounded-full font-bold">
+                    PREMIUM
+                  </span>
+                </label>
+                <p className="text-sm text-amber-700 mt-1">
+                  Khusus soal HOTS (Higher Order Thinking Skills) - Tantangan untuk pemikir tingkat tinggi! 🧠✨
+                </p>
+                <p className="text-xs text-amber-600 mt-1">
+                  • Soal analisis, evaluasi, dan problem solving kompleks<br/>
+                  • Eksklusif untuk siswa yang ingin tantangan maksimal<br/>
+                  • Persiapan terbaik untuk soal UTBK level tinggi
+                </p>
+              </div>
             </div>
           </div>
 

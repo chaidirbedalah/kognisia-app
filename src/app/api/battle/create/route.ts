@@ -43,7 +43,8 @@ export async function POST(request: NextRequest) {
       battle_type, 
       subtest_code, 
       question_count,
-      scheduled_start_at
+      scheduled_start_at,
+      hots_mode
     } = body
 
     // Validate required fields
@@ -97,6 +98,11 @@ export async function POST(request: NextRequest) {
       questionQuery = questionQuery.eq('subtest_utbk', subtest_code)
     }
 
+    // Filter for HOTS questions if HOTS mode is enabled
+    if (hots_mode) {
+      questionQuery = questionQuery.eq('is_hots', true)
+    }
+
     const questionLimit = battle_type === 'subtest' 
       ? (question_count || 10)
       : 20
@@ -104,7 +110,8 @@ export async function POST(request: NextRequest) {
     console.log('Question query params:', {
       battle_type,
       subtest_code,
-      questionLimit
+      questionLimit,
+      hots_mode
     })
 
     const { data: questions, error: questionsError } = await questionQuery.limit(questionLimit)
@@ -121,7 +128,10 @@ export async function POST(request: NextRequest) {
     }
 
     if (!questions || questions.length === 0) {
-      throw new Error(`No questions found for subtest: ${subtest_code || 'all'}`)
+      const errorMsg = hots_mode 
+        ? `No HOTS questions found for ${subtest_code ? `subtest: ${subtest_code}` : 'mini tryout'}`
+        : `No questions found for subtest: ${subtest_code || 'all'}`
+      throw new Error(errorMsg)
     }
 
     // Shuffle questions
@@ -132,14 +142,15 @@ export async function POST(request: NextRequest) {
       .from('squad_battles')
       .insert({
         squad_id: squad.id,
-        difficulty: 'medium', // Default difficulty
+        difficulty: hots_mode ? 'hots' : 'medium', // Use 'hots' for HOTS mode
         battle_type,
         subtest_code: battle_type === 'subtest' ? subtest_code : null,
         question_count: battle_type === 'subtest' ? question_count : null,
         total_questions: shuffled.length,
         time_limit_minutes: 15,
         scheduled_start_at: scheduled_start_at || null,
-        status: scheduled_start_at ? 'scheduled' : 'active'
+        status: scheduled_start_at ? 'scheduled' : 'active',
+        is_hots_mode: hots_mode || false
       })
       .select()
       .single()

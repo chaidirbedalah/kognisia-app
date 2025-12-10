@@ -27,7 +27,7 @@ Panduan ini untuk asisten yang akan membuat soal-soal UTBK 2026 untuk aplikasi K
 | `hint_text` | TEXT | Petunjuk untuk siswa | "Substitusi nilai x = 5 ke dalam fungsi" |
 | `solution_steps` | TEXT | Langkah penyelesaian | "f(5) = 2(5) + 3 = 10 + 3 = 13" |
 | `question_image_url` | TEXT | URL gambar soal (jika ada) | "https://..." |
-| `difficulty` | TEXT | Compatibility field | "medium" |
+
 | `logic_clues` | TEXT | Petunjuk logika | "Gunakan substitusi langsung" |
 | `distractor_analysis` | TEXT | Analisis pengecoh | "Opsi A-C adalah hasil perhitungan yang salah" |
 
@@ -72,10 +72,10 @@ Panduan ini untuk asisten yang akan membuat soal-soal UTBK 2026 untuk aplikasi K
 
 ### Format Excel/Google Sheets:
 
-| question_text | option_a | option_b | option_c | option_d | option_e | correct_answer | subtest_utbk | difficulty | hint_text | solution_steps |
-|---------------|----------|----------|----------|----------|----------|----------------|--------------|------------|-----------|----------------|
-| Soal 1... | A | B | C | D | E | D | PM | easy | Hint... | Steps... |
-| Soal 2... | A | B | C | D | E | A | PU | medium | Hint... | Steps... |
+| question_text | option_a | option_b | option_c | option_d | option_e | correct_answer | subtest_utbk | is_hots | hint_text | solution_steps |
+|---------------|----------|----------|----------|----------|----------|----------------|--------------|---------|-----------|----------------|
+| Soal 1... | A | B | C | D | E | D | PM | false | Hint... | Steps... |
+| Soal 2... | A | B | C | D | E | A | PU | true | Hint... | Steps... |
 
 ### Contoh Soal Lengkap:
 
@@ -89,11 +89,178 @@ Panduan ini untuk asisten yang akan membuat soal-soal UTBK 2026 untuk aplikasi K
   "option_e": "42",
   "correct_answer": "B",
   "subtest_utbk": "PM",
-  "difficulty": "medium",
+  "is_hots": false,
   "hint_text": "Gunakan rumus suku ke-n barisan aritmatika: Un = a + (n-1)b",
   "solution_steps": "U3 = 12, U7 = 24. Beda b = (24-12)/(7-3) = 3. Suku pertama a = 12 - 2(3) = 6. U10 = 6 + 9(3) = 33"
 }
 ```
+
+## 📖 Soal Multi-Question dengan Teks Bacaan
+
+### **Cara Menangani Soal dengan Teks Bacaan Bersama:**
+
+Banyak subtest UTBK menggunakan satu teks/passage untuk beberapa pertanyaan. Setiap soal tetap diinput sebagai entry terpisah di database dengan teks bacaan diulang di setiap `question_text`.
+
+### **Subtest yang Sering Menggunakan Format Ini:**
+
+- **PU** (Penalaran Umum): Analisis logika dan argumen
+- **PBM** (Pemahaman Bacaan & Menulis): Pemahaman teks dan struktur bahasa
+- **LIT_INDO** (Literasi Bahasa Indonesia): Analisis sastra dan tata bahasa
+- **LIT_ING** (Literasi Bahasa Inggris): Reading comprehension
+- **PPU** (Pengetahuan & Pemahaman Umum): Konteks pengetahuan umum
+
+### **Contoh 1: Penalaran Umum (PU)**
+
+**Teks Bacaan:**
+> "Tanaman anggrek bulan terkenal karena keindahan bunganya sehingga banyak orang berani membayar mahal untuk membelinya. Namun, ternyata anggrek bulan tidak rajin berbunga apabila tidak mendapatkan lingkungan yang sesuai. Pemilik yang berpengalaman dan disiplin dapat menciptakan lingkungan yang sesuai bagi anggrek bulan. Pemberian lingkungan yang sesuai adalah bagian dari perawatan anggrek bulan. Ciri-ciri bunga anggrek yang mendapatkan perawatan yang tepat adalah bunganya mekar sempurna, tidak layu, dan tidak berjamur."
+
+**Soal PU-1 - Penalaran Deduktif (Regular):**
+```json
+{
+  "question_text": "Tanaman anggrek bulan terkenal karena keindahan bunganya sehingga banyak orang berani membayar mahal untuk membelinya. Namun, ternyata anggrek bulan tidak rajin berbunga apabila tidak mendapatkan lingkungan yang sesuai. Pemilik yang berpengalaman dan disiplin dapat menciptakan lingkungan yang sesuai bagi anggrek bulan. Pemberian lingkungan yang sesuai adalah bagian dari perawatan anggrek bulan. Ciri-ciri bunga anggrek yang mendapatkan perawatan yang tepat adalah bunganya mekar sempurna, tidak layu, dan tidak berjamur.\n\nBerdasarkan bacaan tersebut, manakah simpulan berikut yang TEPAT?",
+  "option_a": "Pemiliknya tidak berpengalaman dan disiplin jika anggrek bulan rajin berbunga.",
+  "option_b": "Pemiliknya berpengalaman dan disiplin jika anggrek bulan tidak rajin berbunga.",
+  "option_c": "Anggrek bulan rajin berbunga jika pemiliknya tidak berpengalaman dan disiplin.",
+  "option_d": "Anggrek bulan tidak rajin berbunga jika pemiliknya berpengalaman dan disiplin.",
+  "option_e": "Anggrek bulan tidak rajin berbunga jika pemiliknya tidak berpengalaman dan disiplin.",
+  "correct_answer": "E",
+  "subtest_utbk": "PU",
+  "is_hots": false,
+  "hint_text": "Perhatikan hubungan sebab-akibat: lingkungan sesuai → rajin berbunga. Pemilik berpengalaman → lingkungan sesuai.",
+  "solution_steps": "Dari teks: anggrek tidak rajin berbunga JIKA tidak dapat lingkungan sesuai. Pemilik berpengalaman dapat menciptakan lingkungan sesuai. Kontrapositif: jika pemilik TIDAK berpengalaman → TIDAK dapat lingkungan sesuai → TIDAK rajin berbunga."
+}
+```
+
+**Soal PU-2 - Analisis Argumen (HOTS):**
+```json
+{
+  "question_text": "Tanaman anggrek bulan terkenal karena keindahan bunganya sehingga banyak orang berani membayar mahal untuk membelinya. Namun, ternyata anggrek bulan tidak rajin berbunga apabila tidak mendapatkan lingkungan yang sesuai. Pemilik yang berpengalaman dan disiplin dapat menciptakan lingkungan yang sesuai bagi anggrek bulan. Pemberian lingkungan yang sesuai adalah bagian dari perawatan anggrek bulan. Ciri-ciri bunga anggrek yang mendapatkan perawatan yang tepat adalah bunganya mekar sempurna, tidak layu, dan tidak berjamur.\n\nManakah informasi berikut yang dapat MEMPERKUAT pernyataan 'Tanaman anggrek bulan terkenal karena keindahan bunganya'?",
+  "option_a": "Tanaman anggrek bulan sering kali dijadikan hiasan pada acara-acara penting.",
+  "option_b": "Banyak tanaman anggrek lain yang bunganya tidak seindah anggrek bulan.",
+  "option_c": "Banyak orang yang mengetahui keindahan anggrek bulan meskipun tidak memilikinya.",
+  "option_d": "Banyak orang menanam anggrek bulan karena nilai investasinya yang tinggi.",
+  "option_e": "Beberapa orang yang gemar memelihara bunga tidak mengenal tanaman anggrek bulan.",
+  "correct_answer": "A",
+  "subtest_utbk": "PU",
+  "is_hots": true,
+  "hint_text": "Cari bukti yang menunjukkan pengakuan terhadap keindahan anggrek bulan di masyarakat.",
+  "solution_steps": "Opsi A memperkuat karena menunjukkan anggrek bulan dipilih untuk acara penting karena keindahannya. Opsi B-E tidak secara langsung mendukung ketenaran karena keindahan."
+}
+```
+
+### **Contoh 2: Literasi Bahasa Indonesia (LIT_INDO)**
+
+**Teks Bacaan:**
+> "Dalam novel 'Laskar Pelangi', Andrea Hirata menggambarkan perjuangan anak-anak Belitung untuk mendapatkan pendidikan. Melalui tokoh Ikal, pengarang menyampaikan pesan bahwa pendidikan adalah kunci untuk mengubah nasib. Gaya bahasa yang digunakan Andrea Hirata sangat puitis dan penuh metafora, membuat pembaca terhanyut dalam cerita."
+
+**Soal LIT_INDO-1 - Analisis Unsur Intrinsik (Regular):**
+```json
+{
+  "question_text": "Dalam novel 'Laskar Pelangi', Andrea Hirata menggambarkan perjuangan anak-anak Belitung untuk mendapatkan pendidikan. Melalui tokoh Ikal, pengarang menyampaikan pesan bahwa pendidikan adalah kunci untuk mengubah nasib. Gaya bahasa yang digunakan Andrea Hirata sangat puitis dan penuh metafora, membuat pembaca terhanyut dalam cerita.\n\nBerdasarkan teks tersebut, tema utama novel 'Laskar Pelangi' adalah...",
+  "option_a": "Perjuangan hidup di daerah terpencil",
+  "option_b": "Pentingnya pendidikan untuk masa depan",
+  "option_c": "Keindahan alam Pulau Belitung",
+  "option_d": "Persahabatan anak-anak sekolah",
+  "option_e": "Kemiskinan masyarakat Indonesia",
+  "correct_answer": "B",
+  "subtest_utbk": "LIT_INDO",
+  "is_hots": false
+}
+```
+
+### **Contoh 3: Literasi Bahasa Inggris (LIT_ING)**
+
+**Teks Bacaan:**
+> "Climate change is one of the most pressing issues of our time. Rising global temperatures have led to melting ice caps, rising sea levels, and extreme weather patterns. Scientists agree that human activities, particularly the burning of fossil fuels, are the primary cause of this phenomenon. Immediate action is required to reduce greenhouse gas emissions and transition to renewable energy sources."
+
+**Soal LIT_ING-1 - Reading Comprehension (Regular):**
+```json
+{
+  "question_text": "Climate change is one of the most pressing issues of our time. Rising global temperatures have led to melting ice caps, rising sea levels, and extreme weather patterns. Scientists agree that human activities, particularly the burning of fossil fuels, are the primary cause of this phenomenon. Immediate action is required to reduce greenhouse gas emissions and transition to renewable energy sources.\n\nAccording to the passage, what is the main cause of climate change?",
+  "option_a": "Natural weather patterns",
+  "option_b": "Solar radiation changes",
+  "option_c": "Human activities, especially burning fossil fuels",
+  "option_d": "Volcanic eruptions",
+  "option_e": "Ocean current changes",
+  "correct_answer": "C",
+  "subtest_utbk": "LIT_ING",
+  "is_hots": false
+}
+```
+
+### **Contoh 4: Pemahaman Bacaan & Menulis (PBM)**
+
+**Teks Bacaan:**
+> "Penggunaan media sosial telah mengubah cara manusia berkomunikasi. Di satu sisi, media sosial memudahkan orang untuk terhubung dengan keluarga dan teman yang jauh. Namun, di sisi lain, penggunaan berlebihan dapat menyebabkan kecanduan dan mengurangi interaksi sosial langsung. Penelitian menunjukkan bahwa remaja yang menghabiskan lebih dari 3 jam sehari di media sosial cenderung mengalami masalah kesehatan mental."
+
+**Soal PBM-1 - Analisis Struktur Teks (HOTS):**
+```json
+{
+  "question_text": "Penggunaan media sosial telah mengubah cara manusia berkomunikasi. Di satu sisi, media sosial memudahkan orang untuk terhubung dengan keluarga dan teman yang jauh. Namun, di sisi lain, penggunaan berlebihan dapat menyebabkan kecanduan dan mengurangi interaksi sosial langsung. Penelitian menunjukkan bahwa remaja yang menghabiskan lebih dari 3 jam sehari di media sosial cenderung mengalami masalah kesehatan mental.\n\nPola pengembangan paragraf dalam teks tersebut adalah...",
+  "option_a": "Sebab-akibat",
+  "option_b": "Perbandingan dan pertentangan",
+  "option_c": "Kronologis",
+  "option_d": "Definisi dan contoh",
+  "option_e": "Klasifikasi",
+  "correct_answer": "B",
+  "subtest_utbk": "PBM",
+  "is_hots": true
+}
+```
+
+### **Tipe-Tipe Soal Multi-Question Berdasarkan Subtest:**
+
+#### **PU (Penalaran Umum):**
+- Penalaran Deduktif/Induktif
+- Analisis Argumen
+- Penalaran Kausal
+- Evaluasi Bukti
+
+#### **LIT_INDO (Literasi Bahasa Indonesia):**
+- Analisis Unsur Intrinsik/Ekstrinsik
+- Interpretasi Makna
+- Gaya Bahasa dan Majas
+- Struktur Teks
+
+#### **LIT_ING (Literasi Bahasa Inggris):**
+- Reading Comprehension
+- Vocabulary in Context
+- Main Ideas and Details
+- Inference and Implication
+
+#### **PBM (Pemahaman Bacaan & Menulis):**
+- Struktur dan Pola Teks
+- Kohesi dan Koherensi
+- Analisis Wacana
+- Ejaan dan Tata Bahasa
+
+#### **PPU (Pengetahuan & Pemahaman Umum):**
+- Konteks Sejarah/Geografi
+- Fenomena Sosial
+- Sains dan Teknologi
+- Budaya dan Seni
+
+### **Tips Pembuatan Soal Multi-Question:**
+
+#### **Umum untuk Semua Subtest:**
+- **Gunakan konteks nyata** dan relevan dengan kehidupan siswa
+- **Buat teks bacaan 100-200 kata** untuk 3-5 soal
+- **Variasikan tingkat kesulitan** dalam satu set soal
+- **Pastikan setiap soal bisa berdiri sendiri** meski menggunakan teks yang sama
+- **Buat pengecoh yang masuk akal** dan menguji pemahaman berbeda
+
+#### **Khusus per Subtest:**
+- **PU**: Fokus pada logika dan penalaran, hindari pengetahuan khusus
+- **LIT_INDO**: Gunakan teks sastra/nonsastra berkualitas, perhatikan EYD
+- **LIT_ING**: Pilih teks dengan vocabulary level yang sesuai
+- **PBM**: Variasikan jenis teks (argumentatif, deskriptif, naratif)
+- **PPU**: Pilih topik yang umum diketahui tapi tidak terlalu spesifik
+
+#### **Format Database:**
+- **Ulangi teks lengkap** di setiap `question_text`
+- **Tambahkan nomor soal** dalam set (contoh: "Soal 1 dari 4")
+- **Gunakan `\n\n`** untuk memisahkan teks bacaan dan pertanyaan
+- **Konsisten dalam penomoran** dan format
 
 ## 🎯 Kategori Soal
 
@@ -150,11 +317,11 @@ Panduan ini untuk asisten yang akan membuat soal-soal UTBK 2026 untuk aplikasi K
 ```sql
 INSERT INTO question_bank (
   question_text, option_a, option_b, option_c, option_d, option_e,
-  correct_answer, subtest_utbk, difficulty, hint_text, solution_steps
+  correct_answer, subtest_utbk, is_hots, hint_text, solution_steps
 ) VALUES (
   'Soal anda...',
   'Opsi A', 'Opsi B', 'Opsi C', 'Opsi D', 'Opsi E',
-  'D', 'PM', 'medium', 'Hint...', 'Steps...'
+  'D', 'PM', false, 'Hint...', 'Steps...'
 );
 ```
 
@@ -166,11 +333,11 @@ INSERT INTO question_bank (
 ## 📊 Target Jumlah Soal
 
 ### **Minimum untuk Launch:**
-- **Per Subtest:** 50 soal (easy: 20, medium: 20, hard: 10)
+- **Per Subtest:** 50 soal (Regular: 35, HOTS: 15)
 - **Total:** 350 soal untuk 7 subtest
 
 ### **Target Ideal:**
-- **Per Subtest:** 200 soal (easy: 80, medium: 80, hard: 40)  
+- **Per Subtest:** 200 soal (Regular: 140, HOTS: 60)  
 - **Total:** 1,400 soal untuk 7 subtest
 
 ### **Prioritas Pembuatan:**
@@ -186,11 +353,11 @@ INSERT INTO question_bank (
 
 ### **Phase 1: Planning (1-2 hari)**
 1. Review kurikulum UTBK 2026 per subtest
-2. Buat outline topik dan distribusi kesulitan
+2. Buat outline topik dan distribusi Regular vs HOTS
 3. Setup template dan tools
 
 ### **Phase 2: Content Creation (2-3 minggu)**
-1. Buat soal per subtest sesuai target
+1. Buat soal per subtest sesuai target (70% Regular, 30% HOTS)
 2. Review dan validasi kualitas
 3. Format sesuai template database
 
