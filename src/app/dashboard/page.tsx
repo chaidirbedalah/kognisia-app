@@ -10,6 +10,7 @@ import { DailyChallengeTab } from '@/components/dashboard/DailyChallengeTab'
 import { MarathonTab } from '@/components/dashboard/MarathonTab'
 import { TryOutTab } from '@/components/dashboard/TryOutTab'
 import { ProgressTab } from '@/components/dashboard/ProgressTab'
+import { StreakCard } from '@/components/streak/StreakCard'
 import { 
   fetchUserStats, 
   fetchDailyChallengeData, 
@@ -226,7 +227,7 @@ export default function DashboardPage() {
         {activeTab === 'overview' && (
           <div className="space-y-6">
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <StatsCard
                 title="Streak Harian"
                 value={userStats?.currentStreak || 0}
@@ -243,6 +244,15 @@ export default function DashboardPage() {
                 loading={loading}
                 variant="primary"
                 onClick={() => setActiveTab('daily')}
+              />
+              <StatsCard
+                title="Squad Battle"
+                value={userStats?.totalSquadBattles || 0}
+                icon="⚔️"
+                description="Kompetisi real-time"
+                loading={loading}
+                variant="primary"
+                onClick={() => window.location.href = '/squad'}
               />
               <StatsCard
                 title="Mini Try Out"
@@ -361,7 +371,7 @@ export default function DashboardPage() {
             )}
 
             {/* Quick Actions */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <Card>
                 <CardHeader>
                   <CardTitle>Daily Challenge 📚</CardTitle>
@@ -375,6 +385,26 @@ export default function DashboardPage() {
                     onClick={() => window.location.href = '/daily-challenge'}
                   >
                     Mulai Daily Challenge
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Streak Card */}
+              <StreakCard />
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Squad Battle ⚔️</CardTitle>
+                  <CardDescription>
+                    Kompetisi real-time dengan teman!
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button 
+                    className="w-full bg-purple-600 hover:bg-purple-700"
+                    onClick={() => window.location.href = '/squad'}
+                  >
+                    Mulai Squad Battle
                   </Button>
                 </CardContent>
               </Card>

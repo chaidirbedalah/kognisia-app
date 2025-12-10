@@ -62,7 +62,7 @@ export async function GET(
     }
 
     // If battle is active, get questions
-    let questions = []
+    let questions: any[] = []
     if (battle.status === 'active') {
       const result = await getBattleDetails(battleId)
       questions = result.questions.map(q => ({

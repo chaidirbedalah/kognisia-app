@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     if (mode === 'balanced') {
       // Balanced Mode: Fetch 3 questions from each of 7 subtests (21 total)
       const config = ASSESSMENT_CONFIGS.daily_challenge_balanced
-      const questions = []
+      const questions: any[] = []
 
       for (const dist of config.subtestDistribution) {
         // Fetch questions for this subtest with randomization

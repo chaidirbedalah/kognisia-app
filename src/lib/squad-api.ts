@@ -371,7 +371,7 @@ export async function startSquadBattle(userId: string, request: StartBattleReque
     const participants = members.map(m => ({
       battle_id: battle.id,
       user_id: m.user_id,
-      total_questions: request.total_questions || 10
+      total_questions: shuffled.length
     }))
     
     await supabase

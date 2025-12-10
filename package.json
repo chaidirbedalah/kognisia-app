@@ -15,7 +15,9 @@
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:debug": "playwright test --debug",
     "test:e2e:report": "playwright show-report",
-    "seed:test": "npx tsx scripts/seed-test-data.ts"
+    "seed:test": "npx tsx scripts/seed-test-data.ts",
+    "create-demo-users": "npx tsx scripts/create-demo-users.ts",
+    "sync-users": "npx tsx scripts/sync-auth-to-users-table.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -35,7 +37,9 @@
     "@radix-ui/react-tabs": "^1.1.13",
     "@radix-ui/react-toast": "^1.2.15",
     "@radix-ui/react-tooltip": "^1.2.8",
+    "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.86.2",
+    "@types/uuid": "^10.0.0",
     "autoprefixer": "^10.4.22",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -51,6 +55,7 @@
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.4.0",
     "tailwindcss-animate": "^1.0.7",
+    "uuid": "^13.0.0",
     "zod": "^4.1.13"
   },
   "devDependencies": {

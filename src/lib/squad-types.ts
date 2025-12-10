@@ -212,9 +212,10 @@ export function getBattleStatusLabel(status: SquadBattle['status']): string {
     waiting: 'Menunggu',
     active: 'Sedang Berlangsung',
     completed: 'Selesai',
-    cancelled: 'Dibatalkan'
+    cancelled: 'Dibatalkan',
+    scheduled: 'Terjadwal'
   }
-  return labels[status]
+  return labels[status] || status
 }
 
 export function getDifficultyLabel(difficulty: SquadBattle['difficulty']): string {

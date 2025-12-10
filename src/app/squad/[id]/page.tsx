@@ -136,7 +136,7 @@ export default function SquadDetailsPage() {
         <div className="flex items-start justify-between">
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-4xl font-bold text-gray-900">{squad.name}</h1>
+              <h1 className="text-4xl font-bold text-gray-900">{squad?.name}</h1>
               {isLeader && (
                 <Badge className="bg-yellow-500">
                   <Crown className="h-3 w-3 mr-1" />
@@ -145,7 +145,7 @@ export default function SquadDetailsPage() {
               )}
             </div>
             <p className="text-gray-600">
-              {members.length}/{squad.max_members} members
+              {members.length}/{squad?.max_members || 0} members
             </p>
           </div>
 
@@ -180,7 +180,7 @@ export default function SquadDetailsPage() {
           <CardContent>
             <div className="bg-purple-50 border-2 border-purple-200 rounded-lg p-4 text-center">
               <p className="text-3xl font-bold text-purple-600 tracking-wider mb-3">
-                {squad.invite_code}
+                {squad?.invite_code}
               </p>
               <Button
                 onClick={copyInviteCode}
@@ -255,7 +255,7 @@ export default function SquadDetailsPage() {
                 </div>
               ))}
 
-              {members.length < squad.max_members && (
+              {squad && members.length < squad.max_members && (
                 <div className="p-4 border-2 border-dashed border-gray-300 rounded-lg text-center">
                   <p className="text-sm text-gray-600">
                     {squad.max_members - members.length} slot{squad.max_members - members.length > 1 ? 's' : ''} available
@@ -337,9 +337,6 @@ export default function SquadDetailsPage() {
       <StartBattleDialog
         open={startBattleOpen}
         onOpenChange={setStartBattleOpen}
-        squadId={squadId}
-        squadName={squad?.name || 'Unknown Squad'}
-        inviteCode={squad?.invite_code || 'UNKNOWN'}
         onBattleStarted={handleBattleCreated}
       />
     </div>

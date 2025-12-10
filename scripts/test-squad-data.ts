@@ -95,8 +95,8 @@ async function testSquadData() {
       console.log('\nExtracted squad object:')
       console.log(JSON.stringify(firstSquad, null, 2))
       
-      if (firstSquad && firstSquad.id) {
-        console.log('✅ Squad ID is present:', firstSquad.id)
+      if (firstSquad && firstSquad.length > 0 && firstSquad[0].id) {
+        console.log('✅ Squad ID is present:', firstSquad[0].id)
       } else {
         console.log('❌ Squad ID is missing!')
       }
