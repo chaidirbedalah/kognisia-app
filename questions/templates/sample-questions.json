@@ -1,0 +1,67 @@
+[
+  {
+    "question_text": "Dalam suatu barisan aritmatika, suku ke-3 adalah 12 dan suku ke-7 adalah 24. Berapa suku ke-10?",
+    "option_a": "30",
+    "option_b": "33",
+    "option_c": "36", 
+    "option_d": "39",
+    "option_e": "42",
+    "correct_answer": "B",
+    "subtest_utbk": "PM",
+    "is_hots": false,
+    "hint_text": "Gunakan rumus suku ke-n barisan aritmatika: Un = a + (n-1)b",
+    "solution_steps": "U3 = 12, U7 = 24. Beda b = (24-12)/(7-3) = 3. Suku pertama a = 12 - 2(3) = 6. U10 = 6 + 9(3) = 33"
+  },
+  {
+    "question_text": "Jika semua A adalah B, dan semua B adalah C, maka dapat disimpulkan bahwa:",
+    "option_a": "Semua C adalah A",
+    "option_b": "Semua A adalah C", 
+    "option_c": "Beberapa C adalah A",
+    "option_d": "Tidak ada A yang C",
+    "option_e": "Semua C adalah B",
+    "correct_answer": "B",
+    "subtest_utbk": "PU",
+    "is_hots": true,
+    "hint_text": "Gunakan aturan silogisme: jika A→B dan B→C, maka A→C",
+    "solution_steps": "Dari premis 'semua A adalah B' dan 'semua B adalah C', dapat disimpulkan bahwa 'semua A adalah C' berdasarkan aturan transitif dalam logika."
+  },
+  {
+    "question_text": "Manakah kalimat berikut yang menggunakan tanda baca dengan benar?",
+    "option_a": "Dia berkata, \"Saya akan datang besok\".",
+    "option_b": "Dia berkata, 'Saya akan datang besok'.",
+    "option_c": "Dia berkata: \"Saya akan datang besok.\"",
+    "option_d": "Dia berkata \"Saya akan datang besok\".",
+    "option_e": "Dia berkata; \"Saya akan datang besok\".",
+    "correct_answer": "A",
+    "subtest_utbk": "LIT_INDO",
+    "is_hots": false,
+    "hint_text": "Perhatikan penggunaan koma sebelum kutipan dan tanda titik di dalam kutipan",
+    "solution_steps": "Kalimat langsung diawali dengan koma, menggunakan tanda kutip ganda, dan diakhiri dengan tanda titik di dalam kutipan."
+  },
+  {
+    "question_text": "Choose the correct sentence:",
+    "option_a": "She have been working here for five years.",
+    "option_b": "She has been working here for five years.",
+    "option_c": "She had been working here for five years.",
+    "option_d": "She is been working here for five years.", 
+    "option_e": "She was been working here for five years.",
+    "correct_answer": "B",
+    "subtest_utbk": "LIT_ING",
+    "is_hots": false,
+    "hint_text": "Use present perfect continuous for actions that started in the past and continue to the present",
+    "solution_steps": "Present perfect continuous: has/have + been + verb-ing. 'She' is third person singular, so use 'has been working'."
+  },
+  {
+    "question_text": "Ibu kota negara yang terletak di benua Afrika dan memiliki piramida terkenal adalah:",
+    "option_a": "Kairo",
+    "option_b": "Lagos", 
+    "option_c": "Casablanca",
+    "option_d": "Alexandria",
+    "option_e": "Tunis",
+    "correct_answer": "A",
+    "subtest_utbk": "PPU",
+    "is_hots": false,
+    "hint_text": "Piramida Giza terletak di dekat ibu kota Mesir",
+    "solution_steps": "Kairo adalah ibu kota Mesir, negara di Afrika Utara yang memiliki Piramida Giza yang terkenal di dunia."
+  }
+]
