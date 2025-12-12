@@ -1,11 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase-server'
-import { generateCalendar } from '@/lib/streak-types'
+import { createClient } from '@supabase/supabase-js'
 
 export async function GET(request: NextRequest) {
   try {
-    // Get current user
-    const supabase = await createClient()
+    const authHeader = request.headers.get('authorization')
+    
+    if (!authHeader) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        global: {
+          headers: {
+            Authorization: authHeader
+          }
+        }
+      }
+    )
+
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     
     if (authError || !user) {
@@ -15,50 +33,65 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Get streak stats
-    const { data: stats, error: statsError } = await supabase
-      .from('streak_stats')
+    // Get streak data
+    const { data: streak, error: streakError } = await supabase
+      .from('daily_streaks')
       .select('*')
       .eq('user_id', user.id)
       .single()
 
-    // If no stats yet, return default
-    if (statsError && statsError.code === 'PGRST116') {
-      return NextResponse.json({
-        stats: {
-          user_id: user.id,
-          current_streak: 0,
-          longest_streak: 0,
-          total_active_days: 0,
-          last_activity_date: null
-        },
-        recent_activities: [],
-        calendar: generateCalendar([], 30)
-      })
+    if (streakError && streakError.code !== 'PGRST116') {
+      throw streakError
     }
 
-    if (statsError) throw statsError
-
-    // Get recent activities (last 30 days)
-    const thirtyDaysAgo = new Date()
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
-    
-    const { data: activities, error: activitiesError } = await supabase
-      .from('daily_streaks')
-      .select('*')
+    // Get today's activities
+    const today = new Date().toISOString().split('T')[0]
+    const { data: todayActivities, error: activitiesError } = await supabase
+      .from('streak_activities')
+      .select('activity_type')
       .eq('user_id', user.id)
-      .gte('activity_date', thirtyDaysAgo.toISOString().split('T')[0])
-      .order('activity_date', { ascending: false })
+      .eq('activity_date', today)
 
     if (activitiesError) throw activitiesError
 
-    // Generate calendar
-    const calendar = generateCalendar(activities || [], 30)
+    // Get streak rewards
+    const { data: rewards, error: rewardsError } = await supabase
+      .from('streak_rewards')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('streak_milestone', { ascending: true })
+
+    if (rewardsError) throw rewardsError
+
+    // Check if streak is active today
+    const isActiveToday = todayActivities && todayActivities.length > 0
+
+    // Check if streak will break tomorrow
+    let streakStatus = 'active'
+    if (streak) {
+      const lastDate = new Date(streak.last_activity_date)
+      const today = new Date()
+      const daysDiff = Math.floor((today.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24))
+      
+      if (daysDiff > 1) {
+        streakStatus = 'broken'
+      } else if (daysDiff === 1 && !isActiveToday) {
+        streakStatus = 'at_risk'
+      }
+    }
 
     return NextResponse.json({
-      stats,
-      recent_activities: activities || [],
-      calendar
+      success: true,
+      streak: {
+        current_streak: streak?.current_streak || 0,
+        longest_streak: streak?.longest_streak || 0,
+        last_activity_date: streak?.last_activity_date || null,
+        status: streakStatus,
+        is_active_today: isActiveToday
+      },
+      today_activities: todayActivities?.map(a => a.activity_type) || [],
+      rewards: rewards || [],
+      next_milestone: getNextMilestone(streak?.current_streak || 0)
     })
 
   } catch (error: any) {
@@ -69,3 +102,14 @@ export async function GET(request: NextRequest) {
     )
   }
 }
+
+function getNextMilestone(currentStreak: number): number {
+  const milestones = [7, 14, 30, 60, 100, 365]
+  for (const milestone of milestones) {
+    if (currentStreak < milestone) {
+      return milestone
+    }
+  }
+  return 365
+}
+
