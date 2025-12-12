@@ -467,6 +467,23 @@ export default function DashboardPage() {
                   </Button>
                 </CardContent>
               </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Leaderboard 🏅</CardTitle>
+                  <CardDescription>
+                    Lihat ranking global berdasarkan points
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button 
+                    className="w-full bg-yellow-600 hover:bg-yellow-700"
+                    onClick={() => window.location.href = '/leaderboard'}
+                  >
+                    Lihat Leaderboard
+                  </Button>
+                </CardContent>
+              </Card>
             </div>
           </div>
         )}
