@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { UTBK_2026_SUBTESTS } from '@/lib/utbk-constants'
 import type { DailyChallengeMode, SubtestCode } from '@/lib/types'
+import { supabase } from '@/lib/supabase'
+import { checkAndUnlockAchievements } from '@/lib/achievement-checker'
 
 interface SubtestResult {
   subtestCode: SubtestCode
@@ -50,7 +52,31 @@ function DailyChallengeResultsContent() {
         console.error('Failed to parse results:', e)
       }
     }
+
+    // Check and unlock achievements
+    checkAchievements(parseInt(accuracyParam || '0'), parseInt(questionsParam || '0'))
   }, [searchParams])
+
+  async function checkAchievements(finalAccuracy: number, totalQuestions: number) {
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session) {
+        const battleResult = {
+          score: totalScore,
+          accuracy: finalAccuracy,
+          rank: 1, // Daily challenge doesn't have ranking
+          correct_answers: Math.round(totalQuestions * finalAccuracy / 100),
+          total_questions: totalQuestions,
+          time_taken: 0, // Not tracked in daily challenge
+          is_elite: false
+        }
+        
+        await checkAndUnlockAchievements(session.user.id, battleResult, session)
+      }
+    } catch (error) {
+      console.error('Error checking achievements:', error)
+    }
+  }
 
   const getSubtestName = (code: SubtestCode) => {
     return UTBK_2026_SUBTESTS.find(s => s.code === code)?.name || code

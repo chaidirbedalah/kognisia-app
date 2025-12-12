@@ -23,6 +23,8 @@ import {
   Home,
   RotateCcw
 } from 'lucide-react'
+import { supabase } from '@/lib/supabase'
+import { checkAndUnlockAchievements } from '@/lib/achievement-checker'
 
 interface SubtestResult {
   subtestCode: string
@@ -56,10 +58,35 @@ function ResultsContent() {
     // For now, get from sessionStorage (set by submit endpoint)
     const storedResults = sessionStorage.getItem(`mini-tryout-results-${sessionId}`)
     if (storedResults) {
-      setResults(JSON.parse(storedResults))
+      const parsedResults = JSON.parse(storedResults)
+      setResults(parsedResults)
+      
+      // Check and unlock achievements
+      checkAchievements(parsedResults)
     }
     setIsLoading(false)
   }, [sessionId])
+
+  async function checkAchievements(results: Results) {
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session) {
+        const battleResult = {
+          score: results.correctAnswers * 10,
+          accuracy: results.accuracy,
+          rank: 1, // Mini try out doesn't have ranking
+          correct_answers: results.correctAnswers,
+          total_questions: results.totalQuestions,
+          time_taken: results.totalTimeSeconds,
+          is_elite: false
+        }
+        
+        await checkAndUnlockAchievements(session.user.id, battleResult, session)
+      }
+    } catch (error) {
+      console.error('Error checking achievements:', error)
+    }
+  }
 
   const formatTime = (seconds: number) => {
     const hours = Math.floor(seconds / 3600)
