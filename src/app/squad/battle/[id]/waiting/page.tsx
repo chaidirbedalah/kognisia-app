@@ -6,8 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Clock, Users, Swords, ArrowLeft, BookOpen, Target } from 'lucide-react'
+import { Clock, Users, Swords, ArrowLeft, BookOpen, Target, Trophy } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
+import Link from 'next/link'
 
 interface BattleInfo {
   id: string
@@ -232,6 +233,16 @@ export default function BattleWaitingRoomPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Leaderboard Link */}
+      <div className="mb-6">
+        <Link href={`/squad/battle/${battleId}/leaderboard`}>
+          <Button className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white">
+            <Trophy className="h-5 w-5 mr-2" />
+            View Live Leaderboard
+          </Button>
+        </Link>
+      </div>
 
       {/* Battle Info */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
