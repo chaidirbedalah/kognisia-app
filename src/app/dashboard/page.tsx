@@ -149,6 +149,13 @@ export default function DashboardPage() {
           <h1 className="text-2xl font-bold text-blue-600">Kognisia</h1>
           <div className="flex items-center gap-4">
             <span className="text-sm text-gray-600">{user.email}</span>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => window.location.href = '/profile'}
+            >
+              Profil
+            </Button>
             <Button variant="outline" size="sm" onClick={handleLogout}>
               Keluar
             </Button>
