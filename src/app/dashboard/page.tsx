@@ -484,6 +484,23 @@ export default function DashboardPage() {
                   </Button>
                 </CardContent>
               </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Seasonal Challenge ❄️</CardTitle>
+                  <CardDescription>
+                    Tantangan musiman dengan achievement eksklusif
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button 
+                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                    onClick={() => window.location.href = '/seasonal'}
+                  >
+                    Lihat Seasonal
+                  </Button>
+                </CardContent>
+              </Card>
             </div>
           </div>
         )}
