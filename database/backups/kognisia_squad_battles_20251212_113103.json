@@ -1,0 +1,50 @@
+[
+  {
+    "id": "683088b4-f865-4feb-832b-9c6e97cc19d9",
+    "squad_id": "5b2719d0-b9f7-4e28-ba24-3b661951df7e",
+    "difficulty": "medium",
+    "status": "scheduled",
+    "total_questions": 20,
+    "time_limit_minutes": 15,
+    "started_at": null,
+    "ended_at": null,
+    "created_at": "2025-12-10T07:57:07.497861+00:00",
+    "updated_at": "2025-12-10T07:57:07.497861+00:00",
+    "battle_type": "mini_tryout",
+    "subtest_code": null,
+    "question_count": null,
+    "scheduled_start_at": "2025-12-10T08:27:07.122+00:00"
+  },
+  {
+    "id": "fb9041f5-23ab-4a7f-b14b-d0d92751449a",
+    "squad_id": "3fb438ee-6137-4aef-9bd2-64476e9497b2",
+    "difficulty": "medium",
+    "status": "scheduled",
+    "total_questions": 20,
+    "time_limit_minutes": 15,
+    "started_at": null,
+    "ended_at": null,
+    "created_at": "2025-12-10T08:15:42.427445+00:00",
+    "updated_at": "2025-12-10T08:15:42.427445+00:00",
+    "battle_type": "mini_tryout",
+    "subtest_code": null,
+    "question_count": null,
+    "scheduled_start_at": "2025-12-10T08:45:41.786+00:00"
+  },
+  {
+    "id": "e93c34d1-fc71-4fbc-9d08-32b56cd16271",
+    "squad_id": "804f1fa5-e4d7-4048-93b0-c93da7b5c0a8",
+    "difficulty": "medium",
+    "status": "scheduled",
+    "total_questions": 10,
+    "time_limit_minutes": 15,
+    "started_at": null,
+    "ended_at": null,
+    "created_at": "2025-12-10T09:09:37.671095+00:00",
+    "updated_at": "2025-12-10T09:09:37.671095+00:00",
+    "battle_type": "subtest",
+    "subtest_code": "PU",
+    "question_count": 20,
+    "scheduled_start_at": "2025-12-10T09:39:37.071+00:00"
+  }
+]

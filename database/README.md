@@ -1,106 +1,231 @@
-# Database Migrations
+# 🗄️ Kognisia Database Management
 
-This directory contains SQL migration files for the Kognisia application database.
+## 📋 Overview
 
-## Running Migrations
+This directory contains database management scripts and backups for the Kognisia application.
 
-### Using Supabase Dashboard
+## 🔐 Database Password Reset Impact
 
-1. Log in to your Supabase project dashboard
-2. Navigate to the SQL Editor
-3. Copy the contents of the migration file
-4. Paste and execute the SQL
+### What Happens When You Reset Supabase Database Password:
 
-### Using Supabase CLI
+1. **Immediate Effects:**
+   - All existing database connections terminated
+   - Applications using old password lose access
+   - Database connection errors in your app
 
-If you have the Supabase CLI installed:
+2. **What Remains Working:**
+   - ✅ Supabase client SDK (uses API keys, not database password)
+   - ✅ Your app's `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - ✅ Your app's `SUPABASE_SERVICE_ROLE_KEY`
+   - ✅ All Supabase Auth, Storage, and Edge Functions
 
+3. **What Needs Updating:**
+   - ❌ Direct PostgreSQL connection strings
+   - ❌ Database backup scripts
+   - ❌ Any tools using direct database access
+
+### Safe Password Reset Process:
+
+1. **Before Reset:**
+   ```bash
+   # Create backup with current password
+   export SUPABASE_DB_URL="postgresql://postgres:OLD_PASSWORD@..."
+   ./scripts/backup-database.sh
+   ```
+
+2. **Reset Password in Supabase Dashboard**
+
+3. **After Reset:**
+   ```bash
+   # Update connection string with new password
+   export SUPABASE_DB_URL="postgresql://postgres:NEW_PASSWORD@..."
+   # Test connection
+   psql "$SUPABASE_DB_URL" -c "SELECT version();"
+   ```
+
+## 💾 Backup & Restore Scripts
+
+### 🗄️ Full Database Backup
 ```bash
-# Navigate to the project root
-cd kognisia-app
+# Set your Supabase connection string
+export SUPABASE_DB_URL="postgresql://postgres:[password]@[host]:5432/postgres"
 
-# Run a specific migration
-supabase db execute --file database/migrations/001_create_subtests_table.sql
+# Create full backup (structure + data)
+./scripts/backup-database.sh
 ```
 
-### Manual Execution
+**Output:**
+- `./database/backups/kognisia_backup_YYYYMMDD_HHMMSS.sql`
+- `./database/backups/kognisia_backup_YYYYMMDD_HHMMSS.sql.gz` (compressed)
 
-You can also connect to your Supabase database using any PostgreSQL client and execute the migration files directly.
-
-## Migration Files
-
-### 001_create_subtests_table.sql
-
-Creates the `subtests` reference table with the official UTBK 2026 structure:
-- 6 subtests (PPU, PBM, PK, LIT_INDO, LIT_ING, PM)
-- Total: 160 questions, 195 minutes
-- Includes display order, question counts, and duration for each subtest
-
-**Requirements:** 1.1, 1.3, 1.4, 1.5
-
-### 002_update_question_bank_schema.sql
-
-Updates the `question_bank` table for UTBK 2026 compliance:
-- Adds `subtest_code` column with foreign key to `subtests` table
-- Migrates old 7-subtest structure to new 6-subtest structure
-- Maps 'PU' questions to 'PPU' (merges Penalaran Umum into Pengetahuan & Pemahaman Umum)
-- Creates performance indexes on `subtest_code`
-- Includes verification queries
-
-**Requirements:** 1.2, 10.5
-
-**Dependencies:** Must run after 001_create_subtests_table.sql
-
-### 003_update_student_progress_schema.sql
-
-Updates the `student_progress` table for Daily Challenge mode tracking:
-- Adds `daily_challenge_mode` column (TEXT, CHECK: 'balanced' or 'focus')
-- Adds `focus_subtest_code` column (TEXT, REFERENCES subtests)
-- Creates performance indexes on `subtest_code`, `assessment_type`, and composite indexes
-- Adds check constraint to ensure data integrity between mode and subtest selection
-
-**Requirements:** 2.6, 4.5
-
-**Dependencies:** Must run after 001_create_subtests_table.sql
-
-### 004_update_assessment_types.sql
-
-Updates assessment types for UTBK 2026 compliance:
-- Adds support for 'mini_tryout' assessment type
-- Updates existing 'marathon' records to 'tryout_utbk' for clarity
-- Documents valid assessment types in column comment
-- Includes verification queries to ensure data integrity
-
-**Requirements:** 7.8
-
-**Dependencies:** Must run after 003_update_student_progress_schema.sql
-
-## Verification
-
-After running the migration, verify the data:
-
-```sql
--- Check that 6 subtests were created
-SELECT COUNT(*) FROM subtests;
--- Expected: 6
-
--- Verify total questions and duration
-SELECT 
-  SUM(utbk_question_count) as total_questions,
-  SUM(utbk_duration_minutes) as total_minutes
-FROM subtests;
--- Expected: 160 questions, 195 minutes
-
--- View all subtests
-SELECT * FROM subtests ORDER BY display_order;
+### 🏗️ Schema-Only Backup
+```bash
+# Create structure-only backup (no data)
+./scripts/backup-schema-only.sh
 ```
 
-## Rollback
+**Use Cases:**
+- Setting up development environment
+- Creating new database with same structure
+- Version control for database schema
 
-To rollback this migration:
+### 🔄 Database Restore
+```bash
+# Set target database (localhost or VPS)
+export TARGET_DB_URL="postgresql://postgres:password@localhost:5432/kognisia"
 
-```sql
-DROP TABLE IF EXISTS subtests CASCADE;
+# Restore from backup
+./scripts/restore-database.sh ./database/backups/kognisia_backup_20241210_143022.sql
 ```
 
-**Warning:** This will also drop any foreign key references to this table.
+### 🐘 Local PostgreSQL Setup
+```bash
+# Set up local PostgreSQL database
+./scripts/setup-local-postgres.sh
+```
+
+**Creates:**
+- Database: `kognisia`
+- User: `kognisia_user`
+- Password: `kognisia_password`
+- Connection: `postgresql://kognisia_user:kognisia_password@localhost:5432/kognisia`
+
+## 🚀 Migration to VPS
+
+### Step 1: Prepare VPS
+```bash
+# On your VPS (Ubuntu/Debian)
+sudo apt-get update
+sudo apt-get install postgresql postgresql-contrib
+
+# Create database
+sudo -u postgres createdb kognisia
+sudo -u postgres createuser kognisia_user
+sudo -u postgres psql -c "ALTER USER kognisia_user WITH PASSWORD 'your_secure_password';"
+sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE kognisia TO kognisia_user;"
+```
+
+### Step 2: Create Backup from Supabase
+```bash
+# On your local machine
+export SUPABASE_DB_URL="postgresql://postgres:[supabase_password]@[supabase_host]:5432/postgres"
+./scripts/backup-database.sh
+```
+
+### Step 3: Transfer and Restore
+```bash
+# Upload backup to VPS
+scp ./database/backups/kognisia_backup_*.sql user@your-vps:/tmp/
+
+# On VPS, restore database
+export TARGET_DB_URL="postgresql://kognisia_user:your_secure_password@localhost:5432/kognisia"
+psql "$TARGET_DB_URL" < /tmp/kognisia_backup_*.sql
+```
+
+### Step 4: Update Application
+```bash
+# Update your app's environment variables
+DATABASE_URL="postgresql://kognisia_user:your_secure_password@your-vps-ip:5432/kognisia"
+```
+
+## 📊 Backup Strategy Recommendations
+
+### 🕐 Automated Backups
+```bash
+# Add to crontab for daily backups
+0 2 * * * /path/to/kognisia-app/scripts/backup-database.sh
+
+# Weekly full backup + daily incremental
+0 2 * * 0 /path/to/kognisia-app/scripts/backup-database.sh  # Sunday full
+0 2 * * 1-6 /path/to/kognisia-app/scripts/backup-schema-only.sh  # Mon-Sat schema
+```
+
+### 🗂️ Backup Retention
+- **Daily:** Keep 7 days
+- **Weekly:** Keep 4 weeks  
+- **Monthly:** Keep 12 months
+- **Yearly:** Keep indefinitely
+
+### 📍 Storage Locations
+1. **Local:** `./database/backups/` (development)
+2. **Cloud Storage:** AWS S3, Google Drive, Dropbox
+3. **VPS:** `/var/backups/kognisia/`
+4. **External:** USB drive, external server
+
+## 🔧 Troubleshooting
+
+### Connection Issues
+```bash
+# Test Supabase connection
+psql "$SUPABASE_DB_URL" -c "SELECT version();"
+
+# Test local connection
+psql "postgresql://kognisia_user:kognisia_password@localhost:5432/kognisia" -c "SELECT version();"
+```
+
+### Permission Issues
+```bash
+# Fix PostgreSQL permissions
+sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE kognisia TO kognisia_user;"
+sudo -u postgres psql -d kognisia -c "GRANT ALL ON SCHEMA public TO kognisia_user;"
+```
+
+### Large Database Backups
+```bash
+# For large databases, use custom format
+pg_dump "$SUPABASE_DB_URL" --format=custom --file=backup.dump
+
+# Restore custom format
+pg_restore --dbname="$TARGET_DB_URL" backup.dump
+```
+
+## 📋 Checklist: Database Migration
+
+### Pre-Migration
+- [ ] Create full Supabase backup
+- [ ] Test backup integrity
+- [ ] Document current connection strings
+- [ ] Prepare VPS environment
+- [ ] Test VPS PostgreSQL installation
+
+### Migration
+- [ ] Create final Supabase backup
+- [ ] Transfer backup to VPS
+- [ ] Restore database on VPS
+- [ ] Test database functionality
+- [ ] Update application environment variables
+
+### Post-Migration
+- [ ] Test application with new database
+- [ ] Set up automated backups on VPS
+- [ ] Monitor performance and errors
+- [ ] Update documentation
+- [ ] Decommission Supabase (if desired)
+
+## 🆘 Emergency Recovery
+
+### If Database is Lost
+1. **Check Backups:** `ls -la ./database/backups/`
+2. **Find Latest:** Most recent `kognisia_backup_*.sql`
+3. **Restore Quickly:** Use restore script
+4. **Verify Data:** Check critical tables
+5. **Resume Operations:** Update connection strings
+
+### If Backup is Corrupted
+1. **Try Compressed Version:** `.sql.gz` files
+2. **Use Schema Backup:** Restore structure, rebuild data
+3. **Contact Supabase:** They may have point-in-time recovery
+4. **Check Git History:** Database migrations in version control
+
+---
+
+## 🎯 Best Practices
+
+1. **Regular Backups:** Daily automated backups
+2. **Test Restores:** Monthly restore testing
+3. **Multiple Locations:** Store backups in multiple places
+4. **Version Control:** Track schema changes in Git
+5. **Documentation:** Keep connection strings secure but documented
+6. **Monitoring:** Set up alerts for backup failures
+
+**Your database is your most valuable asset - protect it well!** 🛡️

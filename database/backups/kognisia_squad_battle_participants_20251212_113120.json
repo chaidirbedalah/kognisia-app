@@ -1,0 +1,41 @@
+[
+  {
+    "id": "ef72f4e4-a8a5-4a4a-a147-f9b472d043e5",
+    "battle_id": "683088b4-f865-4feb-832b-9c6e97cc19d9",
+    "user_id": "4b6b4d0e-dfce-4062-b055-2dbbc94be86e",
+    "score": 0,
+    "correct_answers": 0,
+    "total_questions": 10,
+    "accuracy": 0.00,
+    "rank": null,
+    "time_taken_seconds": null,
+    "completed_at": null,
+    "created_at": "2025-12-10T07:57:07.955157+00:00"
+  },
+  {
+    "id": "4b29393a-31e3-44a4-ad74-ac7519d5dae8",
+    "battle_id": "fb9041f5-23ab-4a7f-b14b-d0d92751449a",
+    "user_id": "4b6b4d0e-dfce-4062-b055-2dbbc94be86e",
+    "score": 0,
+    "correct_answers": 0,
+    "total_questions": 20,
+    "accuracy": 0.00,
+    "rank": null,
+    "time_taken_seconds": null,
+    "completed_at": null,
+    "created_at": "2025-12-10T08:15:42.594096+00:00"
+  },
+  {
+    "id": "32b4387f-bc59-4dd1-a3ff-98a16689236c",
+    "battle_id": "e93c34d1-fc71-4fbc-9d08-32b56cd16271",
+    "user_id": "4b6b4d0e-dfce-4062-b055-2dbbc94be86e",
+    "score": 0,
+    "correct_answers": 0,
+    "total_questions": 10,
+    "accuracy": 0.00,
+    "rank": null,
+    "time_taken_seconds": null,
+    "completed_at": null,
+    "created_at": "2025-12-10T09:09:37.805842+00:00"
+  }
+]
