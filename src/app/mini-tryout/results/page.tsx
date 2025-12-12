@@ -75,10 +75,10 @@ function ResultsContent() {
           score: results.correctAnswers * 10,
           accuracy: results.accuracy,
           rank: 1, // Mini try out doesn't have ranking
-          correct_answers: results.correctAnswers,
-          total_questions: results.totalQuestions,
-          time_taken: results.totalTimeSeconds,
-          is_elite: false
+          correctAnswers: results.correctAnswers,
+          totalQuestions: results.totalQuestions,
+          timeTakenSeconds: results.totalTimeSeconds,
+          isHots: false
         }
         
         await checkAndUnlockAchievements(session.user.id, battleResult, session)

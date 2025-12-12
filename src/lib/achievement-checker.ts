@@ -21,9 +21,9 @@ export async function checkAndUnlockAchievements(
   const achievementsToUnlock: string[] = []
 
   // Check First Battle
-  const { data: battleCount } = await supabase
+  const { count: battleCount } = await supabase
     .from('squad_battle_participants')
-    .select('id', { count: 'exact' })
+    .select('id', { count: 'exact', head: true })
     .eq('user_id', userId)
 
   if (battleCount === 1) {
@@ -110,14 +110,14 @@ export async function checkAndUnlockAchievements(
  */
 export async function getAchievementProgress(userId: string) {
   try {
-    const { data: stats } = await supabase
+    const { count: stats } = await supabase
       .from('user_achievements')
-      .select('id', { count: 'exact' })
+      .select('id', { count: 'exact', head: true })
       .eq('user_id', userId)
 
-    const { data: totalAchievements } = await supabase
+    const { count: totalAchievements } = await supabase
       .from('achievements')
-      .select('id', { count: 'exact' })
+      .select('id', { count: 'exact', head: true })
 
     return {
       unlocked: stats || 0,

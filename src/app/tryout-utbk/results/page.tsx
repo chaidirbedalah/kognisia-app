@@ -88,10 +88,10 @@ function TryOutUTBKResultsContent() {
           score: totalScore,
           accuracy: finalAccuracy,
           rank: 1, // Try out doesn't have ranking
-          correct_answers: Math.round(totalQuestions * finalAccuracy / 100),
-          total_questions: totalQuestions,
-          time_taken: timeMinutes * 60, // Convert to seconds
-          is_elite: false
+          correctAnswers: Math.round(totalQuestions * finalAccuracy / 100),
+          totalQuestions: totalQuestions,
+          timeTakenSeconds: timeMinutes * 60, // Convert to seconds
+          isHots: false
         }
         
         await checkAndUnlockAchievements(session.user.id, battleResult, session)

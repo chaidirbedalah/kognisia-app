@@ -63,10 +63,10 @@ export default function BattleResultsPage() {
               score: currentParticipant.score,
               accuracy: currentParticipant.accuracy,
               rank: currentParticipant.rank,
-              correct_answers: currentParticipant.correct_answers,
-              total_questions: currentParticipant.total_questions,
-              time_taken: currentParticipant.time_taken,
-              is_elite: battleData.battle?.is_elite || false
+              correctAnswers: currentParticipant.correct_answers,
+              totalQuestions: currentParticipant.total_questions,
+              timeTakenSeconds: currentParticipant.time_taken,
+              isHots: battleData.battle?.is_elite || false
             }
             
             await checkAndUnlockAchievements(session.user.id, battleResult, session)

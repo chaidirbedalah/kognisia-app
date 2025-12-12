@@ -29,7 +29,7 @@ interface UserStats {
 export default function ProfilePage() {
   const router = useRouter()
   const { stats: streakStats, loading: streakLoading } = useStreakSystem()
-  const { stats: achievementStats, loading: achievementLoading } = useAchievements()
+  const { achievements, stats: achievementStats, loading: achievementLoading } = useAchievements()
   
   const [user, setUser] = useState<UserProfile | null>(null)
   const [userStats, setUserStats] = useState<UserStats | null>(null)
@@ -196,9 +196,9 @@ export default function ProfilePage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {achievementStats && achievementStats.achievements.filter(a => a.unlocked).length > 0 ? (
+            {achievements && achievements.filter(a => a.unlocked).length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                {achievementStats.achievements
+                {achievements
                   .filter(a => a.unlocked)
                   .map((achievement) => (
                     <div

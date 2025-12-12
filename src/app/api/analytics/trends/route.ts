@@ -95,11 +95,14 @@ export async function GET(request: NextRequest) {
     }
 
     // Build achievement timeline
-    const achievementTimeline = achievements?.map(a => ({
-      date: a.unlocked_at,
-      achievement: a.achievements,
-      points: a.achievements?.points || 0
-    })) || [];
+    const achievementTimeline = achievements?.map(a => {
+      const achievement = Array.isArray(a.achievements) ? a.achievements[0] : a.achievements;
+      return {
+        date: a.unlocked_at,
+        achievement: achievement,
+        points: achievement?.points || 0
+      };
+    }) || [];
 
     // Calculate cumulative points over time
     let cumulativePoints = 0;

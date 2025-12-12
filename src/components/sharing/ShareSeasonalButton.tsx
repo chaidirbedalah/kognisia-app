@@ -2,13 +2,7 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Share2, Copy, Check } from 'lucide-react'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+import { Copy, Check } from 'lucide-react'
 
 interface ShareSeasonalButtonProps {
   seasonName: string
@@ -60,45 +54,44 @@ Join the seasonal challenge now! 🚀`
   }
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="outline"
-          size="sm"
-          className="gap-2"
-        >
-          <Share2 className="h-4 w-4" />
-          Share
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={handleWhatsApp}>
-          <span className="mr-2">💬</span>
-          WhatsApp
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={handleTwitter}>
-          <span className="mr-2">𝕏</span>
-          Twitter/X
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={handleFacebook}>
-          <span className="mr-2">f</span>
-          Facebook
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={handleCopyToClipboard}>
-          {copied ? (
-            <>
-              <Check className="h-4 w-4 mr-2 text-green-600" />
-              Copied!
-            </>
-          ) : (
-            <>
-              <Copy className="h-4 w-4 mr-2" />
-              Copy Text
-            </>
-          )}
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <div className="flex gap-2">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={handleWhatsApp}
+        title="Share on WhatsApp"
+      >
+        💬
+      </Button>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={handleTwitter}
+        title="Share on Twitter/X"
+      >
+        𝕏
+      </Button>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={handleFacebook}
+        title="Share on Facebook"
+      >
+        f
+      </Button>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={handleCopyToClipboard}
+        title="Copy to clipboard"
+      >
+        {copied ? (
+          <Check className="h-4 w-4 text-green-600" />
+        ) : (
+          <Copy className="h-4 w-4" />
+        )}
+      </Button>
+    </div>
   )
 }
 

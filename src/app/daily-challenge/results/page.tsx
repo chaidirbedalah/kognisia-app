@@ -65,10 +65,10 @@ function DailyChallengeResultsContent() {
           score: totalScore,
           accuracy: finalAccuracy,
           rank: 1, // Daily challenge doesn't have ranking
-          correct_answers: Math.round(totalQuestions * finalAccuracy / 100),
-          total_questions: totalQuestions,
-          time_taken: 0, // Not tracked in daily challenge
-          is_elite: false
+          correctAnswers: Math.round(totalQuestions * finalAccuracy / 100),
+          totalQuestions: totalQuestions,
+          timeTakenSeconds: 0, // Not tracked in daily challenge
+          isHots: false
         }
         
         await checkAndUnlockAchievements(session.user.id, battleResult, session)

@@ -181,7 +181,7 @@ export const cacheKeys = {
   // Analytics
   userMetrics: (userId: string) => `analytics:metrics:${userId}`,
   engagementTrend: () => 'analytics:engagement:trend',
-  achievementStats: () => 'analytics:achievements:stats'
+  achievementAnalytics: () => 'analytics:achievements:stats'
 };
 
 /**
