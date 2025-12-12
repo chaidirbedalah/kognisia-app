@@ -8,6 +8,8 @@ import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import type { SquadBattle, SquadBattleLeaderboard } from '@/lib/squad-types'
 import { Trophy, Medal, Award, Home, RotateCcw, Users } from 'lucide-react'
+import { supabase } from '@/lib/supabase'
+import { checkAndUnlockAchievements } from '@/lib/achievement-checker'
 
 export default function BattleResultsPage() {
   const router = useRouter()
@@ -47,6 +49,33 @@ export default function BattleResultsPage() {
       }
 
       setLeaderboard(leaderboardData.leaderboard)
+
+      // Check and unlock achievements after battle
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (session && leaderboardData.leaderboard) {
+          const currentParticipant = leaderboardData.leaderboard.participants.find(
+            (p: any) => p.is_current_user
+          )
+          
+          if (currentParticipant) {
+            const battleResult = {
+              score: currentParticipant.score,
+              accuracy: currentParticipant.accuracy,
+              rank: currentParticipant.rank,
+              correct_answers: currentParticipant.correct_answers,
+              total_questions: currentParticipant.total_questions,
+              time_taken: currentParticipant.time_taken,
+              is_elite: battleData.battle?.is_elite || false
+            }
+            
+            await checkAndUnlockAchievements(session.user.id, battleResult, session)
+          }
+        }
+      } catch (achievementError) {
+        console.error('Error checking achievements:', achievementError)
+        // Don't fail the page if achievement check fails
+      }
     } catch (err: any) {
       setError(err.message)
     } finally {

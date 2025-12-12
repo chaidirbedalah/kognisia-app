@@ -443,6 +443,23 @@ export default function DashboardPage() {
                   </Button>
                 </CardContent>
               </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Achievements 🏆</CardTitle>
+                  <CardDescription>
+                    Lihat pencapaian dan badges kamu
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button 
+                    className="w-full bg-amber-600 hover:bg-amber-700"
+                    onClick={() => window.location.href = '/achievements'}
+                  >
+                    Lihat Achievements
+                  </Button>
+                </CardContent>
+              </Card>
             </div>
           </div>
         )}
