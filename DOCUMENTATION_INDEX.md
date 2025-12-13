@@ -6,17 +6,14 @@ Panduan lengkap untuk semua aspek Kognisia App development.
 
 ## 📚 QUICK START
 
-Mulai dari sini jika Anda baru:
+**Mulai dari sini jika Anda baru:**
 
-1. **[QUICK_SETUP_GUIDE.md](./QUICK_SETUP_GUIDE.md)** ⭐ START HERE
-   - Setup dalam 15 menit
-   - Clone repo, database, dan Vercel
-   - Checklist lengkap
-
-2. **[SETUP_DEVELOPMENT_ENVIRONMENT.md](./SETUP_DEVELOPMENT_ENVIRONMENT.md)**
-   - Panduan detail step-by-step
-   - Penjelasan setiap langkah
-   - Troubleshooting untuk setiap step
+**[SETUP_GUIDE_MASTER.md](./SETUP_GUIDE_MASTER.md)** ⭐ **SATU-SATUNYA YANG ANDA BUTUHKAN**
+- Setup lengkap dalam 30 menit
+- Clone repo, database, dan Vercel
+- Step-by-step yang jelas
+- Troubleshooting included
+- **IKUTI PANDUAN INI SAJA!**
 
 ---
 
@@ -24,13 +21,13 @@ Mulai dari sini jika Anda baru:
 
 Panduan untuk development sehari-hari:
 
-3. **[GIT_WORKFLOW_GUIDE.md](./GIT_WORKFLOW_GUIDE.md)**
+2. **[GIT_WORKFLOW_GUIDE.md](./GIT_WORKFLOW_GUIDE.md)**
    - Branch strategy
    - Commit best practices
    - Pull request workflow
    - Conflict resolution
 
-4. **[NAVIGATION_SYSTEM_IMPLEMENTATION.md](./NAVIGATION_SYSTEM_IMPLEMENTATION.md)**
+3. **[NAVIGATION_SYSTEM_IMPLEMENTATION.md](./NAVIGATION_SYSTEM_IMPLEMENTATION.md)**
    - Fitur navigasi yang baru
    - Mobile & desktop navigation
    - Menu structure
@@ -42,32 +39,11 @@ Panduan untuk development sehari-hari:
 
 Panduan untuk database management:
 
-5. **[DATABASE_BACKUP_AND_RESTORE.md](./DATABASE_BACKUP_AND_RESTORE.md)**
+4. **[DATABASE_BACKUP_AND_RESTORE.md](./DATABASE_BACKUP_AND_RESTORE.md)**
    - Backup strategies
    - Restore procedures
    - Disaster recovery
    - Automation scripts
-
-6. **[DATABASE_MIGRATION_REQUIRED.md](./DATABASE_MIGRATION_REQUIRED.md)**
-   - Migration procedures
-   - Schema changes
-   - Data migration
-
----
-
-## 🚀 DEPLOYMENT GUIDES
-
-Panduan untuk deployment:
-
-7. **[DEPLOYMENT_INSTRUCTIONS.md](./DEPLOYMENT_INSTRUCTIONS.md)**
-   - Deploy ke Vercel
-   - Environment setup
-   - Pre-deployment checklist
-
-8. **[DEPLOYMENT_SUCCESS_SUMMARY.md](./DEPLOYMENT_SUCCESS_SUMMARY.md)**
-   - Deployment history
-   - Status checks
-   - Verification steps
 
 ---
 
@@ -75,7 +51,7 @@ Panduan untuk deployment:
 
 Panduan untuk mengatasi masalah:
 
-9. **[TROUBLESHOOTING_GUIDE.md](./TROUBLESHOOTING_GUIDE.md)** ⭐ WHEN STUCK
+5. **[TROUBLESHOOTING_GUIDE.md](./TROUBLESHOOTING_GUIDE.md)**
    - Common issues & solutions
    - Setup problems
    - Database issues
@@ -88,26 +64,26 @@ Panduan untuk mengatasi masalah:
 
 Dokumentasi project:
 
-10. **[UTBK_2026_PROJECT_FINAL_SUMMARY.md](./UTBK_2026_PROJECT_FINAL_SUMMARY.md)**
-    - Project overview
-    - All features implemented
-    - Architecture
-    - Technology stack
+6. **[UTBK_2026_PROJECT_FINAL_SUMMARY.md](./UTBK_2026_PROJECT_FINAL_SUMMARY.md)**
+   - Project overview
+   - All features implemented
+   - Architecture
+   - Technology stack
 
-11. **[PRIORITY_3_COMPLETE.md](./PRIORITY_3_COMPLETE.md)**
-    - Priority 3 features
-    - Implementation details
-    - Status & completion
+7. **[PRIORITY_3_COMPLETE.md](./PRIORITY_3_COMPLETE.md)**
+   - Priority 3 features
+   - Implementation details
+   - Status & completion
 
-12. **[PRIORITY_2_COMPLETE.md](./PRIORITY_2_COMPLETE.md)**
-    - Priority 2 features
-    - Achievement system
-    - Implementation details
+8. **[PRIORITY_2_COMPLETE.md](./PRIORITY_2_COMPLETE.md)**
+   - Priority 2 features
+   - Achievement system
+   - Implementation details
 
-13. **[ACHIEVEMENT_INTEGRATION_COMPLETE.md](./ACHIEVEMENT_INTEGRATION_COMPLETE.md)**
-    - Achievement system
-    - Integration details
-    - API endpoints
+9. **[ACHIEVEMENT_INTEGRATION_COMPLETE.md](./ACHIEVEMENT_INTEGRATION_COMPLETE.md)**
+   - Achievement system
+   - Integration details
+   - API endpoints
 
 ---
 
@@ -115,17 +91,17 @@ Dokumentasi project:
 
 Panduan untuk fitur-fitur spesifik:
 
-14. **[SQUAD_BATTLE_QUICK_START.md](./SQUAD_BATTLE_QUICK_START.md)**
+10. **[SQUAD_BATTLE_QUICK_START.md](./SQUAD_BATTLE_QUICK_START.md)**
     - Squad battle system
     - How to use
     - API endpoints
 
-15. **[QA_TEST_PLAN.md](./QA_TEST_PLAN.md)**
+11. **[QA_TEST_PLAN.md](./QA_TEST_PLAN.md)**
     - Testing procedures
     - Test cases
     - QA checklist
 
-16. **[E2E_TESTING_GUIDE.md](./E2E_TESTING_GUIDE.md)**
+12. **[E2E_TESTING_GUIDE.md](./E2E_TESTING_GUIDE.md)**
     - End-to-end testing
     - Playwright setup
     - Test examples
@@ -136,12 +112,12 @@ Panduan untuk fitur-fitur spesifik:
 
 Panduan referensi:
 
-17. **[UTBK_2026_QUICK_REFERENCE.md](./UTBK_2026_QUICK_REFERENCE.md)**
+13. **[UTBK_2026_QUICK_REFERENCE.md](./UTBK_2026_QUICK_REFERENCE.md)**
     - Quick reference
     - Common commands
     - Useful links
 
-18. **[README.md](./README.md)**
+14. **[README.md](./README.md)**
     - Project overview
     - Getting started
     - Features
@@ -152,13 +128,11 @@ Panduan referensi:
 
 ```
 kognisia-app/
-├── QUICK_SETUP_GUIDE.md                    # ⭐ START HERE
-├── SETUP_DEVELOPMENT_ENVIRONMENT.md        # Detailed setup
+├── SETUP_GUIDE_MASTER.md                   # ⭐ START HERE - SATU-SATUNYA YANG ANDA BUTUHKAN
 ├── GIT_WORKFLOW_GUIDE.md                   # Git best practices
 ├── NAVIGATION_SYSTEM_IMPLEMENTATION.md     # Navigation feature
 ├── DATABASE_BACKUP_AND_RESTORE.md          # Database management
 ├── TROUBLESHOOTING_GUIDE.md                # ⭐ WHEN STUCK
-├── DEPLOYMENT_INSTRUCTIONS.md              # Deployment guide
 ├── UTBK_2026_PROJECT_FINAL_SUMMARY.md      # Project overview
 ├── PRIORITY_3_COMPLETE.md                  # Priority 3 features
 ├── PRIORITY_2_COMPLETE.md                  # Priority 2 features
@@ -177,8 +151,8 @@ kognisia-app/
 
 ### For New Developers
 
-1. Read: [QUICK_SETUP_GUIDE.md](./QUICK_SETUP_GUIDE.md)
-2. Setup: Follow all steps
+1. Read: [SETUP_GUIDE_MASTER.md](./SETUP_GUIDE_MASTER.md) ⭐
+2. Setup: Follow all steps (30 menit)
 3. Read: [UTBK_2026_PROJECT_FINAL_SUMMARY.md](./UTBK_2026_PROJECT_FINAL_SUMMARY.md)
 4. Explore: Browse codebase
 5. Read: [GIT_WORKFLOW_GUIDE.md](./GIT_WORKFLOW_GUIDE.md)
@@ -186,8 +160,8 @@ kognisia-app/
 
 ### For Experienced Developers
 
-1. Skim: [QUICK_SETUP_GUIDE.md](./QUICK_SETUP_GUIDE.md)
-2. Setup: Follow quick steps
+1. Skim: [SETUP_GUIDE_MASTER.md](./SETUP_GUIDE_MASTER.md)
+2. Setup: Follow steps (30 menit)
 3. Read: [GIT_WORKFLOW_GUIDE.md](./GIT_WORKFLOW_GUIDE.md)
 4. Explore: Codebase & features
 5. Start: Create feature branch
@@ -233,15 +207,16 @@ kognisia-app/
 
 | Category | Count | Status |
 |----------|-------|--------|
-| Setup Guides | 2 | ✅ Complete |
+| Setup Guides | 1 | ✅ Complete |
 | Development Guides | 2 | ✅ Complete |
-| Database Guides | 2 | ✅ Complete |
-| Deployment Guides | 2 | ✅ Complete |
+| Database Guides | 1 | ✅ Complete |
 | Troubleshooting | 1 | ✅ Complete |
 | Project Docs | 4 | ✅ Complete |
 | Feature Guides | 3 | ✅ Complete |
 | Reference Guides | 2 | ✅ Complete |
-| **TOTAL** | **18** | **✅ Complete** |
+| **TOTAL** | **14** | **✅ Complete** |
+
+**Cleaned up**: 10 redundant files removed for clarity
 
 ---
 
