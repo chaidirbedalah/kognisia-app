@@ -22,11 +22,11 @@ CREATE INDEX IF NOT EXISTS idx_user_cosmetics_user_id ON user_cosmetics(user_id)
 CREATE INDEX IF NOT EXISTS idx_event_challenges_difficulty ON event_challenges(difficulty);
 CREATE INDEX IF NOT EXISTS idx_user_event_progress_completed_at ON user_event_progress(completed_at DESC);
 
--- Analytics indexes
+-- Analytics indexes (already created in create_analytics_tables.sql, but adding composite indexes)
 CREATE INDEX IF NOT EXISTS idx_analytics_events_user_id_type ON analytics_events(user_id, event_type);
-CREATE INDEX IF NOT EXISTS idx_analytics_events_created_at ON analytics_events(created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_analytics_achievements_user_id ON analytics_achievements(user_id);
-CREATE INDEX IF NOT EXISTS idx_analytics_engagement_user_id ON analytics_engagement(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_engagement_metrics_user_id_score ON user_engagement_metrics(user_id, engagement_score DESC);
+CREATE INDEX IF NOT EXISTS idx_achievement_unlock_stats_unlock_percentage ON achievement_unlock_stats(unlock_percentage DESC);
+CREATE INDEX IF NOT EXISTS idx_seasonal_performance_stats_user_season ON seasonal_performance_stats(user_id, season_id);
 
 -- Performance optimization complete
 -- All essential indexes have been created for better query performance
