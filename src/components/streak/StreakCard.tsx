@@ -33,7 +33,7 @@ export function StreakCard() {
 
   if (loading) {
     return (
-      <Card>
+      <Card data-testid="streak-card">
         <CardContent className="pt-6">
           <div className="flex items-center justify-center h-32">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600"></div>
@@ -45,7 +45,7 @@ export function StreakCard() {
 
   if (!stats) {
     return (
-      <Card>
+      <Card data-testid="streak-card">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Flame className="h-5 w-5 text-orange-500" />
@@ -66,7 +66,7 @@ export function StreakCard() {
   const message = getStreakMessage(stats)
 
   return (
-    <Card>
+    <Card data-testid="streak-card">
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">

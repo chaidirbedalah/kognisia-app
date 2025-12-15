@@ -45,7 +45,12 @@ export async function loginAsTeacher(page: Page) {
  * Logout
  */
 export async function logout(page: Page) {
-  await page.click('button:has-text("Logout"), button:has-text("Keluar")')
+  const btn = page.getByTestId('logout-button')
+  if (await btn.isVisible({ timeout: 3000 }).catch(() => false)) {
+    await btn.click()
+  } else {
+    await page.click('button:has-text("Logout"), button:has-text("Keluar")')
+  }
   await page.waitForURL(/.*login/, { timeout: 5000 })
 }
 

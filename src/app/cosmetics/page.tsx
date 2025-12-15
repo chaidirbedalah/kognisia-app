@@ -2,10 +2,11 @@
 
 import { useRouter } from 'next/navigation'
 import { useCosmetics } from '@/hooks/useCosmetics'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Sparkles, Lock } from 'lucide-react'
+import { Skeleton } from '@/components/ui/skeleton'
 
 export default function CosmeticsPage() {
   const router = useRouter()
@@ -13,10 +14,48 @@ export default function CosmeticsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading cosmetics...</p>
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 py-8">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-4">
+              <Skeleton className="h-8 w-8 rounded" />
+              <Skeleton className="h-8 w-64 rounded" />
+            </div>
+            <Skeleton className="h-4 w-96 rounded" />
+          </div>
+          <Card className="mb-8">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <Skeleton className="h-4 w-40 rounded mb-2" />
+                  <Skeleton className="h-8 w-24 rounded" />
+                </div>
+                <div className="text-right">
+                  <Skeleton className="h-4 w-32 rounded mb-2" />
+                  <Skeleton className="h-8 w-24 rounded" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <div className="mb-8">
+            <Skeleton className="h-6 w-40 rounded mb-4" />
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="relative rounded-lg overflow-hidden">
+                  <Skeleton className="h-40 rounded" />
+                </div>
+              ))}
+            </div>
+          </div>
+          <Card>
+            <CardContent className="p-6">
+              <Skeleton className="h-5 w-56 rounded mb-2" />
+              <Skeleton className="h-4 w-full rounded" />
+            </CardContent>
+          </Card>
+          <div className="mt-8 text-center">
+            <Skeleton className="h-9 w-40 rounded mx-auto" />
+          </div>
         </div>
       </div>
     )
@@ -89,7 +128,14 @@ export default function CosmeticsPage() {
               {typeLabels[type] || type}
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {(cosmetics as any[]).map((cosmetic) => (
+              {(Array.isArray(cosmetics) ? cosmetics : []).map((cosmetic: {
+                id: string
+                unlocked: boolean
+                icon_emoji: string
+                name: string
+                description: string
+                rarity: string
+              }) => (
                 <div
                   key={cosmetic.id}
                   className={`relative rounded-lg overflow-hidden transition-all ${
@@ -166,4 +212,3 @@ export default function CosmeticsPage() {
     </div>
   )
 }
-

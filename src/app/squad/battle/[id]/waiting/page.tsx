@@ -1,14 +1,15 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Clock, Users, Swords, ArrowLeft, BookOpen, Target, Trophy } from 'lucide-react'
+import { Clock, Users, Swords, ArrowLeft, BookOpen, Target, Trophy, Wifi } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
+import { toast } from 'sonner'
 
 interface BattleInfo {
   id: string
@@ -33,21 +34,166 @@ export default function BattleWaitingRoomPage() {
   const [error, setError] = useState('')
   const [countdown, setCountdown] = useState('')
   const [participantCount, setParticipantCount] = useState(0)
+  const [coins, setCoins] = useState<{ bronze: number; silver: number; gold: number; totalBronze: number } | null>(null)
+  const prevParticipantRef = useRef(0)
+  const [pulseParticipants, setPulseParticipants] = useState(false)
 
+  const loadBattleInfo = useCallback(async () => {
+    try {
+      setLoading(true)
+      setError('')
+
+      const { data: { session } } = await supabase.auth.getSession()
+      
+      if (!session) {
+        throw new Error('No active session')
+      }
+
+      const response = await fetch(`/api/squad/battle/${battleId}`, {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`
+        }
+      })
+      
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to load battle info')
+      }
+
+      setBattle(data.battle)
+      setParticipantCount(data.participant_count || 0)
+
+      if (!data.is_participant) {
+        const joinRes = await fetch('/api/battle/join', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ battle_id: battleId })
+        })
+        const joinJson = await joinRes.json()
+        if (!joinRes.ok) {
+          toast.error(joinJson.error || 'Gagal auto-join battle')
+          throw new Error(joinJson.error || 'Failed to auto-join battle')
+        }
+        toast.success('Berhasil auto-join. Biaya Coins dipotong.')
+      }
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to load battle info')
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (session) {
+          const res = await fetch('/api/economy/summary', {
+            headers: { Authorization: `Bearer ${session.access_token}` }
+          })
+          if (res.ok) {
+            const json = await res.json()
+            setCoins(json.coins || null)
+          }
+        }
+      } catch {}
+    } finally {
+      setLoading(false)
+    }
+  }, [battleId])
+
+  const checkBattleStatus = useCallback(async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) return
+
+      const response = await fetch(`/api/squad/battle/${battleId}/status`, {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`
+        }
+      })
+      
+      const data = await response.json()
+
+      if (data.status === 'active') {
+        router.push(`/squad/battle/${battleId}`)
+      }
+    } catch (error: unknown) {
+      console.error('Error checking battle status:', error)
+    }
+  }, [battleId, router])
   useEffect(() => {
     if (battleId) {
       loadBattleInfo()
     }
-  }, [battleId])
+  }, [battleId, loadBattleInfo])
 
   useEffect(() => {
-    // Check battle status every 5 seconds
-    const interval = setInterval(() => {
-      checkBattleStatus()
-    }, 5000)
+    let channel: ReturnType<typeof supabase.channel> | null = null
+    let mounted = true
 
-    return () => clearInterval(interval)
-  }, [battleId])
+    const setupRealtime = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (!session) return
+
+        channel = supabase
+          .channel(`battle-${battleId}`)
+          .on('postgres_changes', {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'squad_battles',
+            filter: `id=eq.${battleId}`
+          }, async () => {
+            if (!mounted) return
+            await checkBattleStatus()
+          })
+          .on('postgres_changes', {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'squad_battle_participants',
+            filter: `battle_id=eq.${battleId}`
+          }, async () => {
+            if (!mounted) return
+            await refreshParticipantCount()
+          })
+          .on('postgres_changes', {
+            event: 'DELETE',
+            schema: 'public',
+            table: 'squad_battle_participants',
+            filter: `battle_id=eq.${battleId}`
+          }, async () => {
+            if (!mounted) return
+            await refreshParticipantCount()
+          })
+          .subscribe()
+      } catch (e) {
+        console.error('Error setting up realtime', e)
+      }
+    }
+
+    const refreshParticipantCount = async () => {
+      try {
+        const { count } = await supabase
+          .from('squad_battle_participants')
+          .select('user_id', { count: 'exact', head: true })
+          .eq('battle_id', battleId)
+        setParticipantCount(count || 0)
+      } catch {}
+    }
+
+    setupRealtime()
+    return () => {
+      mounted = false
+      if (channel) supabase.removeChannel(channel)
+    }
+  }, [battleId, checkBattleStatus])
+
+  useEffect(() => {
+    if (participantCount !== prevParticipantRef.current) {
+      setPulseParticipants(true)
+      const t = setTimeout(() => setPulseParticipants(false), 600)
+      prevParticipantRef.current = participantCount
+      return () => clearTimeout(t)
+    }
+  }, [participantCount])
 
   useEffect(() => {
     // Update countdown every second
@@ -78,59 +224,9 @@ export default function BattleWaitingRoomPage() {
     return () => clearInterval(interval)
   }, [battle])
 
-  async function loadBattleInfo() {
-    try {
-      setLoading(true)
-      setError('')
+  
 
-      const { data: { session } } = await supabase.auth.getSession()
-      
-      if (!session) {
-        throw new Error('No active session')
-      }
-
-      const response = await fetch(`/api/squad/battle/${battleId}`, {
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`
-        }
-      })
-      
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to load battle info')
-      }
-
-      setBattle(data.battle)
-      setParticipantCount(data.participant_count || 0)
-    } catch (err: any) {
-      setError(err.message)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  async function checkBattleStatus() {
-    try {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) return
-
-      const response = await fetch(`/api/squad/battle/${battleId}/status`, {
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`
-        }
-      })
-      
-      const data = await response.json()
-
-      if (data.status === 'active') {
-        // Battle has started! Redirect to battle page
-        router.push(`/squad/battle/${battleId}`)
-      }
-    } catch (error) {
-      console.error('Error checking battle status:', error)
-    }
-  }
+  
 
   if (loading) {
     return (
@@ -146,15 +242,40 @@ export default function BattleWaitingRoomPage() {
   }
 
   if (error || !battle) {
+    const insufficient = (error || '').toLowerCase().includes('coins tidak cukup')
     return (
       <div className="container mx-auto p-6">
         <Alert variant="destructive">
-          <AlertDescription>{error || 'Battle not found'}</AlertDescription>
+          <AlertDescription>
+            {insufficient ? 'Coins kamu tidak cukup untuk bergabung ke battle ini.' : (error || 'Battle not found')}
+          </AlertDescription>
         </Alert>
-        <Button onClick={() => router.back()} className="mt-4">
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Go Back
-        </Button>
+        {insufficient && coins && (
+          <div className="mt-3 text-sm text-gray-700">
+            <p>Saldo saat ini: Gold {coins.gold} • Silver {coins.silver} • Bronze {coins.bronze} (Total {coins.totalBronze})</p>
+          </div>
+        )}
+        <div className="flex gap-3 mt-4">
+          <Button onClick={() => router.back()}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Kembali
+          </Button>
+          {insufficient && (
+            <Button variant="outline" onClick={() => router.push('/dashboard')}>
+              Lihat Dashboard
+            </Button>
+          )}
+          {insufficient && (
+            <>
+              <Button className="bg-blue-600 hover:bg-blue-700" onClick={() => router.push('/daily-challenge')}>
+                Daily Challenge
+              </Button>
+              <Button className="bg-amber-600 hover:bg-amber-700" onClick={() => router.push('/cohort')}>
+                Buka Cohort
+              </Button>
+            </>
+          )}
+        </div>
       </div>
     )
   }
@@ -205,7 +326,7 @@ export default function BattleWaitingRoomPage() {
                 <div className="mb-4">
                   <Clock className="h-16 w-16 text-purple-600 mx-auto mb-3 animate-pulse" />
                   <p className="text-sm text-gray-600 mb-2">Battle starts in</p>
-                  <p className="text-5xl font-bold text-purple-600 mb-4">{countdown}</p>
+                  <p className="text-5xl font-bold text-purple-600 mb-4" aria-live="polite" aria-label="Countdown ke mulai">{countdown}</p>
                   <p className="text-gray-600">
                     {new Date(battle.scheduled_start_at).toLocaleString('id-ID', {
                       weekday: 'long',
@@ -236,10 +357,14 @@ export default function BattleWaitingRoomPage() {
 
       {/* Leaderboard Link */}
       <div className="mb-6">
-        <Link href={`/squad/battle/${battleId}/leaderboard`}>
-          <Button className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white">
-            <Trophy className="h-5 w-5 mr-2" />
+        <Link href={`/squad/battle/${battleId}/leaderboard`} aria-label="Lihat leaderboard live">
+          <Button className="group w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white transition-transform hover:scale-[1.02] active:scale-[0.98]">
+            <Trophy className="h-5 w-5 mr-2 transition-transform group-hover:scale-110" />
             View Live Leaderboard
+            <span className="ml-auto inline-flex items-center gap-1 text-xs bg-white/20 px-2 py-1 rounded">
+              <Wifi className="h-3 w-3" />
+              Live
+            </span>
           </Button>
         </Link>
       </div>
@@ -290,7 +415,7 @@ export default function BattleWaitingRoomPage() {
           </CardHeader>
           <CardContent>
             <div className="text-center py-4">
-              <p className="text-4xl font-bold text-purple-600 mb-2">{participantCount}</p>
+              <p className={`text-4xl font-bold text-purple-600 mb-2 transition-transform ${pulseParticipants ? 'scale-110' : ''}`} aria-live="polite">{participantCount}</p>
               <p className="text-sm text-gray-600">members ready</p>
             </div>
           </CardContent>

@@ -7,7 +7,7 @@
  * Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 8.6
  */
 
-import { useEffect, useState, Suspense } from 'react'
+import { useEffect, useState, useCallback, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -25,6 +25,7 @@ import {
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { checkAndUnlockAchievements } from '@/lib/achievement-checker'
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from '@/components/ui/breadcrumb'
 
 interface SubtestResult {
   subtestCode: string
@@ -50,24 +51,12 @@ function ResultsContent() {
   const searchParams = useSearchParams()
   const sessionId = searchParams.get('sessionId')
 
-  const [results, setResults] = useState<Results | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    // In a real implementation, fetch results from API using sessionId
-    // For now, get from sessionStorage (set by submit endpoint)
+  const [results] = useState<Results | null>(() => {
     const storedResults = sessionStorage.getItem(`mini-tryout-results-${sessionId}`)
-    if (storedResults) {
-      const parsedResults = JSON.parse(storedResults)
-      setResults(parsedResults)
-      
-      // Check and unlock achievements
-      checkAchievements(parsedResults)
-    }
-    setIsLoading(false)
-  }, [sessionId])
+    return storedResults ? JSON.parse(storedResults) : null
+  })
 
-  async function checkAchievements(results: Results) {
+  const checkAchievements = useCallback(async (results: Results) => {
     try {
       const { data: { session } } = await supabase.auth.getSession()
       if (session) {
@@ -86,7 +75,13 @@ function ResultsContent() {
     } catch (error) {
       console.error('Error checking achievements:', error)
     }
-  }
+  }, [])
+  
+  useEffect(() => {
+    if (results) {
+      checkAchievements(results)
+    }
+  }, [results, checkAchievements])
 
   const formatTime = (seconds: number) => {
     const hours = Math.floor(seconds / 3600)
@@ -106,16 +101,7 @@ function ResultsContent() {
     }
   }
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Memuat hasil...</p>
-        </div>
-      </div>
-    )
-  }
+  
 
   if (!results) {
     return (
@@ -140,20 +126,34 @@ function ResultsContent() {
   const TimingIcon = timingBadge.icon
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+    <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="max-w-6xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="text-center">
-          <h1 className="text-3xl font-bold mb-2">Hasil Mini Try Out UTBK</h1>
-          <p className="text-gray-600">Berikut adalah hasil lengkap Mini Try Out kamu</p>
+        <Breadcrumb className="mb-2">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/dashboard">Kognisia</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/mini-tryout">Mini Try Out</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Hasil</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+        <div className="text-center mb-2">
+          <h1 className="text-4xl font-bold tracking-tight text-foreground mb-2">Hasil Mini Try Out UTBK</h1>
+          <p className="text-muted-foreground">Berikut adalah hasil lengkap Mini Try Out kamu</p>
         </div>
 
         {/* Overall Score Card (Requirement 8.1) */}
-        <Card className="border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-white">
+        <Card className="shadow-md">
           <CardContent className="p-8">
             <div className="text-center">
               <Trophy className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
-              <div className="text-6xl font-bold text-blue-600 mb-2">
+              <div className="text-6xl font-bold text-primary mb-2">
                 {results.accuracy.toFixed(1)}%
               </div>
               <p className="text-xl text-gray-600 mb-4">Akurasi Keseluruhan</p>
@@ -176,7 +176,7 @@ function ResultsContent() {
         </Card>
 
         {/* Timing Comparison (Requirement 8.5) */}
-        <Card>
+        <Card className="transition-shadow hover:shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Clock className="w-5 h-5" />
@@ -207,7 +207,7 @@ function ResultsContent() {
         {/* Strongest & Weakest Subtests (Requirements 8.3, 8.4) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Strongest */}
-          <Card className="border-2 border-green-200 bg-gradient-to-br from-green-50 to-white">
+          <Card className="shadow-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-green-700">
                 <TrendingUp className="w-5 h-5" />
@@ -228,7 +228,7 @@ function ResultsContent() {
           </Card>
 
           {/* Weakest */}
-          <Card className="border-2 border-orange-200 bg-gradient-to-br from-orange-50 to-white">
+          <Card className="shadow-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-orange-700">
                 <TrendingDown className="w-5 h-5" />
@@ -253,9 +253,9 @@ function ResultsContent() {
         </div>
 
         {/* Per-Subtest Breakdown (Requirement 8.2) */}
-        <Card>
+        <Card className="transition-shadow hover:shadow-lg">
           <CardHeader>
-            <CardTitle>Breakdown Per Subtes</CardTitle>
+            <CardTitle className="text-lg">Breakdown Per Subtes</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">

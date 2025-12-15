@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, Suspense } from 'react'
+import { useEffect, useState, useCallback, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -9,6 +9,8 @@ import { UTBK_2026_SUBTESTS } from '@/lib/utbk-constants'
 import type { DailyChallengeMode, SubtestCode } from '@/lib/types'
 import { supabase } from '@/lib/supabase'
 import { checkAndUnlockAchievements } from '@/lib/achievement-checker'
+import { toast } from 'sonner'
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from '@/components/ui/breadcrumb'
 
 interface SubtestResult {
   subtestCode: SubtestCode
@@ -22,61 +24,51 @@ function DailyChallengeResultsContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   
-  const [mode, setMode] = useState<DailyChallengeMode | null>(null)
-  const [subtestCode, setSubtestCode] = useState<SubtestCode | null>(null)
-  const [totalScore, setTotalScore] = useState(0)
-  const [totalQuestions, setTotalQuestions] = useState(0)
-  const [accuracy, setAccuracy] = useState(0)
-  const [subtestResults, setSubtestResults] = useState<SubtestResult[]>([])
-
-  useEffect(() => {
-    // Get results from URL params
-    const modeParam = searchParams.get('mode') as DailyChallengeMode
-    const subtestParam = searchParams.get('subtest') as SubtestCode
-    const scoreParam = searchParams.get('score')
-    const questionsParam = searchParams.get('questions')
-    const accuracyParam = searchParams.get('accuracy')
+  const [mode] = useState<DailyChallengeMode | null>(() => searchParams.get('mode') as DailyChallengeMode)
+  const [subtestCode] = useState<SubtestCode | null>(() => searchParams.get('subtest') as SubtestCode)
+  const [totalScore] = useState<number>(() => parseInt(searchParams.get('score') || '0'))
+  const [totalQuestions] = useState<number>(() => parseInt(searchParams.get('questions') || '0'))
+  const [accuracy] = useState<number>(() => parseInt(searchParams.get('accuracy') || '0'))
+  const [coins] = useState<number>(() => parseInt(searchParams.get('coins') || '0'))
+  const [subtestResults] = useState<SubtestResult[]>(() => {
     const resultsParam = searchParams.get('results')
-
-    if (modeParam) setMode(modeParam)
-    if (subtestParam) setSubtestCode(subtestParam)
-    if (scoreParam) setTotalScore(parseInt(scoreParam))
-    if (questionsParam) setTotalQuestions(parseInt(questionsParam))
-    if (accuracyParam) setAccuracy(parseInt(accuracyParam))
-    
-    if (resultsParam) {
-      try {
-        const parsed = JSON.parse(decodeURIComponent(resultsParam))
-        setSubtestResults(parsed)
-      } catch (e) {
-        console.error('Failed to parse results:', e)
-      }
+    if (!resultsParam) return []
+    try {
+      return JSON.parse(decodeURIComponent(resultsParam))
+    } catch {
+      return []
     }
+  })
 
-    // Check and unlock achievements
-    checkAchievements(parseInt(accuracyParam || '0'), parseInt(questionsParam || '0'))
-  }, [searchParams])
-
-  async function checkAchievements(finalAccuracy: number, totalQuestions: number) {
+  const checkAchievements = useCallback(async (finalAccuracy: number, totalQuestions: number) => {
     try {
       const { data: { session } } = await supabase.auth.getSession()
       if (session) {
         const battleResult = {
           score: totalScore,
           accuracy: finalAccuracy,
-          rank: 1, // Daily challenge doesn't have ranking
+          rank: 1,
           correctAnswers: Math.round(totalQuestions * finalAccuracy / 100),
           totalQuestions: totalQuestions,
-          timeTakenSeconds: 0, // Not tracked in daily challenge
+          timeTakenSeconds: 0,
           isHots: false
         }
-        
         await checkAndUnlockAchievements(session.user.id, battleResult, session)
       }
     } catch (error) {
       console.error('Error checking achievements:', error)
     }
-  }
+  }, [totalScore])
+  
+  useEffect(() => {
+    checkAchievements(accuracy, totalQuestions)
+  }, [accuracy, totalQuestions, checkAchievements])
+  
+  useEffect(() => {
+    if (coins && coins > 0) {
+      toast.success(`Kamu mendapatkan +${coins} Coin`)
+    }
+  }, [coins])
 
   const getSubtestName = (code: SubtestCode) => {
     return UTBK_2026_SUBTESTS.find(s => s.code === code)?.name || code
@@ -87,27 +79,41 @@ function DailyChallengeResultsContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-background py-8">
       <div className="max-w-4xl mx-auto px-4">
-        {/* Header */}
-        <div className="text-center mb-8">
+        <Breadcrumb className="mb-4">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/dashboard">Kognisia</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/daily-challenge">Daily Challenge</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Hasil</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+        <div className="text-center mb-10">
           <div className="text-6xl mb-4">🎉</div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-4xl font-bold tracking-tight text-foreground mb-2">
             Daily Challenge Selesai!
           </h1>
-          <p className="text-gray-600">
+          <p className="text-muted-foreground">
             {mode === 'balanced' ? 'Mode: Balanced (Semua Subtest)' : `Mode: Focus (${subtestCode ? getSubtestName(subtestCode) : ''})`}
           </p>
         </div>
 
         {/* Overall Score Card */}
-        <Card className="mb-6 bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-blue-200">
+        <Card className="mb-6 shadow-md">
           <CardHeader>
-            <CardTitle className="text-center">Skor Total</CardTitle>
+            <CardTitle className="text-center text-xl">Skor Total</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-center">
-              <div className="text-5xl font-bold text-blue-600 mb-2">
+              <div className="text-5xl font-bold text-primary mb-2">
                 {totalScore}/{totalQuestions * 10}
               </div>
               <div className="text-2xl font-semibold mb-4">
@@ -118,7 +124,7 @@ function DailyChallengeResultsContent() {
                   {accuracy}% Akurasi
                 </span>
               </div>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 {totalQuestions - Math.round(totalQuestions * accuracy / 100)} soal salah dari {totalQuestions} soal
               </p>
             </div>
@@ -127,9 +133,9 @@ function DailyChallengeResultsContent() {
 
         {/* Per-Subtest Breakdown for Balanced Mode */}
         {mode === 'balanced' && subtestResults.length > 0 && (
-          <Card className="mb-6">
+          <Card className="mb-6 transition-shadow hover:shadow-lg">
             <CardHeader>
-              <CardTitle>Breakdown Per Subtest 📊</CardTitle>
+              <CardTitle className="text-lg">Breakdown Per Subtest 📊</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -139,8 +145,8 @@ function DailyChallengeResultsContent() {
                       <div className="flex items-center gap-2">
                         <span className="text-2xl">{getSubtestIcon(result.subtestCode)}</span>
                         <div>
-                          <p className="font-semibold text-gray-900">{result.subtestName}</p>
-                          <p className="text-sm text-gray-600">
+                          <p className="font-semibold text-foreground">{result.subtestName}</p>
+                          <p className="text-sm text-muted-foreground">
                             {result.correctAnswers}/{result.totalQuestions} benar
                           </p>
                         </div>
@@ -157,7 +163,7 @@ function DailyChallengeResultsContent() {
                         {result.accuracy}%
                       </Badge>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className="w-full bg-muted rounded-full h-2">
                       <div
                         className={`h-2 rounded-full transition-all ${
                           result.accuracy >= 70 ? 'bg-green-500' :
@@ -175,7 +181,7 @@ function DailyChallengeResultsContent() {
 
         {/* Single Subtest Performance for Focus Mode */}
         {mode === 'focus' && subtestCode && (
-          <Card className="mb-6">
+          <Card className="mb-6 transition-shadow hover:shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <span className="text-2xl">{getSubtestIcon(subtestCode)}</span>
@@ -185,13 +191,13 @@ function DailyChallengeResultsContent() {
             <CardContent>
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Soal Benar</span>
-                  <span className="font-bold text-gray-900">
+                  <span className="text-muted-foreground">Soal Benar</span>
+                  <span className="font-bold text-foreground">
                     {Math.round(totalQuestions * accuracy / 100)}/{totalQuestions}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Akurasi</span>
+                  <span className="text-muted-foreground">Akurasi</span>
                   <span className={`font-bold ${
                     accuracy >= 70 ? 'text-green-600' :
                     accuracy >= 50 ? 'text-yellow-600' : 'text-red-600'
@@ -199,7 +205,7 @@ function DailyChallengeResultsContent() {
                     {accuracy}%
                   </span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-3">
+                <div className="w-full bg-muted rounded-full h-3">
                   <div
                     className={`h-3 rounded-full transition-all ${
                       accuracy >= 70 ? 'bg-green-500' :
@@ -214,13 +220,13 @@ function DailyChallengeResultsContent() {
         )}
 
         {/* Insight Card */}
-        <Card className="mb-6 bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200">
+        <Card className="mb-6 shadow-sm">
           <CardContent className="pt-6">
             <div className="flex items-start gap-3">
               <span className="text-2xl">💡</span>
               <div>
-                <p className="font-semibold text-gray-900 mb-1">Insight:</p>
-                <p className="text-gray-700">
+                <p className="font-semibold text-foreground mb-1">Insight:</p>
+                <p className="text-muted-foreground">
                   {accuracy >= 80
                     ? 'Luar biasa! Kamu menguasai materi dengan sangat baik. Pertahankan!'
                     : accuracy >= 70

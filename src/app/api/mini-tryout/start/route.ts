@@ -5,11 +5,11 @@
  * Requirements: 7.1, 7.2, 7.3
  */
 
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { ASSESSMENT_CONFIGS, getOrderedSubtests } from '@/lib/utbk-constants'
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     const supabase = await createClient()
 
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     const orderedSubtests = getOrderedSubtests()
 
     // Fetch 10 questions from each subtest (randomized)
-    const questionsBySubtest: Record<string, any[]> = {}
+    const questionsBySubtest: Record<string, unknown[]> = {}
     
     for (const subtest of orderedSubtests) {
       const { data: questions, error: questionsError } = await supabase
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
         code: s.code,
         name: s.name,
         questionCount: 10,
-        startIndex: orderedSubtests.slice(0, orderedSubtests.indexOf(s)).reduce((sum, st) => sum + 10, 0)
+        startIndex: orderedSubtests.slice(0, orderedSubtests.indexOf(s)).reduce((sum) => sum + 10, 0)
       }))
     })
   } catch (error) {

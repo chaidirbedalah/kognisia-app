@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 
 interface LeaderboardEntry {
   id: string
@@ -44,7 +44,7 @@ export function useLeaderboard(
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const fetchLeaderboard = async () => {
+  const fetchLeaderboard = useCallback(async () => {
     try {
       const response = await fetch(`/api/squad/battle/${battleId}/leaderboard`)
       
@@ -56,13 +56,13 @@ export function useLeaderboard(
       setLeaderboard(data.leaderboard || [])
       setStats(data.stats)
       setError(null)
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch leaderboard')
       console.error('Error fetching leaderboard:', err)
     } finally {
       setLoading(false)
     }
-  }
+  }, [battleId])
 
   useEffect(() => {
     fetchLeaderboard()
@@ -71,7 +71,7 @@ export function useLeaderboard(
       const interval = setInterval(fetchLeaderboard, refreshInterval)
       return () => clearInterval(interval)
     }
-  }, [battleId, autoRefresh, refreshInterval])
+  }, [battleId, autoRefresh, refreshInterval, fetchLeaderboard])
 
   return {
     leaderboard,

@@ -73,6 +73,18 @@ export interface TryOutData {
   solutionViewed: number
 }
 
+// Internal minimal types for progress aggregation
+type StudentProgress = {
+  created_at: string
+  is_correct: boolean
+  hint_used?: boolean | null
+  solution_viewed?: boolean | null
+  assessment_type?: string | null
+  assessment_id?: string | null
+  question_id: string
+  subtest_code?: string | null
+}
+
 export interface ProgressData {
   subtest: string
   accuracy: number
@@ -246,7 +258,17 @@ export async function fetchDailyChallengeData(userId: string): Promise<DailyChal
     }
 
   // Group by date
-  const dateMap = new Map<string, any[]>()
+  type StudentProgress = {
+    created_at: string
+    is_correct: boolean
+    hint_used?: boolean | null
+    solution_viewed?: boolean | null
+    assessment_type?: string | null
+    assessment_id?: string | null
+    question_id: string
+    subtest_code?: string | null
+  }
+  const dateMap = new Map<string, StudentProgress[]>()
   
   dailyChallengeProgress.forEach(p => {
     const date = new Date(p.created_at).toISOString().split('T')[0]
@@ -314,7 +336,7 @@ export async function fetchMiniTryOutData(userId: string): Promise<TryOutData[]>
     }
 
     // Group by assessment_id (session)
-    const sessionMap = new Map<string, any[]>()
+    const sessionMap = new Map<string, StudentProgress[]>()
     
     miniTryOutProgress.forEach(p => {
       const sessionId = p.assessment_id || new Date(p.created_at).toISOString().split('T')[0]
@@ -337,7 +359,7 @@ export async function fetchMiniTryOutData(userId: string): Promise<TryOutData[]>
       const directAnswers = totalQuestions - hintUsedCount - solutionViewedCount
       
       // Calculate subtest scores
-      const subtestMap = new Map<string, any[]>()
+      const subtestMap = new Map<string, StudentProgress[]>()
       items.forEach(p => {
         const subtest = p.subtest_code || 'Unknown'
         if (!subtestMap.has(subtest)) {
@@ -417,13 +439,14 @@ export async function fetchTryOutData(userId: string): Promise<TryOutData[]> {
       .select('id, subtest_utbk')
       .in('id', questionIds)
     
-    const questionDataMap = new Map<string, any>()
+    type QuestionMeta = { subtest_code?: string }
+    const questionDataMap = new Map<string, QuestionMeta>()
     questionBankData?.forEach(q => {
       questionDataMap.set(q.id, { subtest_code: q.subtest_utbk })
     })
 
   // Group by date (assuming one try out per day)
-  const dateMap = new Map<string, any[]>()
+  const dateMap = new Map<string, StudentProgress[]>()
   
   tryOutProgress.forEach(p => {
     const date = new Date(p.created_at).toISOString().split('T')[0]
@@ -446,7 +469,7 @@ export async function fetchTryOutData(userId: string): Promise<TryOutData[]> {
     const directAnswers = totalQuestions - hintUsedCount - solutionViewedCount
     
     // Calculate subtest scores
-    const subtestMap = new Map<string, any[]>()
+    const subtestMap = new Map<string, StudentProgress[]>()
     items.forEach(p => {
       const subtest = questionDataMap.get(p.question_id)?.subtest_code || 'Unknown'
       if (!subtestMap.has(subtest)) {
@@ -523,13 +546,14 @@ export async function fetchTryOutUTBKData(userId: string): Promise<TryOutUTBKDat
       .select('id, subtest_utbk')
       .in('id', questionIds)
     
-    const questionDataMap = new Map<string, any>()
+    type QuestionMeta = { subtest_code?: string }
+    const questionDataMap = new Map<string, QuestionMeta>()
     questionBankData?.forEach(q => {
       questionDataMap.set(q.id, { subtest_code: q.subtest_utbk })
     })
 
   // Group by date (assuming one Try Out UTBK per day)
-  const dateMap = new Map<string, any[]>()
+  const dateMap = new Map<string, StudentProgress[]>()
   
   tryOutUTBKProgress.forEach(p => {
     const date = new Date(p.created_at).toISOString().split('T')[0]
@@ -552,7 +576,7 @@ export async function fetchTryOutUTBKData(userId: string): Promise<TryOutUTBKDat
     const directAnswers = totalQuestions - hintUsedCount - solutionViewedCount
     
     // Calculate subtest scores
-    const subtestMap = new Map<string, any[]>()
+    const subtestMap = new Map<string, StudentProgress[]>()
     items.forEach(p => {
       const subtest = questionDataMap.get(p.question_id)?.subtest_code || 'Unknown'
       if (!subtestMap.has(subtest)) {
@@ -630,7 +654,8 @@ export async function fetchProgressBySubtest(userId: string): Promise<ProgressDa
       topicNameMap.set(t.id, t.name)
     })
     
-    const questionDataMap = new Map<string, any>()
+    type QuestionMeta = { subtest_code?: string; topic_name?: string }
+    const questionDataMap = new Map<string, QuestionMeta>()
     questionBankData?.forEach(q => {
       questionDataMap.set(q.id, { 
         subtest_code: q.subtest_utbk, // Map subtest_utbk to subtest_code
@@ -639,7 +664,7 @@ export async function fetchProgressBySubtest(userId: string): Promise<ProgressDa
     })
 
   // Group by subtest
-  const subtestMap = new Map<string, any[]>()
+  const subtestMap = new Map<string, StudentProgress[]>()
   
   progressData.forEach(p => {
     const subtest = questionDataMap.get(p.question_id)?.subtest_code || 'Unknown'
@@ -657,7 +682,7 @@ export async function fetchProgressBySubtest(userId: string): Promise<ProgressDa
     const accuracy = Math.round((correctAnswers / totalQuestions) * 100)
     
     // Group by topic
-    const topicMap = new Map<string, any[]>()
+    const topicMap = new Map<string, StudentProgress[]>()
     items.forEach(p => {
       const topicName = questionDataMap.get(p.question_id)?.topic_name || 'Unknown'
       if (!topicMap.has(topicName)) {

@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import type { DailyChallengeMode, SubtestCode } from '@/lib/types'
+import { z } from 'zod'
+export const runtime = 'nodejs'
+import { awardCoins, awardXP } from '@/lib/economy'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
 /**
  * POST /api/daily-challenge/submit
@@ -16,30 +19,22 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
  * - 4.5: Store focus_subtest_code if Focus mode
  * - 7.7: Create progress record for only selected subtest in Focus mode
  */
+const BodySchema = z.object({
+  userId: z.string().min(1),
+  mode: z.enum(['balanced','focus']),
+  subtestCode: z.string().optional(),
+  answers: z.record(z.string(), z.string()),
+  questions: z.array(z.object({ id: z.string().min(1) })),
+  timeSpent: z.number().int().nonnegative().optional()
+})
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    const { 
-      userId, 
-      mode, 
-      subtestCode, 
-      answers,
-      questions,
-      timeSpent 
-    } = body as {
-      userId: string
-      mode: DailyChallengeMode
-      subtestCode?: SubtestCode
-      answers: Record<number, string>
-      questions: Array<{
-        id: string
-        correct_answer: string
-        subtest_code: SubtestCode
-      }>
-      timeSpent?: number
+    const parsed = BodySchema.safeParse(await request.json())
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid body' }, { status: 400 })
     }
+    const { userId, mode, subtestCode, answers, questions, timeSpent } = parsed.data
 
-    // Validate required fields
     if (!userId || !mode || !answers || !questions) {
       return NextResponse.json(
         { error: 'Missing required fields' },
@@ -47,10 +42,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Validate mode
-    if (!['balanced', 'focus'].includes(mode)) {
+    if (mode === 'focus' && !subtestCode) {
       return NextResponse.json(
-        { error: 'Invalid mode' },
+        { error: 'Focus mode requires subtestCode' },
         { status: 400 }
       )
     }
@@ -63,7 +57,16 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const supabase = createClient(supabaseUrl, supabaseKey)
+    const supabase = createClient(supabaseUrl, supabaseAnonKey)
+    const admin = createClient(supabaseUrl, supabaseServiceKey)
+    const { data: dbQuestions, error: qErr } = await admin
+      .from('question_bank')
+      .select('id, correct_answer, subtest_utbk')
+      .in('id', questions.map(q => q.id))
+    if (qErr) {
+      return NextResponse.json({ error: 'Failed fetching questions' }, { status: 500 })
+    }
+    const byId = new Map(dbQuestions?.map(q => [q.id, q]))
 
     // Prepare progress records
     const progressRecords = []
@@ -71,9 +74,9 @@ export async function POST(request: NextRequest) {
     let totalScore = 0
 
     for (let idx = 0; idx < questions.length; idx++) {
-      const question = questions[idx]
-      const userAnswer = answers[idx] || null
-      const isCorrect = userAnswer === question.correct_answer
+      const q = byId.get(questions[idx].id)
+      const userAnswer = answers[String(idx)] || null
+      const isCorrect = q ? userAnswer === q.correct_answer : false
       
       if (isCorrect) {
         totalCorrect++
@@ -83,18 +86,15 @@ export async function POST(request: NextRequest) {
       const questionScore = isCorrect ? 10 : 0
       totalScore += questionScore
 
-      // Create progress record
-      // Requirement 2.6: Store daily_challenge_mode
-      // Requirement 4.5: Store focus_subtest_code if Focus mode
       progressRecords.push({
         student_id: userId,
-        question_id: question.id,
+        question_id: questions[idx].id,
         selected_answer: userAnswer,
         is_correct: isCorrect,
         score: questionScore,
         time_spent_seconds: timeSpent ? Math.floor(timeSpent / questions.length) : 60,
         assessment_type: 'daily_challenge',
-        subtest_code: question.subtest_code,
+        subtest_code: q?.subtest_utbk || 'UNKNOWN',
         daily_challenge_mode: mode,
         focus_subtest_code: mode === 'focus' ? subtestCode : null,
       })
@@ -121,17 +121,15 @@ export async function POST(request: NextRequest) {
     // Calculate per-subtest breakdown
     const subtestBreakdown: Record<string, { correct: number; total: number }> = {}
     
-    for (const question of questions) {
-      const code = question.subtest_code
+    for (let idx = 0; idx < questions.length; idx++) {
+      const q = byId.get(questions[idx].id)
+      const code = q?.subtest_utbk || 'UNKNOWN'
       if (!subtestBreakdown[code]) {
         subtestBreakdown[code] = { correct: 0, total: 0 }
       }
       subtestBreakdown[code].total++
-      
-      // Find if this question was answered correctly
-      const idx = questions.indexOf(question)
-      const userAnswer = answers[idx]
-      if (userAnswer === question.correct_answer) {
+      const userAnswer = answers[String(idx)]
+      if (q && userAnswer === q.correct_answer) {
         subtestBreakdown[code].correct++
       }
     }
@@ -145,7 +143,44 @@ export async function POST(request: NextRequest) {
       accuracy: Math.round((stats.correct / stats.total) * 100)
     }))
 
-    // Return success response
+    // Economy rewards: Tickets + XP bonus on completion
+    const answeredCount = Object.keys(answers).length
+    const requiredForCompletion = Math.floor(questions.length * 0.8)
+    let xpAwarded = 0
+    let coinsAwarded = 0
+    if (answeredCount >= requiredForCompletion) {
+      if (accuracy > 60) {
+        coinsAwarded = 1
+      }
+      if (accuracy >= 70) {
+        xpAwarded = 150
+      } else if (accuracy >= 50) {
+        xpAwarded = 100
+      } else {
+        xpAwarded = 50
+      }
+      try {
+        if (coinsAwarded > 0) {
+          await awardCoins(
+            userId,
+            coinsAwarded,
+            'daily_challenge_reward',
+            undefined,
+            { mode, subtestCode: subtestCode || null, totalQuestions: questions.length, accuracy }
+          )
+        }
+        await awardXP(
+          userId,
+          xpAwarded,
+          'daily_challenge',
+          undefined,
+          { mode, subtestCode: subtestCode || null }
+        )
+      } catch (e) {
+        console.error('Economy reward error:', e)
+      }
+    }
+
     return NextResponse.json({
       success: true,
       totalQuestions: questions.length,
@@ -154,7 +189,12 @@ export async function POST(request: NextRequest) {
       accuracy,
       mode,
       subtestCode: mode === 'focus' ? subtestCode : undefined,
-      subtestResults
+      subtestResults,
+      rewards: {
+        coins: coinsAwarded,
+        xp: xpAwarded,
+        completion: answeredCount >= requiredForCompletion
+      }
     })
   } catch (error) {
     console.error('Error in daily-challenge/submit:', error)

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 
@@ -20,17 +20,7 @@ export function useRealtimeAchievements() {
   const [error, setError] = useState<string | null>(null)
   const [channel, setChannel] = useState<RealtimeChannel | null>(null)
 
-  useEffect(() => {
-    subscribeToAchievements()
-
-    return () => {
-      if (channel) {
-        supabase.removeChannel(channel)
-      }
-    }
-  }, [])
-
-  const subscribeToAchievements = async () => {
+  const subscribeToAchievements = useCallback(async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession()
       
@@ -39,7 +29,7 @@ export function useRealtimeAchievements() {
       }
 
       // Subscribe to real-time updates
-      const channel = supabase
+      const ch = supabase
         .channel('user_achievements')
         .on(
           'postgres_changes',
@@ -57,13 +47,24 @@ export function useRealtimeAchievements() {
         )
         .subscribe()
 
-      setChannel(channel)
+      setChannel(ch)
       setLoading(false)
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to subscribe')
       setLoading(false)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    subscribeToAchievements()
+
+    return () => {
+      if (channel) {
+        supabase.removeChannel(channel)
+      }
+    }
+  }, [channel, subscribeToAchievements])
+
 
   const fetchAchievementDetails = async (achievementId: string) => {
     try {
@@ -100,4 +101,3 @@ export function useRealtimeAchievements() {
     isConnected: channel?.state === 'joined'
   }
 }
-

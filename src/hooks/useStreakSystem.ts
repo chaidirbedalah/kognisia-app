@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { toast } from 'sonner'
 
 export interface StreakData {
   current_streak: number
@@ -28,6 +29,7 @@ export function useStreakSystem() {
   const [stats, setStats] = useState<StreakStats | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const prevStatusRef = useRef<StreakData['status'] | null>(null)
 
   useEffect(() => {
     fetchStreakStats()
@@ -39,7 +41,9 @@ export function useStreakSystem() {
       const { data: { session } } = await supabase.auth.getSession()
       
       if (!session) {
-        throw new Error('No active session')
+        setStats(null)
+        setError(null)
+        return
       }
 
       const response = await fetch('/api/streak/stats', {
@@ -55,13 +59,72 @@ export function useStreakSystem() {
       const data = await response.json()
       setStats(data)
       setError(null)
-    } catch (err: any) {
-      setError(err.message)
-      console.error('Error fetching streak stats:', err)
+
+      const newStatus = (data?.streak?.status ?? null) as StreakData['status'] | null
+      const prevStatus = prevStatusRef.current
+      prevStatusRef.current = newStatus
+
+      if (prevStatus && newStatus && prevStatus !== newStatus) {
+        if (prevStatus === 'at_risk' && newStatus === 'active') {
+          toast.success('Streak terselamatkan untuk hari ini! 🔥')
+        } else if (newStatus === 'broken') {
+          toast.error('Streak putus. Coba lagi besok 💔')
+        } else if (newStatus === 'at_risk') {
+          toast.warning('Streak berisiko putus hari ini. Ayo selesaikan Daily Challenge! ⚠️')
+        }
+      }
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch streak stats')
     } finally {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    let channel: ReturnType<typeof supabase.channel> | null = null
+    let isMounted = true
+
+    const setupRealtime = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (!session) return
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) return
+
+        channel = supabase
+          .channel('streak-realtime')
+          .on('postgres_changes', {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'streak_activities',
+            filter: `user_id=eq.${user.id}`
+          }, async () => {
+            if (!isMounted) return
+            await fetchStreakStats()
+          })
+          .on('postgres_changes', {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'daily_streaks',
+            filter: `user_id=eq.${user.id}`
+          }, async () => {
+            if (!isMounted) return
+            await fetchStreakStats()
+          })
+          .subscribe()
+      } catch (e) {
+        console.error('Error setting up streak realtime:', e)
+      }
+    }
+
+    setupRealtime()
+    return () => {
+      isMounted = false
+      if (channel) {
+        supabase.removeChannel(channel)
+      }
+    }
+  }, [])
 
   const updateStreak = async (activityType: string) => {
     try {
@@ -88,8 +151,8 @@ export function useStreakSystem() {
       // Refresh stats
       await fetchStreakStats()
       return true
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to update streak')
       console.error('Error updating streak:', err)
       return false
     }
@@ -103,4 +166,3 @@ export function useStreakSystem() {
     refetch: fetchStreakStats
   }
 }
-

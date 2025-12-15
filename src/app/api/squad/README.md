@@ -4,7 +4,7 @@
 API endpoints untuk Squad Battle feature. Semua endpoints require authentication.
 
 ## Authentication
-All endpoints require valid Supabase auth token in request headers.
+Semua endpoint memprioritaskan autentikasi via SSR cookies (Next.js + `@supabase/ssr`) untuk validasi sesi di server. Untuk kompatibilitas mundur, header `Authorization: Bearer <token>` tetap didukung sebagai fallback.
 
 ## Endpoints
 

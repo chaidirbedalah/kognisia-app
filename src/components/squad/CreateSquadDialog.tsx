@@ -78,8 +78,8 @@ export function CreateSquadDialog({
         throw new Error('Invalid response: missing invite_code or squad.id')
       }
 
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to create squad')
     } finally {
       setLoading(false)
     }
@@ -138,7 +138,7 @@ export function CreateSquadDialog({
 
             <Alert>
               <AlertDescription>
-                Squad "{name}" has been created successfully. Share the invite code with your friends to let them join!
+                Squad {name} has been created successfully. Share the invite code with your friends to let them join!
               </AlertDescription>
             </Alert>
           </div>

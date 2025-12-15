@@ -1,7 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { Trophy, Medal, Zap } from 'lucide-react'
+import { useEffect, useState, useCallback } from 'react'
+import Image from 'next/image'
+import { Trophy, Medal, Zap, Wifi, WifiOff } from 'lucide-react'
+import { supabase } from '@/lib/supabase'
 
 interface LeaderboardEntry {
   id: string
@@ -26,19 +28,28 @@ interface BattleLeaderboardProps {
   battleId: string
   autoRefresh?: boolean
   refreshInterval?: number
+  onConnectionChange?: (connected: boolean) => void
 }
 
 export function BattleLeaderboard({
   battleId,
   autoRefresh = true,
-  refreshInterval = 5000
+  refreshInterval = 5000,
+  onConnectionChange
 }: BattleLeaderboardProps) {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([])
-  const [stats, setStats] = useState<any>(null)
+  interface BattleStats {
+    total_participants: number
+    completed_participants: number
+    average_score: number
+    average_accuracy: number
+  }
+  const [stats, setStats] = useState<BattleStats | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [isConnected, setIsConnected] = useState(false)
 
-  const fetchLeaderboard = async () => {
+  const fetchLeaderboard = useCallback(async () => {
     try {
       const response = await fetch(`/api/squad/battle/${battleId}/leaderboard`)
       
@@ -50,13 +61,13 @@ export function BattleLeaderboard({
       setLeaderboard(data.leaderboard || [])
       setStats(data.stats)
       setError(null)
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch leaderboard')
       console.error('Error fetching leaderboard:', err)
     } finally {
       setLoading(false)
     }
-  }
+  }, [battleId])
 
   useEffect(() => {
     fetchLeaderboard()
@@ -65,7 +76,34 @@ export function BattleLeaderboard({
       const interval = setInterval(fetchLeaderboard, refreshInterval)
       return () => clearInterval(interval)
     }
-  }, [battleId, autoRefresh, refreshInterval])
+  }, [battleId, autoRefresh, refreshInterval, fetchLeaderboard])
+
+  useEffect(() => {
+    let channel: ReturnType<typeof supabase.channel> | null = null
+    let mounted = true
+    try {
+      channel = supabase
+        .channel(`battle-leaderboard-${battleId}`)
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'squad_battle_participants',
+          filter: `battle_id=eq.${battleId}`
+        }, async () => {
+          if (!mounted) return
+          await fetchLeaderboard()
+        })
+        .subscribe((status) => {
+          const live = status === 'SUBSCRIBED'
+          setIsConnected(live)
+          onConnectionChange?.(live)
+        })
+    } catch {}
+    return () => {
+      mounted = false
+      if (channel) supabase.removeChannel(channel)
+    }
+  }, [battleId, fetchLeaderboard, onConnectionChange])
 
   if (loading) {
     return (
@@ -85,6 +123,19 @@ export function BattleLeaderboard({
 
   return (
     <div className="space-y-6">
+      <div className="flex items-center justify-end gap-2" aria-live="polite">
+        {isConnected ? (
+          <span className="inline-flex items-center gap-1 text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
+            <Wifi className="h-3 w-3" />
+            Live
+          </span>
+        ) : (
+          <span className="inline-flex items-center gap-1 text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">
+            <WifiOff className="h-3 w-3" />
+            Offline
+          </span>
+        )}
+      </div>
       {/* Battle Stats */}
       {stats && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -151,10 +202,12 @@ export function BattleLeaderboard({
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         {entry.user.avatar_url && (
-                          <img
+                          <Image
                             src={entry.user.avatar_url}
                             alt={entry.user.full_name}
-                            className="h-8 w-8 rounded-full"
+                            width={32}
+                            height={32}
+                            className="h-8 w-8 rounded-full object-cover"
                           />
                         )}
                         <div>

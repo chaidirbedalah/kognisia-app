@@ -20,7 +20,7 @@ interface MarathonTabProps {
 export function MarathonTab({ data, loading }: MarathonTabProps) {
   if (loading) {
     return (
-      <div className="space-y-6">
+      <div data-testid="tryout-utbk-tab" className="space-y-6">
         <Card>
           <CardHeader>
             <div className="h-6 bg-gray-200 animate-pulse rounded w-48 mb-2"></div>
@@ -40,7 +40,7 @@ export function MarathonTab({ data, loading }: MarathonTabProps) {
 
   if (data.length === 0) {
     return (
-      <Card>
+      <Card data-testid="tryout-utbk-empty">
         <CardHeader>
           <CardTitle>Riwayat Try Out UTBK</CardTitle>
           <CardDescription>Belum ada riwayat</CardDescription>
@@ -56,6 +56,7 @@ export function MarathonTab({ data, loading }: MarathonTabProps) {
             </p>
             <button
               onClick={() => window.location.href = '/tryout-utbk'}
+              data-testid="start-tryout-utbk-button"
               className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               Mulai Try Out UTBK
@@ -75,7 +76,7 @@ export function MarathonTab({ data, loading }: MarathonTabProps) {
   const avgScore = Math.round(totalCorrect / totalTryOuts)
 
   return (
-    <div className="space-y-6">
+    <div data-testid="tryout-utbk-tab" className="space-y-6">
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
@@ -118,7 +119,7 @@ export function MarathonTab({ data, loading }: MarathonTabProps) {
       </div>
 
       {/* Try Out UTBK History */}
-      <Card>
+      <Card data-testid="tryout-utbk-history">
         <CardHeader>
           <CardTitle>Riwayat Try Out UTBK 📝</CardTitle>
           <CardDescription>

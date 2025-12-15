@@ -32,11 +32,9 @@ interface EventCardProps {
 }
 
 export function EventCard({
-  id,
   name,
   description,
   icon,
-  start_date,
   end_date,
   bonus_multiplier,
   challenges,
@@ -45,8 +43,6 @@ export function EventCard({
   onJoin,
   onViewDetails
 }: EventCardProps) {
-  const endDate = new Date(end_date);
-  const daysLeft = Math.ceil((endDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
@@ -83,10 +79,7 @@ export function EventCard({
 
       <div className="mb-4 p-3 bg-gray-50 rounded">
         <p className="text-sm text-gray-600">
-          Berakhir dalam <span className="font-bold text-red-600">{daysLeft} hari</span>
-        </p>
-        <p className="text-xs text-gray-500 mt-1">
-          {format(new Date(end_date), 'dd MMMM yyyy', { locale: idLocale })}
+          Berakhir pada <span className="font-bold text-red-600">{format(new Date(end_date), 'dd MMMM yyyy', { locale: idLocale })}</span>
         </p>
       </div>
 

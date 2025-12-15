@@ -180,6 +180,9 @@ export default function DailyChallengePage() {
       if (result.subtestResults && result.subtestResults.length > 0) {
         params.append('results', encodeURIComponent(JSON.stringify(result.subtestResults)))
       }
+      if (result.rewards?.coins && Number(result.rewards.coins) > 0) {
+        params.append('coins', String(result.rewards.coins))
+      }
       
       window.location.href = `/daily-challenge/results?${params.toString()}`
     } catch (error) {
@@ -198,7 +201,7 @@ export default function DailyChallengePage() {
   // Render mode selection step
   if (flowStep === 'mode-selection') {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
+      <div data-testid="daily-mode-selection-step" className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-4xl mx-auto px-4">
           <div className="mb-8 text-center">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Daily Challenge 📚</h1>
@@ -216,7 +219,7 @@ export default function DailyChallengePage() {
   // Render subtest selection step (for Focus mode)
   if (flowStep === 'subtest-selection') {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
+      <div data-testid="daily-subtest-selection-step" className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-6xl mx-auto px-4">
           <div className="mb-8">
             <Button 
@@ -241,7 +244,7 @@ export default function DailyChallengePage() {
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div data-testid="daily-loading" className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Memuat soal...</p>
@@ -253,7 +256,7 @@ export default function DailyChallengePage() {
   // No questions available
   if (!currentQuestion) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div data-testid="daily-no-questions" className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <p className="text-gray-600 mb-4">Tidak ada soal tersedia</p>
           <Button onClick={() => setFlowStep('mode-selection')}>
@@ -266,7 +269,7 @@ export default function DailyChallengePage() {
 
   // Render questions step
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div data-testid="daily-question-step" className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4">
         {/* Header */}
         <div className="mb-6 flex justify-between items-center">
@@ -324,6 +327,7 @@ export default function DailyChallengePage() {
         {/* Hint & Solution Buttons */}
         <div className="flex gap-3 mb-6">
           <Button 
+            data-testid="hint-button"
             variant="outline" 
             onClick={() => setShowHint(!showHint)}
             disabled={showSolution}
@@ -331,6 +335,7 @@ export default function DailyChallengePage() {
             {showHint ? 'Sembunyikan' : 'Lihat'} Petunjuk
           </Button>
           <Button 
+            data-testid="solution-button"
             variant="outline" 
             onClick={() => setShowSolution(!showSolution)}
           >
@@ -360,6 +365,7 @@ export default function DailyChallengePage() {
         {/* Navigation */}
         <div className="flex justify-between">
           <Button 
+            data-testid="prev-button"
             variant="outline" 
             onClick={handlePrevious}
             disabled={currentIndex === 0}
@@ -368,11 +374,11 @@ export default function DailyChallengePage() {
           </Button>
           
           {currentIndex === questions.length - 1 ? (
-            <Button onClick={handleSubmit}>
+            <Button data-testid="submit-button" onClick={handleSubmit}>
               Selesai & Submit
             </Button>
           ) : (
-            <Button onClick={handleNext}>
+            <Button data-testid="next-button" onClick={handleNext}>
               Selanjutnya →
             </Button>
           )}

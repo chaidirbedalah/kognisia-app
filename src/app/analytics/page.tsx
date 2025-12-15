@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { Skeleton } from '@/components/ui/skeleton'
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { format } from 'date-fns';
 import { id as idLocale } from 'date-fns/locale';
@@ -14,9 +15,7 @@ export default function AnalyticsPage() {
     userMetrics,
     engagementTrend,
     seasonalPerformance,
-    streakStats,
     achievementTimeline,
-    pointsTimeline,
     trends,
     loading,
     error
@@ -26,9 +25,68 @@ export default function AnalyticsPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-100 p-4 md:p-8">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
-            <p className="mt-4 text-gray-600">Memuat analytics...</p>
+          <div className="mb-8">
+            <Skeleton className="h-10 w-48 rounded mb-2" />
+            <Skeleton className="h-4 w-80 rounded" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="bg-white rounded-lg shadow p-6">
+                <Skeleton className="h-4 w-28 rounded mb-2" />
+                <Skeleton className="h-8 w-24 rounded" />
+                <Skeleton className="h-3 w-40 rounded mt-2" />
+              </div>
+            ))}
+          </div>
+          <div className="bg-white rounded-lg shadow p-6 mb-8">
+            <Skeleton className="h-7 w-56 rounded mb-4" />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="p-4 bg-gray-50 rounded">
+                  <Skeleton className="h-4 w-32 rounded mb-2" />
+                  <Skeleton className="h-6 w-20 rounded" />
+                </div>
+              ))}
+            </div>
+            <div className="space-y-2">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                  <div className="flex items-center gap-3">
+                    <Skeleton className="h-6 w-6 rounded" />
+                    <div>
+                      <Skeleton className="h-4 w-40 rounded mb-1" />
+                      <Skeleton className="h-3 w-24 rounded" />
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <Skeleton className="h-4 w-16 rounded mb-1" />
+                    <Skeleton className="h-3 w-12 rounded" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="bg-white rounded-lg shadow p-6 mb-8">
+            <Skeleton className="h-7 w-56 rounded mb-4" />
+            <div className="space-y-4">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                  <Skeleton className="h-4 w-40 rounded" />
+                  <Skeleton className="h-4 w-24 rounded" />
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="bg-white rounded-lg shadow p-6">
+            <Skeleton className="h-7 w-56 rounded mb-4" />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="p-4 bg-gray-50 rounded">
+                  <Skeleton className="h-4 w-32 rounded mb-2" />
+                  <Skeleton className="h-6 w-20 rounded" />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

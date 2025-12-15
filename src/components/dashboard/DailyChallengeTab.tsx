@@ -11,7 +11,7 @@ interface DailyChallengeTabProps {
 export function DailyChallengeTab({ data, loading }: DailyChallengeTabProps) {
   if (loading) {
     return (
-      <div className="space-y-6">
+      <div data-testid="daily-challenge-tab" className="space-y-6">
         <Card>
           <CardHeader>
             <div className="h-6 bg-gray-200 animate-pulse rounded w-48 mb-2"></div>
@@ -31,7 +31,7 @@ export function DailyChallengeTab({ data, loading }: DailyChallengeTabProps) {
 
   if (data.length === 0) {
     return (
-      <Card>
+      <Card data-testid="daily-challenge-empty">
         <CardHeader>
           <CardTitle>Riwayat Daily Challenge</CardTitle>
           <CardDescription>Belum ada riwayat</CardDescription>
@@ -69,7 +69,7 @@ export function DailyChallengeTab({ data, loading }: DailyChallengeTabProps) {
   const layerBreakdown = calculate3LayerBreakdown(totalDirect, totalHint, totalSolution)
 
   return (
-    <div className="space-y-6">
+    <div data-testid="daily-challenge-tab" className="space-y-6">
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
@@ -197,7 +197,7 @@ export function DailyChallengeTab({ data, loading }: DailyChallengeTabProps) {
       </Card>
 
       {/* History List */}
-      <Card>
+      <Card data-testid="daily-challenge-history">
         <CardHeader>
           <CardTitle>Riwayat Daily Challenge 📅</CardTitle>
           <CardDescription>

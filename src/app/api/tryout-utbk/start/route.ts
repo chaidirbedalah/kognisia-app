@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { ASSESSMENT_CONFIGS, UTBK_2026_SUBTESTS } from '@/lib/utbk-constants'
 
+type DBQuestion = {
+  subtest_code: string
+} & Record<string, unknown>
+
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
@@ -37,7 +41,7 @@ export async function POST(request: NextRequest) {
     const config = ASSESSMENT_CONFIGS.tryout_utbk
 
     // Fetch questions for each subtest according to UTBK 2026 distribution
-    const allQuestions: any[] = []
+    const allQuestions: Array<DBQuestion & { subtest_display_order: number; recommended_minutes: number }> = []
     
     for (const dist of config.subtestDistribution) {
       const { data, error } = await supabase
@@ -64,14 +68,14 @@ export async function POST(request: NextRequest) {
       }
 
       // Randomize and select required count
-      const shuffled = shuffleArray(data)
+      const shuffled = shuffleArray(data as DBQuestion[])
       const selected = shuffled.slice(0, dist.questionCount)
       
       // Add subtest metadata
       const questionsWithMeta = selected.map(q => ({
         ...q,
         subtest_display_order: UTBK_2026_SUBTESTS.find(s => s.code === dist.subtestCode)?.displayOrder || 0,
-        recommended_minutes: dist.recommendedMinutes
+        recommended_minutes: Number(dist.recommendedMinutes)
       }))
       
       allQuestions.push(...questionsWithMeta)

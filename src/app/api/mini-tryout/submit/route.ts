@@ -68,9 +68,8 @@ export async function POST(request: NextRequest) {
 
       // Create progress record (Requirement 7.7)
       progressRecords.push({
-        user_id: user.id,
         student_id: user.id,
-        question_id: question.id,
+        question_id: Number(question.id),
         assessment_id: sessionId,
         assessment_type: 'mini_tryout', // Requirement 7.8
         subtest_code: question.subtest_code,

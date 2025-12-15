@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -9,8 +9,9 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { StartBattleDialog } from '@/components/squad/StartBattleDialog'
 import { ScheduledBattlesList } from '@/components/squad/ScheduledBattlesList'
 import type { Squad, SquadMember } from '@/lib/squad-types'
-import { Users, Crown, Copy, Check, Swords, ArrowLeft, UserMinus } from 'lucide-react'
+import { Users, Crown, Copy, Check, Swords, ArrowLeft } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
+import { Skeleton } from '@/components/ui/skeleton'
 
 export default function SquadDetailsPage() {
   const router = useRouter()
@@ -29,13 +30,7 @@ export default function SquadDetailsPage() {
     console.log('startBattleOpen changed:', startBattleOpen)
   }, [startBattleOpen])
 
-  useEffect(() => {
-    if (squadId) {
-      loadSquadDetails()
-    }
-  }, [squadId])
-
-  async function loadSquadDetails() {
+  const loadSquadDetails = useCallback(async () => {
     if (!squadId) {
       setError('Invalid squad ID')
       setLoading(false)
@@ -46,7 +41,6 @@ export default function SquadDetailsPage() {
       setLoading(true)
       setError('')
 
-      // Get session token
       const { data: { session } } = await supabase.auth.getSession()
       
       if (!session) {
@@ -66,12 +60,21 @@ export default function SquadDetailsPage() {
 
       setSquad(data.squad)
       setMembers(data.members)
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to load squad details')
     } finally {
       setLoading(false)
     }
-  }
+  }, [squadId])
+
+  useEffect(() => {
+    if (squadId) {
+      const t = setTimeout(() => {
+        loadSquadDetails()
+      }, 0)
+      return () => clearTimeout(t)
+    }
+  }, [squadId, loadSquadDetails])
 
   const copyInviteCode = () => {
     if (squad) {
@@ -88,13 +91,66 @@ export default function SquadDetailsPage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto p-6">
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading squad details...</p>
+      <div className="container mx-auto p-6 max-w-5xl">
+        <Button
+          variant="ghost"
+          onClick={() => router.push('/squad')}
+          className="mb-4"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Squads
+        </Button>
+
+        <div className="flex items-start justify-between">
+          <div>
+            <Skeleton className="h-7 w-48 rounded mb-2" />
+            <Skeleton className="h-4 w-64 rounded" />
+          </div>
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-9 w-32 rounded" />
+            <Skeleton className="h-9 w-32 rounded" />
           </div>
         </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Card key={i}>
+              <CardContent className="p-6">
+                <Skeleton className="h-4 w-32 rounded mb-2" />
+                <Skeleton className="h-3 w-24 rounded" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle className="h-6 w-56">
+              <Skeleton className="h-6 w-56 rounded" />
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="rounded-lg border bg-white p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3 flex-1">
+                      <Skeleton className="h-6 w-6 rounded" />
+                      <div className="flex-1">
+                        <Skeleton className="h-4 w-40 rounded mb-2" />
+                        <Skeleton className="h-3 w-24 rounded" />
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <Skeleton className="h-6 w-20 rounded mb-1" />
+                      <Skeleton className="h-3 w-12 rounded" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     )
   }
@@ -118,7 +174,6 @@ export default function SquadDetailsPage() {
   }
 
   const isLeader = members.find(m => m.role === 'leader')?.is_current_user
-  const currentMember = members.find(m => m.is_current_user)
 
   return (
     <div className="container mx-auto p-6 max-w-5xl">
@@ -284,7 +339,7 @@ export default function SquadDetailsPage() {
               </li>
               <li className="flex gap-2">
                 <span className="font-semibold text-purple-600">2.</span>
-                <span>Squad leader clicks "Start Battle" button</span>
+                <span>Squad leader clicks &quot;Start Battle&quot; button</span>
               </li>
               <li className="flex gap-2">
                 <span className="font-semibold text-purple-600">3.</span>

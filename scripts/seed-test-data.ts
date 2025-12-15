@@ -27,7 +27,7 @@ if (!supabaseUrl || !supabaseKey) {
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 // Test user email
-const TEST_USER_EMAIL = 'test@kognisia.com'
+const TEST_USER_EMAIL = 'andi@siswa.id'
 
 // Subtest codes
 const SUBTESTS = ['PU', 'PPU', 'PBM', 'PK', 'LIT_INDO', 'LIT_ING', 'PM']

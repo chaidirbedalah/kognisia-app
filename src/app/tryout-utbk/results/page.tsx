@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, Suspense } from 'react'
+import { useEffect, Suspense, useCallback, useMemo } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -9,6 +9,7 @@ import { UTBK_2026_SUBTESTS } from '@/lib/utbk-constants'
 import type { SubtestCode } from '@/lib/types'
 import { supabase } from '@/lib/supabase'
 import { checkAndUnlockAchievements } from '@/lib/achievement-checker'
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from '@/components/ui/breadcrumb'
 
 interface SubtestResult {
   subtestCode: SubtestCode
@@ -25,72 +26,58 @@ interface SubtestResult {
 function TryOutUTBKResultsContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
-  
-  const [totalScore, setTotalScore] = useState(0)
-  const [totalQuestions, setTotalQuestions] = useState(0)
-  const [accuracy, setAccuracy] = useState(0)
-  const [totalTimeMinutes, setTotalTimeMinutes] = useState(0)
-  const [subtestResults, setSubtestResults] = useState<SubtestResult[]>([])
-  const [strongest, setStrongest] = useState<SubtestResult | null>(null)
-  const [weakest, setWeakest] = useState<SubtestResult | null>(null)
 
-  useEffect(() => {
-    // Get results from URL params
-    const scoreParam = searchParams.get('score')
-    const questionsParam = searchParams.get('questions')
-    const accuracyParam = searchParams.get('accuracy')
-    const timeParam = searchParams.get('time')
-    const resultsParam = searchParams.get('results')
-    const strongestParam = searchParams.get('strongest')
-    const weakestParam = searchParams.get('weakest')
+  const scoreParam = searchParams.get('score')
+  const questionsParam = searchParams.get('questions')
+  const accuracyParam = searchParams.get('accuracy')
+  const timeParam = searchParams.get('time')
+  const resultsParam = searchParams.get('results')
+  const strongestParam = searchParams.get('strongest')
+  const weakestParam = searchParams.get('weakest')
 
-    if (scoreParam) setTotalScore(parseInt(scoreParam))
-    if (questionsParam) setTotalQuestions(parseInt(questionsParam))
-    if (accuracyParam) setAccuracy(parseInt(accuracyParam))
-    if (timeParam) setTotalTimeMinutes(parseInt(timeParam))
-    
-    if (resultsParam) {
-      try {
-        const parsed = JSON.parse(decodeURIComponent(resultsParam))
-        setSubtestResults(parsed)
-      } catch (e) {
-        console.error('Failed to parse results:', e)
-      }
+  const totalScore = useMemo(() => (scoreParam ? parseInt(scoreParam) : 0), [scoreParam])
+  const totalQuestions = useMemo(() => (questionsParam ? parseInt(questionsParam) : 0), [questionsParam])
+  const accuracy = useMemo(() => (accuracyParam ? parseInt(accuracyParam) : 0), [accuracyParam])
+  const totalTimeMinutes = useMemo(() => (timeParam ? parseInt(timeParam) : 0), [timeParam])
+  const subtestResults: SubtestResult[] = useMemo(() => {
+    if (!resultsParam) return []
+    try {
+      return JSON.parse(decodeURIComponent(resultsParam))
+    } catch (e) {
+      console.error('Failed to parse results:', e)
+      return []
     }
-
-    if (strongestParam) {
-      try {
-        const parsed = JSON.parse(decodeURIComponent(strongestParam))
-        setStrongest(parsed)
-      } catch (e) {
-        console.error('Failed to parse strongest:', e)
-      }
+  }, [resultsParam])
+  const strongest: SubtestResult | null = useMemo(() => {
+    if (!strongestParam) return null
+    try {
+      return JSON.parse(decodeURIComponent(strongestParam))
+    } catch (e) {
+      console.error('Failed to parse strongest:', e)
+      return null
     }
-
-    if (weakestParam) {
-      try {
-        const parsed = JSON.parse(decodeURIComponent(weakestParam))
-        setWeakest(parsed)
-      } catch (e) {
-        console.error('Failed to parse weakest:', e)
-      }
+  }, [strongestParam])
+  const weakest: SubtestResult | null = useMemo(() => {
+    if (!weakestParam) return null
+    try {
+      return JSON.parse(decodeURIComponent(weakestParam))
+    } catch (e) {
+      console.error('Failed to parse weakest:', e)
+      return null
     }
+  }, [weakestParam])
 
-    // Check and unlock achievements
-    checkAchievements(parseInt(accuracyParam || '0'), parseInt(questionsParam || '0'), parseInt(timeParam || '0'))
-  }, [searchParams])
-
-  async function checkAchievements(finalAccuracy: number, totalQuestions: number, timeMinutes: number) {
+  const checkAchievements = useCallback(async (finalAccuracy: number, totalQuestionsParam: number, timeMinutes: number) => {
     try {
       const { data: { session } } = await supabase.auth.getSession()
       if (session) {
         const battleResult = {
           score: totalScore,
           accuracy: finalAccuracy,
-          rank: 1, // Try out doesn't have ranking
-          correctAnswers: Math.round(totalQuestions * finalAccuracy / 100),
-          totalQuestions: totalQuestions,
-          timeTakenSeconds: timeMinutes * 60, // Convert to seconds
+          rank: 1,
+          correctAnswers: Math.round(totalQuestionsParam * finalAccuracy / 100),
+          totalQuestions: totalQuestionsParam,
+          timeTakenSeconds: timeMinutes * 60,
           isHots: false
         }
         
@@ -99,7 +86,11 @@ function TryOutUTBKResultsContent() {
     } catch (error) {
       console.error('Error checking achievements:', error)
     }
-  }
+  }, [totalScore])
+
+  useEffect(() => {
+    checkAchievements(accuracy, totalQuestions, totalTimeMinutes)
+  }, [accuracy, totalQuestions, totalTimeMinutes, checkAchievements])
 
   const getSubtestName = (code: SubtestCode) => {
     return UTBK_2026_SUBTESTS.find(s => s.code === code)?.name || code
@@ -116,27 +107,41 @@ function TryOutUTBKResultsContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-background py-8">
       <div className="max-w-6xl mx-auto px-4">
-        {/* Header */}
-        <div className="text-center mb-8">
+        <Breadcrumb className="mb-4">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/dashboard">Kognisia</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/tryout-utbk">Try Out UTBK</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Hasil</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+        <div className="text-center mb-10">
           <div className="text-6xl mb-4">🎉</div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-4xl font-bold tracking-tight text-foreground mb-2">
             Try Out UTBK Selesai!
           </h1>
-          <p className="text-gray-600">
+          <p className="text-muted-foreground">
             Simulasi lengkap UTBK 2026 dengan 160 soal
           </p>
         </div>
 
         {/* Overall Score Card */}
-        <Card className="mb-6 bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-blue-200">
+        <Card className="mb-6 shadow-md">
           <CardHeader>
-            <CardTitle className="text-center">Skor Total</CardTitle>
+            <CardTitle className="text-center text-xl">Skor Total</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-center">
-              <div className="text-5xl font-bold text-blue-600 mb-2">
+              <div className="text-5xl font-bold text-primary mb-2">
                 {totalScore}/{totalQuestions * 10}
               </div>
               <div className="text-2xl font-semibold mb-2">
@@ -147,7 +152,7 @@ function TryOutUTBKResultsContent() {
                   {accuracy}% Akurasi
                 </span>
               </div>
-              <p className="text-gray-600 mb-2">
+              <p className="text-muted-foreground mb-2">
                 {Math.round(totalQuestions * accuracy / 100)} benar dari {totalQuestions} soal
               </p>
               <p className="text-sm text-gray-500">
@@ -161,7 +166,7 @@ function TryOutUTBKResultsContent() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           {/* Strongest */}
           {strongest && (
-            <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
+            <Card className="shadow-sm transition-shadow hover:shadow-md">
               <CardHeader>
                 <CardTitle className="text-sm flex items-center gap-2">
                   <span>💪</span>
@@ -172,8 +177,8 @@ function TryOutUTBKResultsContent() {
                 <div className="flex items-center gap-3">
                   <span className="text-3xl">{getSubtestIcon(strongest.subtestCode)}</span>
                   <div className="flex-1">
-                    <p className="font-semibold text-gray-900">{getSubtestName(strongest.subtestCode)}</p>
-                    <p className="text-sm text-gray-600">
+                    <p className="font-semibold text-foreground">{getSubtestName(strongest.subtestCode)}</p>
+                    <p className="text-sm text-muted-foreground">
                       {strongest.correctAnswers}/{strongest.totalQuestions} benar
                     </p>
                   </div>
@@ -187,7 +192,7 @@ function TryOutUTBKResultsContent() {
 
           {/* Weakest */}
           {weakest && (
-            <Card className="bg-gradient-to-br from-orange-50 to-red-50 border-orange-200">
+            <Card className="shadow-sm transition-shadow hover:shadow-md">
               <CardHeader>
                 <CardTitle className="text-sm flex items-center gap-2">
                   <span>📈</span>
@@ -198,8 +203,8 @@ function TryOutUTBKResultsContent() {
                 <div className="flex items-center gap-3">
                   <span className="text-3xl">{getSubtestIcon(weakest.subtestCode)}</span>
                   <div className="flex-1">
-                    <p className="font-semibold text-gray-900">{getSubtestName(weakest.subtestCode)}</p>
-                    <p className="text-sm text-gray-600">
+                    <p className="font-semibold text-foreground">{getSubtestName(weakest.subtestCode)}</p>
+                    <p className="text-sm text-muted-foreground">
                       {weakest.correctAnswers}/{weakest.totalQuestions} benar
                     </p>
                   </div>
@@ -213,9 +218,9 @@ function TryOutUTBKResultsContent() {
         </div>
 
         {/* Per-Subtest Breakdown */}
-        <Card className="mb-6">
+        <Card className="mb-6 transition-shadow hover:shadow-lg">
           <CardHeader>
-            <CardTitle>Breakdown Per Subtest 📊</CardTitle>
+            <CardTitle className="text-lg">Breakdown Per Subtest 📊</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -225,8 +230,8 @@ function TryOutUTBKResultsContent() {
                     <div className="flex items-center gap-2 flex-1">
                       <span className="text-2xl">{getSubtestIcon(result.subtestCode)}</span>
                       <div>
-                        <p className="font-semibold text-gray-900">{getSubtestName(result.subtestCode)}</p>
-                        <p className="text-sm text-gray-600">
+                        <p className="font-semibold text-foreground">{getSubtestName(result.subtestCode)}</p>
+                        <p className="text-sm text-muted-foreground">
                           {result.correctAnswers}/{result.totalQuestions} benar
                         </p>
                       </div>
@@ -245,7 +250,7 @@ function TryOutUTBKResultsContent() {
                   </div>
 
                   {/* Progress Bar */}
-                  <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
+                  <div className="w-full bg-muted rounded-full h-2 mb-3">
                     <div
                       className={`h-2 rounded-full transition-all ${
                         result.accuracy >= 70 ? 'bg-green-500' :

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 
 export async function POST(request: NextRequest) {
   try {
@@ -144,16 +144,14 @@ export async function POST(request: NextRequest) {
       }
     })
 
-  } catch (error: any) {
-    console.error('Error updating streak:', error)
-    return NextResponse.json(
-      { error: error.message || 'Failed to update streak' },
-      { status: 500 }
-    )
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : 'Failed to update streak'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }
 
-async function checkStreakMilestones(supabase: any, userId: string, currentStreak: number) {
+async function checkStreakMilestones(supabase: SupabaseClient, userId: string, currentStreak: number) {
   const milestones = [7, 14, 30, 60, 100, 365]
   
   for (const milestone of milestones) {
@@ -180,4 +178,3 @@ async function checkStreakMilestones(supabase: any, userId: string, currentStrea
     }
   }
 }
-

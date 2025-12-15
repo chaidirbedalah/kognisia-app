@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
       .eq('user_id', user.id)
       .single()
 
-    const updateData: any = {}
+    const updateData: Record<string, string> = {}
     updateData[`active_${type}_id`] = cosmetic_id
 
     if (customization) {
@@ -118,12 +118,9 @@ export async function POST(request: NextRequest) {
       })
     }
 
-  } catch (error: any) {
-    console.error('Error equipping cosmetic:', error)
-    return NextResponse.json(
-      { error: error.message || 'Failed to equip cosmetic' },
-      { status: 500 }
-    )
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : 'Failed to equip cosmetic'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }
-

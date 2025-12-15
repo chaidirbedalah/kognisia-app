@@ -4,6 +4,7 @@
  */
 
 import { supabase } from './supabase'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import type {
   Squad,
   SquadMember,
@@ -158,7 +159,7 @@ export async function joinSquad(userId: string, request: JoinSquadRequest): Prom
 /**
  * Get user's squads
  */
-export async function getUserSquads(userId: string, supabaseClient?: any): Promise<Squad[]> {
+export async function getUserSquads(userId: string, supabaseClient?: SupabaseClient): Promise<Squad[]> {
   const client = supabaseClient || supabase
   
   const { data, error } = await client
@@ -185,43 +186,34 @@ export async function getUserSquads(userId: string, supabaseClient?: any): Promi
     throw error
   }
   
-  console.log('getUserSquads raw data:', JSON.stringify(data, null, 2))
-  
-  // Map the nested squads data and add member count
-  const squadsWithCounts = await Promise.all(
-    data.map(async (item: any) => {
-      const squad = item.squads
-      
-      if (!squad) {
-        console.warn('Squad data is null for item:', item)
-        return null
-      }
-      
-      // Get member count for this squad
-      const { count } = await client
-        .from('squad_members')
-        .select('*', { count: 'exact', head: true })
-        .eq('squad_id', squad.id)
-        .eq('is_active', true)
-      
-      return {
-        ...squad,
-        member_count: count || 0
-      }
-    })
-  )
-  
-  const squads = squadsWithCounts.filter(Boolean)
-  
-  console.log('getUserSquads final squads:', JSON.stringify(squads, null, 2))
-  
+  type UserSquadRow = {
+    squad_id: string
+    role: string
+    squads?: Squad
+  }
+  const rows = (data ?? []) as unknown as UserSquadRow[]
+  const squadItems = rows.filter((item) => item.squads)
+  const squadIds = squadItems.map((item) => item.squads!.id)
+  const { data: membersForSquads } = await client
+    .from('squad_members')
+    .select('squad_id')
+    .in('squad_id', squadIds)
+    .eq('is_active', true)
+  const countMap = new Map<string, number>()
+  membersForSquads?.forEach((m: { squad_id: string }) => {
+    countMap.set(m.squad_id, (countMap.get(m.squad_id) || 0) + 1)
+  })
+  const squads = squadItems.map((item) => ({
+    ...(item.squads as Squad),
+    member_count: countMap.get(item.squads!.id) || 0
+  }))
   return squads
 }
 
 /**
  * Get squad details with members
  */
-export async function getSquadDetails(squadId: string, currentUserId?: string, supabaseClient?: any): Promise<{ squad: Squad, members: SquadMember[] }> {
+export async function getSquadDetails(squadId: string, currentUserId?: string, supabaseClient?: SupabaseClient): Promise<{ squad: Squad, members: SquadMember[] }> {
   const client = supabaseClient || supabase
   
   const { data: squad, error: squadError } = await client
@@ -247,10 +239,12 @@ export async function getSquadDetails(squadId: string, currentUserId?: string, s
   
   if (membersError) throw membersError
   
-  const membersWithNames = members.map((m: any) => ({
+  type MemberRow = SquadMember & { users?: { id: string; full_name?: string | null; email?: string | null } }
+  const memberRows = (members ?? []) as unknown as MemberRow[]
+  const membersWithNames = memberRows.map((m) => ({
     ...m,
     user_name: m.users?.full_name || m.users?.email || 'Unknown',
-    user_email: m.users?.email,
+    user_email: m.users?.email ?? undefined,
     is_current_user: currentUserId ? m.user_id === currentUserId : false
   }))
   
@@ -260,7 +254,7 @@ export async function getSquadDetails(squadId: string, currentUserId?: string, s
 /**
  * Leave a squad
  */
-export async function leaveSquad(userId: string, squadId: string, supabaseClient?: any): Promise<void> {
+export async function leaveSquad(userId: string, squadId: string, supabaseClient?: SupabaseClient): Promise<void> {
   const client = supabaseClient || supabase
   
   const { error } = await client
@@ -415,7 +409,9 @@ export async function getBattleDetails(battleId: string): Promise<{ battle: Squa
   
   if (questionsError) throw questionsError
   
-  const questionsWithData = questions.map((q: any) => ({
+  type QuestionRow = Omit<SquadBattleQuestion, 'question'> & { question_bank?: SquadBattleQuestion['question'] }
+  const questionRows = (questions ?? []) as unknown as QuestionRow[]
+  const questionsWithData = questionRows.map((q) => ({
     ...q,
     question: q.question_bank
   }))
@@ -452,8 +448,8 @@ export async function submitBattleAnswer(
   if (participant) {
     const newScore = participant.score + (isCorrect ? 1 : 0)
     const newCorrect = participant.correct_answers + (isCorrect ? 1 : 0)
-    const answered = (participant.total_questions || 10) - (10 - newCorrect)
-    const newAccuracy = answered > 0 ? (newCorrect / answered) * 100 : 0
+    const total = participant.total_questions || 10
+    const newAccuracy = total > 0 ? (newCorrect / total) * 100 : 0
     
     await supabase
       .from('squad_battle_participants')
@@ -504,7 +500,11 @@ export async function getBattleLeaderboard(battleId: string, userId: string): Pr
   if (error) throw error
   
   // Calculate ranks
-  const ranked = participants.map((p: any, index) => ({
+  type ParticipantRow = SquadBattleParticipant & {
+    users?: { id: string; full_name?: string | null; email?: string | null }
+  }
+  const participantRows = (participants ?? []) as unknown as ParticipantRow[]
+  const ranked = participantRows.map((p, index) => ({
     ...p,
     rank: index + 1,
     user_name: p.users?.full_name || p.users?.email || 'Unknown',
@@ -558,8 +558,9 @@ export async function completeBattle(userId: string, battleId: string): Promise<
 /**
  * Get user's battle history
  */
-export async function getUserBattleHistory(userId: string): Promise<SquadBattleHistory[]> {
-  const { data, error } = await supabase
+export async function getUserBattleHistory(userId: string, supabaseClient?: SupabaseClient): Promise<SquadBattleHistory[]> {
+  const client = supabaseClient || supabase
+  const { data, error } = await client
     .from('squad_battle_participants')
     .select(`
       battle_id,
@@ -582,14 +583,28 @@ export async function getUserBattleHistory(userId: string): Promise<SquadBattleH
   
   if (error) throw error
   
-  return data.map((item: any) => ({
+  type HistoryRow = {
+    battle_id: string
+    score: number | null
+    accuracy: number | null
+    rank: number | null
+    squad_battles?: {
+      id: string
+      difficulty?: string | null
+      started_at?: string | null
+      squad_id?: string
+      squads?: { name?: string | null }
+    }
+  }
+  const rows = (data ?? []) as unknown as HistoryRow[]
+  return rows.map((item) => ({
     battle_id: item.battle_id,
     squad_name: item.squad_battles?.squads?.name || 'Unknown Squad',
     date: item.squad_battles?.started_at || '',
     rank: item.rank || 0,
     score: item.score || 0,
     accuracy: item.accuracy || 0,
-    total_participants: 0, // TODO: Calculate from participants
-    difficulty: item.squad_battles?.difficulty || 'medium'
+    total_participants: 0,
+    difficulty: (item.squad_battles?.difficulty as SquadBattle['difficulty']) || 'medium'
   }))
 }

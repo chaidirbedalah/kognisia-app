@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -21,11 +21,7 @@ export default function BattleResultsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
-  useEffect(() => {
-    loadResults()
-  }, [battleId])
-
-  async function loadResults() {
+  const loadResults = useCallback(async () => {
     try {
       setLoading(true)
       setError('')
@@ -55,7 +51,7 @@ export default function BattleResultsPage() {
         const { data: { session } } = await supabase.auth.getSession()
         if (session && leaderboardData.leaderboard) {
           const currentParticipant = leaderboardData.leaderboard.participants.find(
-            (p: any) => p.is_current_user
+            (p: unknown) => (p as { is_current_user?: boolean }).is_current_user === true
           )
           
           if (currentParticipant) {
@@ -72,16 +68,20 @@ export default function BattleResultsPage() {
             await checkAndUnlockAchievements(session.user.id, battleResult, session)
           }
         }
-      } catch (achievementError) {
+      } catch (achievementError: unknown) {
         console.error('Error checking achievements:', achievementError)
         // Don't fail the page if achievement check fails
       }
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to load results')
     } finally {
       setLoading(false)
     }
-  }
+  }, [battleId])
+  
+  useEffect(() => {
+    loadResults()
+  }, [loadResults])
 
   const getRankIcon = (rank: number) => {
     switch (rank) {
@@ -221,7 +221,7 @@ export default function BattleResultsPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {leaderboard.participants.map((participant, index) => (
+              {leaderboard.participants.map((participant) => (
                 <div
                   key={participant.id}
                   className={`p-4 rounded-lg border-2 ${getRankColor(participant.rank || 0)} ${

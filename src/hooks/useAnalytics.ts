@@ -97,7 +97,7 @@ interface UseAnalyticsReturn {
   // Engagement Analytics
   userMetrics: UserMetrics;
   engagementTrend: EngagementTrendItem[];
-  recentActivity: any[];
+  recentActivity: RecentActivityItem[];
 
   // Trend Analytics
   seasonalPerformance: SeasonalPerformance[];
@@ -109,6 +109,14 @@ interface UseAnalyticsReturn {
   // State
   loading: boolean;
   error: string | null;
+}
+
+interface RecentActivityItem {
+  date: string;
+  type: string;
+  description?: string;
+  points?: number;
+  [key: string]: unknown;
 }
 
 export function useAnalytics(): UseAnalyticsReturn {
@@ -123,7 +131,7 @@ export function useAnalytics(): UseAnalyticsReturn {
     engagement_score: 0
   });
   const [engagementTrend, setEngagementTrend] = useState<EngagementTrendItem[]>([]);
-  const [recentActivity, setRecentActivity] = useState<any[]>([]);
+  const [recentActivity, setRecentActivity] = useState<RecentActivityItem[]>([]);
   const [seasonalPerformance, setSeasonalPerformance] = useState<SeasonalPerformance[]>([]);
   const [streakStats, setStreakStats] = useState<StreakStats>({
     current_streak: 0,

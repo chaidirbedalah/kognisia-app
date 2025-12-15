@@ -76,7 +76,15 @@ export async function GET(request: NextRequest) {
       .eq('user_id', user.id)
       .single()
 
-    const formattedLeaderboard = (leaderboard || []).map((entry: any) => ({
+    type SeasonalRow = {
+      rank: number
+      total_points: number
+      achievement_count: number
+      user_id: string
+      auth?: { users?: { email?: string | null }[] }
+    }
+    const rows = (leaderboard ?? []) as unknown as SeasonalRow[]
+    const formattedLeaderboard = rows.map((entry) => ({
       rank: entry.rank,
       total_points: entry.total_points,
       achievement_count: entry.achievement_count,
@@ -91,12 +99,9 @@ export async function GET(request: NextRequest) {
       current_user_rank: userRank?.rank || null
     })
 
-  } catch (error: any) {
-    console.error('Error fetching seasonal leaderboard:', error)
-    return NextResponse.json(
-      { error: error.message || 'Failed to fetch seasonal leaderboard' },
-      { status: 500 }
-    )
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : 'Failed to fetch seasonal leaderboard'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }
-

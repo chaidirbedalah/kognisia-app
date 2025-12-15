@@ -12,7 +12,6 @@ import {
   Menu, 
   X,
   BarChart3,
-  Zap
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
@@ -133,4 +132,3 @@ export function MobileNavigation() {
     </>
   )
 }
-

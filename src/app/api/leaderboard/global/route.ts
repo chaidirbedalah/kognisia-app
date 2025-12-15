@@ -99,12 +99,9 @@ export async function GET(request: NextRequest) {
       total_users: leaderboard?.length || 0
     })
 
-  } catch (error: any) {
-    console.error('Error fetching leaderboard:', error)
-    return NextResponse.json(
-      { error: error.message || 'Failed to fetch leaderboard' },
-      { status: 500 }
-    )
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : 'Failed to fetch leaderboard'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }
-

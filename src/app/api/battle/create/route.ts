@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { spendCoins } from '@/lib/economy'
 
 export async function POST(request: NextRequest) {
   try {
@@ -93,7 +94,8 @@ export async function POST(request: NextRequest) {
       ? (question_count || 10)
       : 20
 
-    let finalQuestions: any[] = []
+    type QBQuestion = { id: string } & Record<string, unknown>
+    let finalQuestions: QBQuestion[] = []
 
     if (hots_mode) {
       // ELITE Mode: 100% HOTS questions
@@ -159,8 +161,8 @@ export async function POST(request: NextRequest) {
       }
 
       // Combine questions
-      const availableHots = hotsQuestions || []
-      const availableRegular = regularQuestions || []
+      const availableHots = (hotsQuestions || []) as QBQuestion[]
+      const availableRegular = (regularQuestions || []) as QBQuestion[]
       
       // If we don't have enough HOTS questions, fill with regular questions
       if (availableHots.length < hotsCount) {
@@ -179,7 +181,7 @@ export async function POST(request: NextRequest) {
 
         finalQuestions = [
           ...availableHots,
-          ...(additionalRegular || []).slice(0, questionLimit - availableHots.length)
+          ...((additionalRegular || []) as QBQuestion[]).slice(0, questionLimit - availableHots.length)
         ]
       } else {
         finalQuestions = [...availableHots.slice(0, hotsCount), ...availableRegular.slice(0, regularCount)]
@@ -252,6 +254,19 @@ export async function POST(request: NextRequest) {
         total_questions: shuffled.length
       })
 
+    // Spend coins for entry (ELITE/HOTS = 3, Regular = 2)
+    try {
+      const entryCost = hots_mode ? 3 : 2
+      await spendCoins(user.id, entryCost, 'battle_entry', battle.id, {
+        battle_type,
+        subtest_code: subtest_code || null,
+        hots_mode: !!hots_mode
+      })
+    } catch (e) {
+      // If spending fails, we still allow battle creation, but return info
+      console.error('Coin spend error:', e)
+    }
+
     return NextResponse.json({
       success: true,
       battle: {
@@ -261,11 +276,9 @@ export async function POST(request: NextRequest) {
       }
     })
 
-  } catch (error: any) {
-    console.error('Error creating battle:', error)
-    return NextResponse.json(
-      { error: error.message || 'Failed to create battle' },
-      { status: 500 }
-    )
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : 'Failed to create battle'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }

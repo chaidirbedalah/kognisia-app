@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getBattleDetails } from '@/lib/squad-api'
 import { createClient } from '@/lib/supabase-server'
+import { createClient as createAnonClient } from '@supabase/supabase-js'
 
 export async function GET(
   request: NextRequest,
@@ -11,20 +12,35 @@ export async function GET(
     const resolvedParams = await params
     
     // Get current user
-    const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
+    const ssr = await createClient()
+    const { data: { user }, error: authError } = await ssr.auth.getUser()
+    let client = ssr
+    let currentUserId = user?.id || null
+    if (authError || !currentUserId) {
+      const authHeader = request.headers.get('authorization')
+      if (!authHeader?.startsWith('Bearer ')) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      }
+      client = createAnonClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+          global: {
+            headers: { Authorization: authHeader }
+          }
+        }
       )
+      const { data: tokenUser } = await client.auth.getUser()
+      if (!tokenUser?.user) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      }
+      currentUserId = tokenUser.user.id
     }
 
     const battleId = resolvedParams.id
 
     // Get battle details with squad info
-    const { data: battle, error: battleError } = await supabase
+    const { data: battle, error: battleError } = await client
       .from('squad_battles')
       .select(`
         *,
@@ -42,7 +58,7 @@ export async function GET(
     if (battleError) throw battleError
 
     // Get participant count
-    const { count } = await supabase
+    const { count } = await client
       .from('squad_battle_participants')
       .select('*', { count: 'exact', head: true })
       .eq('battle_id', battleId)
@@ -62,10 +78,24 @@ export async function GET(
     }
 
     // If battle is active, get questions
-    let questions: any[] = []
+    type QuestionView = {
+      id: string
+      order: number
+      question_text?: string
+      question_image_url?: string | null
+      option_a?: string
+      option_b?: string
+      option_c?: string
+      option_d?: string
+      option_e?: string
+      difficulty?: string
+      subtest_utbk?: string
+      hint_text?: string | null
+    }
+    let questions: QuestionView[] = []
     if (battle.status === 'active') {
       const result = await getBattleDetails(battleId)
-      questions = result.questions.map(q => ({
+      questions = result.questions.map((q) => ({
         id: q.question_id,
         order: q.question_order,
         // Don't send correct answer to client during active battle
@@ -86,14 +116,19 @@ export async function GET(
       success: true,
       battle: battleInfo,
       participant_count: count || 0,
+      is_participant: !!(await client
+        .from('squad_battle_participants')
+        .select('id')
+        .eq('battle_id', battleId)
+        .eq('user_id', currentUserId!)
+        .limit(1)
+        .maybeSingle()).data,
       questions
     })
 
-  } catch (error: any) {
-    console.error('Error fetching battle details:', error)
-    return NextResponse.json(
-      { error: error.message || 'Failed to fetch battle details' },
-      { status: 500 }
-    )
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : 'Failed to fetch battle details'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }

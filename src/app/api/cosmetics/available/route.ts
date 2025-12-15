@@ -52,20 +52,23 @@ export async function GET(request: NextRequest) {
 
     const unlockedIds = new Set(userCosmetics?.map(c => c.cosmetic_id) || [])
 
-    // Combine with unlock status
-    const cosmeticsWithStatus = (allCosmetics || []).map(cosmetic => ({
+    type Cosmetic = { id: string; type: string } & Record<string, unknown>
+    const items = (allCosmetics ?? []) as unknown as Cosmetic[]
+    const cosmeticsWithStatus = items.map((cosmetic) => ({
       ...cosmetic,
       unlocked: unlockedIds.has(cosmetic.id)
     }))
 
-    // Group by type
-    const grouped = cosmeticsWithStatus.reduce((acc: any, cosmetic) => {
-      if (!acc[cosmetic.type]) {
-        acc[cosmetic.type] = []
-      }
-      acc[cosmetic.type].push(cosmetic)
-      return acc
-    }, {})
+    const grouped: Record<string, Cosmetic[]> = cosmeticsWithStatus.reduce(
+      (acc, cosmetic) => {
+        if (!acc[cosmetic.type]) {
+          acc[cosmetic.type] = []
+        }
+        acc[cosmetic.type].push(cosmetic)
+        return acc
+      },
+      {} as Record<string, Cosmetic[]>
+    )
 
     return NextResponse.json({
       success: true,
@@ -75,12 +78,9 @@ export async function GET(request: NextRequest) {
       total_count: allCosmetics?.length || 0
     })
 
-  } catch (error: any) {
-    console.error('Error fetching cosmetics:', error)
-    return NextResponse.json(
-      { error: error.message || 'Failed to fetch cosmetics' },
-      { status: 500 }
-    )
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : 'Failed to fetch cosmetics'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }
-

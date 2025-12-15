@@ -1,10 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { BattleQuestion } from '@/components/squad/BattleQuestion'
 import { BattleLeaderboard } from '@/components/squad/BattleLeaderboard'
@@ -26,43 +25,54 @@ export default function BattleSessionPage() {
   const [timeRemaining, setTimeRemaining] = useState(0)
   const [showLeaderboard, setShowLeaderboard] = useState(false)
 
-  useEffect(() => {
-    loadBattleData()
-  }, [battleId])
-
-  // Timer countdown
-  useEffect(() => {
-    if (!battle || timeRemaining <= 0) return
-
-    const timer = setInterval(() => {
-      setTimeRemaining(prev => {
-        if (prev <= 1) {
-          handleAutoSubmit()
-          return 0
-        }
-        return prev - 1
-      })
-    }, 1000)
-
-    return () => clearInterval(timer)
-  }, [battle, timeRemaining])
-
-  async function loadBattleData() {
+  const loadBattleData = useCallback(async () => {
     try {
       setLoading(true)
       setError('')
-
-      const response = await fetch(`/api/squad/battle/${battleId}`)
-      const data = await response.json()
+      const { data: { session } } = await (await import('@/lib/supabase')).supabase.auth.getSession()
+      let response = await fetch(`/api/squad/battle/${battleId}`, {
+        headers: session?.access_token ? { 'Authorization': `Bearer ${session.access_token}` } : {}
+      })
+      let data = await response.json()
 
       if (!response.ok) {
         throw new Error(data.error || 'Failed to load battle')
       }
 
+      if (!data.is_participant && session?.access_token) {
+        const joinRes = await fetch('/api/battle/join', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ battle_id: battleId })
+        })
+        if (!joinRes.ok) {
+          const jj = await joinRes.json().catch(() => ({}))
+          // Redirect to waiting room on join failure (e.g., coins tidak cukup)
+          if ((jj.error || '').toLowerCase().includes('coins')) {
+            return router.push(`/squad/battle/${battleId}/waiting`)
+          }
+          throw new Error(jj.error || 'Failed to join battle')
+        }
+        // Re-fetch to refresh participant status and questions
+        response = await fetch(`/api/squad/battle/${battleId}`, {
+          headers: session?.access_token ? { 'Authorization': `Bearer ${session.access_token}` } : {}
+        })
+        data = await response.json()
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to load battle')
+        }
+      }
+
+      if (!data.is_participant) {
+        return router.push(`/squad/battle/${battleId}/waiting`)
+      }
+
       setBattle(data.battle)
       setQuestions(data.questions)
 
-      // Calculate time remaining
       if (data.battle.started_at && data.battle.time_limit_minutes) {
         const startTime = new Date(data.battle.started_at).getTime()
         const now = Date.now()
@@ -70,12 +80,67 @@ export default function BattleSessionPage() {
         const total = data.battle.time_limit_minutes * 60
         setTimeRemaining(Math.max(0, total - elapsed))
       }
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to load battle')
     } finally {
       setLoading(false)
     }
-  }
+  }, [battleId, router])
+  
+  useEffect(() => {
+    loadBattleData()
+  }, [loadBattleData])
+
+  const handleSubmit = useCallback(async () => {
+    setSubmitting(true)
+
+    try {
+      for (let i = 0; i < questions.length; i++) {
+        const answer = answers[i]
+        if (answer) {
+          await fetch(`/api/squad/battle/${battleId}/answer`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              question_id: questions[i].question_id,
+              selected_answer: answer,
+              time_spent_seconds: 0
+            })
+          })
+        }
+      }
+
+      await fetch(`/api/squad/battle/${battleId}/complete`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ battle_id: battleId })
+      })
+
+      router.push(`/squad/battle/${battleId}/results`)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to submit battle')
+    } finally {
+      setSubmitting(false)
+    }
+  }, [questions, answers, battleId, router])
+  
+  useEffect(() => {
+    if (!battle || timeRemaining <= 0) return
+
+    const timer = setInterval(() => {
+      setTimeRemaining(prev => {
+        if (prev <= 1) {
+          handleSubmit()
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [battle, timeRemaining, handleSubmit])
+
+  
 
   const handleAnswerSelect = (questionId: string, answer: string) => {
     setAnswers({ ...answers, [currentIndex]: answer })
@@ -93,45 +158,9 @@ export default function BattleSessionPage() {
     }
   }
 
-  const handleAutoSubmit = async () => {
-    await handleSubmit()
-  }
+  
 
-  const handleSubmit = async () => {
-    setSubmitting(true)
-
-    try {
-      // Submit all answers
-      for (let i = 0; i < questions.length; i++) {
-        const answer = answers[i]
-        if (answer) {
-          await fetch(`/api/squad/battle/${battleId}/answer`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              question_id: questions[i].question_id,
-              selected_answer: answer,
-              time_spent_seconds: 0
-            })
-          })
-        }
-      }
-
-      // Complete battle
-      await fetch(`/api/squad/battle/${battleId}/complete`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ battle_id: battleId })
-      })
-
-      // Redirect to results
-      router.push(`/squad/battle/${battleId}/results`)
-    } catch (err: any) {
-      setError(err.message)
-    } finally {
-      setSubmitting(false)
-    }
-  }
+  
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60)

@@ -61,11 +61,9 @@ export async function GET(
       scheduled_start_at: battle.scheduled_start_at
     })
 
-  } catch (error: any) {
-    console.error('Error fetching battle status:', error)
-    return NextResponse.json(
-      { error: error.message || 'Failed to fetch battle status' },
-      { status: 500 }
-    )
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : 'Failed to fetch battle status'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }

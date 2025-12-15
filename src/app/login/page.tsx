@@ -16,7 +16,7 @@ export default function LoginPage() {
     e.preventDefault()
     setLoading(true)
     
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     })
@@ -36,10 +36,11 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <Card className="w-full max-w-md">
+    <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-muted to-background p-6">
+      <div className="absolute inset-0 z-0 pointer-events-none bg-[radial-gradient(ellipse_at_top,_hsl(var(--color-accent))/0.15,_transparent_60%)] dark:bg-[radial-gradient(ellipse_at_top,_hsl(var(--color-accent))/0.08,_transparent_60%)]" />
+      <Card className="relative z-10 w-full max-w-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">Kognisia</CardTitle>
+          <CardTitle className="text-2xl font-bold text-center text-foreground">Kognisia</CardTitle>
           <CardDescription className="text-center">
             Platform Pembelajaran AI-Personalized
           </CardDescription>
@@ -55,6 +56,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                className="bg-card text-foreground"
               />
             </div>
             <div className="space-y-2">
@@ -66,6 +68,7 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                className="bg-card text-foreground"
               />
             </div>
             <Button type="submit" className="w-full" disabled={loading}>

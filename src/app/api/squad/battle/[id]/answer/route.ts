@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { submitBattleAnswer } from '@/lib/squad-api'
 import { createClient } from '@/lib/supabase-server'
+import { createClient as createAnonClient } from '@supabase/supabase-js'
 
 export async function POST(
   request: NextRequest,
@@ -11,14 +12,29 @@ export async function POST(
     const resolvedParams = await params
     
     // Get current user
-    const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
+    const ssr = await createClient()
+    const { data: { user }, error: authError } = await ssr.auth.getUser()
+    let client = ssr
+    let currentUserId = user?.id || null
+    if (authError || !currentUserId) {
+      const authHeader = request.headers.get('authorization')
+      if (!authHeader?.startsWith('Bearer ')) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      }
+      client = createAnonClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+          global: {
+            headers: { Authorization: authHeader }
+          }
+        }
       )
+      const { data: tokenUser } = await client.auth.getUser()
+      if (!tokenUser?.user) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      }
+      currentUserId = tokenUser.user.id
     }
 
     const battleId = resolvedParams.id
@@ -51,7 +67,7 @@ export async function POST(
     }
 
     // Submit answer
-    const result = await submitBattleAnswer(user.id, {
+    const result = await submitBattleAnswer(currentUserId!, {
       battle_id: battleId,
       question_id,
       selected_answer: selected_answer.toUpperCase(),
@@ -64,11 +80,9 @@ export async function POST(
       correct_answer: result.correct_answer
     })
 
-  } catch (error: any) {
-    console.error('Error submitting answer:', error)
-    return NextResponse.json(
-      { error: error.message || 'Failed to submit answer' },
-      { status: 500 }
-    )
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : 'Failed to submit answer'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }

@@ -2,8 +2,9 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import Image from 'next/image'
 import type { SquadBattleQuestion } from '@/lib/squad-types'
-import { getDifficultyLabel } from '@/lib/squad-types'
+import { getDifficultyLabel, isValidDifficulty } from '@/lib/squad-types'
 
 interface BattleQuestionProps {
   question: SquadBattleQuestion
@@ -44,19 +45,26 @@ export function BattleQuestion({
       <CardHeader>
         <div className="flex items-start justify-between mb-3">
           <div className="flex gap-2">
-            <Badge variant="secondary">{getDifficultyLabel(q.difficulty as any)}</Badge>
+            <Badge variant="secondary">
+              {getDifficultyLabel(isValidDifficulty(q.difficulty) ? q.difficulty : 'medium')}
+            </Badge>
             <Badge variant="outline">{q.subtest_utbk}</Badge>
           </div>
+        </div>
+        <div className="text-xs text-gray-500">
+          Question {questionNumber} of {totalQuestions}
         </div>
         <CardTitle className="text-lg leading-relaxed">
           {q.question_text}
         </CardTitle>
         {q.question_image_url && (
           <div className="mt-4">
-            <img 
+            <Image 
               src={q.question_image_url} 
               alt="Question illustration"
-              className="max-w-full h-auto rounded-lg"
+              width={800}
+              height={600}
+              className="max-w-full h-auto rounded-lg object-contain"
             />
           </div>
         )}

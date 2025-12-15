@@ -11,7 +11,7 @@ interface TryOutTabProps {
 export function TryOutTab({ data, loading }: TryOutTabProps) {
   if (loading) {
     return (
-      <div className="space-y-6">
+      <div data-testid="mini-tryout-tab" className="space-y-6">
         <Card>
           <CardHeader>
             <div className="h-6 bg-gray-200 animate-pulse rounded w-48 mb-2"></div>
@@ -31,7 +31,7 @@ export function TryOutTab({ data, loading }: TryOutTabProps) {
 
   if (data.length === 0) {
     return (
-      <Card>
+      <Card data-testid="mini-tryout-empty">
         <CardHeader>
           <CardTitle>Riwayat Mini Try Out</CardTitle>
           <CardDescription>Belum ada riwayat</CardDescription>
@@ -47,6 +47,7 @@ export function TryOutTab({ data, loading }: TryOutTabProps) {
             </p>
             <button
               onClick={() => window.location.href = '/mini-tryout'}
+              data-testid="start-mini-tryout-button"
               className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
             >
               Mulai Mini Try Out
@@ -66,7 +67,7 @@ export function TryOutTab({ data, loading }: TryOutTabProps) {
   const avgScore = Math.round(totalCorrect / totalTryOuts)
 
   return (
-    <div className="space-y-6">
+    <div data-testid="mini-tryout-tab" className="space-y-6">
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
@@ -109,7 +110,7 @@ export function TryOutTab({ data, loading }: TryOutTabProps) {
       </div>
 
       {/* Mini Try Out History */}
-      <Card>
+      <Card data-testid="mini-tryout-history">
         <CardHeader>
           <CardTitle>Riwayat Mini Try Out ⚡</CardTitle>
           <CardDescription>

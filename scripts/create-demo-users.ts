@@ -49,6 +49,15 @@ const teacherAccounts = [
 
 const defaultPassword = 'demo123456'
 
+// Optional CLI limits: --students N --teachers M
+const args = process.argv.slice(2)
+const studentsArgIndex = args.indexOf('--students')
+const teachersArgIndex = args.indexOf('--teachers')
+const studentsLimit = studentsArgIndex !== -1 ? parseInt(args[studentsArgIndex + 1] || '0', 10) : 0
+const teachersLimit = teachersArgIndex !== -1 ? parseInt(args[teachersArgIndex + 1] || '0', 10) : 0
+const selectedStudents = studentsLimit > 0 ? studentAccounts.slice(0, studentsLimit) : studentAccounts
+const selectedTeachers = teachersLimit > 0 ? teacherAccounts.slice(0, teachersLimit) : teacherAccounts
+
 async function createUser(email: string, role: 'student' | 'teacher', name: string) {
   try {
     // Create auth user
@@ -103,7 +112,7 @@ async function main() {
 
   // Create student accounts
   console.log('📚 Creating Student Accounts...')
-  for (const username of studentAccounts) {
+  for (const username of selectedStudents) {
     const email = `${username}@siswa.id`
     const name = username.charAt(0).toUpperCase() + username.slice(1)
     const success = await createUser(email, 'student', name)
@@ -116,7 +125,7 @@ async function main() {
 
   console.log('')
   console.log('👨‍🏫 Creating Teacher Accounts...')
-  for (const username of teacherAccounts) {
+  for (const username of selectedTeachers) {
     const email = `${username}@guru.id`
     const name = username.charAt(0).toUpperCase() + username.slice(1)
     const success = await createUser(email, 'teacher', name)
@@ -136,10 +145,10 @@ async function main() {
   console.log('')
   console.log('🔑 Default Password: demo123456')
   console.log('')
-  console.log('📋 Student Accounts: 30')
+  console.log(`📋 Student Accounts: ${selectedStudents.length}`)
   console.log('   Format: [name]@siswa.id')
   console.log('')
-  console.log('👨‍🏫 Teacher Accounts: 10')
+  console.log(`👨‍🏫 Teacher Accounts: ${selectedTeachers.length}`)
   console.log('   Format: [name]@guru.id')
   console.log('')
   console.log('✅ Done!')

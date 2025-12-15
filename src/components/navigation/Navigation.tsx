@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { 
@@ -10,16 +11,19 @@ import {
   Users, 
   User, 
   Menu, 
-  X,
   BarChart3,
   Zap,
   Sparkles,
   Calendar,
   Gauge,
-  LogOut,
-  ChevronDown
+  ChevronDown,
+  Wifi,
+  WifiOff,
+  Sun,
+  Moon
 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { RealtimeNotificationBadge } from '@/components/realtime/RealtimeNotificationBadge'
+import { useRealtimeAchievements } from '@/hooks/useRealtimeAchievements'
 
 interface NavItem {
   label: string
@@ -53,6 +57,8 @@ export function Navigation() {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null)
+  const { isConnected, achievements } = useRealtimeAchievements()
+  const { theme, setTheme } = useTheme()
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/')
 
@@ -70,7 +76,7 @@ export function Navigation() {
   return (
     <>
       {/* Mobile Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 md:hidden z-40">
+      <nav className="fixed bottom-0 left-0 right-0 backdrop-blur-md bg-white/70 dark:bg-neutral-900/60 border-t border-transparent md:hidden z-40">
         <div className="flex justify-around items-center h-16">
           {mainItems.map((item) => (
             <Link
@@ -92,8 +98,31 @@ export function Navigation() {
             className="flex flex-col items-center justify-center w-full h-full gap-1 text-gray-600 hover:text-gray-900"
           >
             <Menu className="h-5 w-5" />
-            <span className="text-xs font-medium">More</span>
+            <span className="text-xs font-medium inline-flex items-center gap-1">
+              More
+              {isConnected ? (
+                <Wifi className="h-3 w-3 text-green-600" />
+              ) : (
+                <WifiOff className="h-3 w-3 text-gray-500" />
+              )}
+              {achievements.length > 0 && (
+                <span className="text-[10px] leading-none px-1.5 py-0.5 rounded bg-purple-600 text-white">
+                  {achievements.length > 99 ? '99+' : achievements.length}
+                </span>
+              )}
+            </span>
           </button>
+          <button
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            aria-label="Toggle Theme"
+            className="flex flex-col items-center justify-center w-full h-full gap-1 text-gray-600 hover:text-gray-900"
+          >
+            <Sun className="h-5 w-5 dark:hidden" aria-hidden="true" />
+            <Moon className="h-5 w-5 hidden dark:inline" aria-hidden="true" />
+            <span className="text-xs font-medium dark:hidden">Light</span>
+            <span className="text-xs font-medium hidden dark:inline">Dark</span>
+          </button>
+          
         </div>
       </nav>
 
@@ -103,7 +132,7 @@ export function Navigation() {
       )}
       
       <div
-        className={`fixed bottom-16 left-0 right-0 bg-white border-t border-gray-200 max-h-96 overflow-y-auto transition-all md:hidden z-40 ${
+        className={`fixed bottom-16 left-0 right-0 backdrop-blur-md bg-white/70 dark:bg-neutral-900/60 border-t border-transparent max-h-96 overflow-y-auto transition-all md:hidden z-40 ${
           isOpen ? 'block' : 'hidden'
         }`}
       >
@@ -186,11 +215,23 @@ export function Navigation() {
               </Link>
             ))}
           </div>
+          <div className="border-t pt-2 mt-2">
+            <button
+              onClick={() => { setTheme(theme === 'dark' ? 'light' : 'dark'); setIsOpen(false) }}
+              aria-label="Toggle Theme"
+              className="w-full flex items-center gap-3 px-4 py-2 rounded-lg transition-colors text-gray-700 hover:bg-gray-100"
+            >
+              <Sun className="h-5 w-5 dark:hidden" aria-hidden="true" />
+              <Moon className="h-5 w-5 hidden dark:inline" aria-hidden="true" />
+              <span className="dark:hidden">Light</span>
+              <span className="hidden dark:inline">Dark</span>
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Desktop Navigation */}
-      <nav className="hidden md:block sticky top-0 bg-white border-b border-gray-200 z-30 shadow-sm">
+      <nav className="hidden md:block sticky top-0 backdrop-blur-md bg-white/70 dark:bg-neutral-900/60 border-b border-transparent z-30 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex justify-between items-center">
             {/* Logo */}
@@ -217,7 +258,7 @@ export function Navigation() {
             </div>
 
             {/* Secondary Navigation */}
-            <div className="flex gap-1">
+            <div className="flex gap-3 items-center">
               {/* Features Dropdown */}
               <div className="relative group">
                 <button className="flex items-center gap-2 px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">
@@ -283,6 +324,22 @@ export function Navigation() {
                   <span>{item.label}</span>
                 </Link>
               ))}
+
+              <button
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                aria-label="Toggle Theme"
+                className="flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-gray-700 hover:bg-gray-100"
+              >
+                <Sun className="h-5 w-5 dark:hidden" aria-hidden="true" />
+                <Moon className="h-5 w-5 hidden dark:inline" aria-hidden="true" />
+                <span className="hidden lg:inline dark:hidden">Light</span>
+                <span className="hidden lg:inline hidden dark:inline">Dark</span>
+              </button>
+
+              {/* Global Live Status */}
+              <div className="pl-2">
+                <RealtimeNotificationBadge />
+              </div>
             </div>
           </div>
         </div>

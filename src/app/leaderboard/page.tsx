@@ -1,11 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { useRouter } from 'next/navigation'
-import { Trophy, Medal, Award, TrendingUp } from 'lucide-react'
+import { Trophy, Medal, Award, TrendingUp, Wifi, WifiOff } from 'lucide-react'
 
 interface LeaderboardEntry {
   rank: number
@@ -21,12 +21,9 @@ export default function LeaderboardPage() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([])
   const [loading, setLoading] = useState(true)
   const [currentUserRank, setCurrentUserRank] = useState<number | null>(null)
+  const [isConnected, setIsConnected] = useState(false)
 
-  useEffect(() => {
-    fetchLeaderboard()
-  }, [])
-
-  const fetchLeaderboard = async () => {
+  const fetchLeaderboard = useCallback(async () => {
     try {
       setLoading(true)
       const { data: { session } } = await supabase.auth.getSession()
@@ -54,7 +51,30 @@ export default function LeaderboardPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [router])
+  
+  useEffect(() => {
+    fetchLeaderboard()
+  }, [fetchLeaderboard])
+
+  useEffect(() => {
+    let channel: ReturnType<typeof supabase.channel> | null = null
+    try {
+      channel = supabase
+        .channel('global-leaderboard')
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'user_achievements'
+        }, () => {})
+        .subscribe((status) => {
+          setIsConnected(status === 'SUBSCRIBED')
+        })
+    } catch {}
+    return () => {
+      if (channel) supabase.removeChannel(channel)
+    }
+  }, [])
 
   const getRankIcon = (rank: number) => {
     switch (rank) {
@@ -84,10 +104,64 @@ export default function LeaderboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading leaderboard...</p>
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 py-8">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="h-8 w-8 bg-muted rounded animate-pulse" />
+              <div className="h-8 w-64 bg-muted rounded animate-pulse" />
+              <div className="h-6 w-16 bg-muted rounded animate-pulse" />
+            </div>
+            <div className="h-4 w-80 bg-muted rounded animate-pulse" />
+          </div>
+          <Card className="mb-8">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="h-4 w-32 bg-muted rounded mb-2 animate-pulse" />
+                  <div className="h-8 w-24 bg-muted rounded animate-pulse" />
+                </div>
+                <div className="h-12 w-12 bg-muted rounded-full animate-pulse" />
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle className="h-6 w-32 bg-muted rounded animate-pulse" />
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <div key={i} className="p-4 rounded-lg border bg-white">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4 flex-1">
+                        <div className="w-12 flex justify-center">
+                          <div className="h-6 w-6 bg-muted rounded animate-pulse" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="h-4 w-40 bg-muted rounded mb-2 animate-pulse" />
+                          <div className="h-3 w-24 bg-muted rounded animate-pulse" />
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="h-6 w-20 bg-muted rounded mb-1 animate-pulse" />
+                        <div className="h-3 w-12 bg-muted rounded animate-pulse" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="mt-8">
+            <CardContent className="p-6">
+              <div className="h-5 w-48 bg-muted rounded mb-2 animate-pulse" />
+              <div className="h-4 w-full bg-muted rounded animate-pulse" />
+            </CardContent>
+          </Card>
+          <div className="mt-8 text-center">
+            <div className="h-5 w-40 bg-muted rounded mx-auto animate-pulse" />
+          </div>
         </div>
       </div>
     )
@@ -101,6 +175,17 @@ export default function LeaderboardPage() {
           <div className="flex items-center gap-3 mb-4">
             <Trophy className="h-8 w-8 text-yellow-500" />
             <h1 className="text-4xl font-bold text-gray-900">Global Leaderboard</h1>
+            {isConnected ? (
+              <Badge className="ml-2 inline-flex items-center gap-1 bg-purple-600 hover:bg-purple-700">
+                <Wifi className="h-3 w-3" />
+                Live
+              </Badge>
+            ) : (
+              <Badge className="ml-2 inline-flex items-center gap-1 bg-gray-600 hover:bg-gray-700">
+                <WifiOff className="h-3 w-3" />
+                Offline
+              </Badge>
+            )}
           </div>
           <p className="text-gray-600">
             Ranking berdasarkan total achievement points
@@ -207,4 +292,3 @@ export default function LeaderboardPage() {
     </div>
   )
 }
-

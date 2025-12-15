@@ -66,7 +66,7 @@ export default function AchievementsPage() {
           <ul className="space-y-2 text-gray-700">
             <li className="flex gap-2">
               <span className="text-blue-600">•</span>
-              <span><strong>First Battle:</strong> Complete your first squad battle to unlock "First Battle"</span>
+              <span><strong>First Battle:</strong> Complete your first squad battle to unlock First Battle</span>
             </li>
             <li className="flex gap-2">
               <span className="text-blue-600">•</span>

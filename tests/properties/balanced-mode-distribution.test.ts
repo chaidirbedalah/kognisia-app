@@ -3,6 +3,10 @@ import * as fc from 'fast-check'
 import { createClient } from '@supabase/supabase-js'
 import { ASSESSMENT_CONFIGS, VALID_SUBTEST_CODES } from '@/lib/utbk-constants'
 
+interface QBQuestion {
+  subtest_code: string
+}
+
 /**
  * Property Test for Balanced Mode Distribution
  * 
@@ -31,7 +35,7 @@ describe('Property 3: Balanced Mode Distribution', () => {
         async (seed) => {
           // Fetch questions for balanced mode
           const config = ASSESSMENT_CONFIGS.daily_challenge_balanced
-          const questions = []
+          const questions: QBQuestion[] = []
 
           for (const dist of config.subtestDistribution) {
             const { data, error } = await supabase
@@ -119,7 +123,7 @@ function shuffleArray<T>(array: T[]): T[] {
   return shuffled
 }
 
-function countBySubtest(questions: any[]): Record<string, number> {
+function countBySubtest(questions: QBQuestion[]): Record<string, number> {
   const counts: Record<string, number> = {}
   for (const q of questions) {
     counts[q.subtest_code] = (counts[q.subtest_code] || 0) + 1
@@ -130,7 +134,7 @@ function countBySubtest(questions: any[]): Record<string, number> {
 async function fetchBalancedModeQuestions() {
   const supabase = createClient(supabaseUrl, supabaseKey)
   const config = ASSESSMENT_CONFIGS.daily_challenge_balanced
-  const questions = []
+  const questions: QBQuestion[] = []
 
   for (const dist of config.subtestDistribution) {
     const { data, error } = await supabase
@@ -143,7 +147,7 @@ async function fetchBalancedModeQuestions() {
       return null
     }
 
-    const shuffled = shuffleArray(data)
+    const shuffled = shuffleArray<QBQuestion>(data as QBQuestion[])
     const selected = shuffled.slice(0, dist.questionCount)
     questions.push(...selected)
   }

@@ -1,12 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { UTBK_2026_SUBTESTS } from '@/lib/utbk-constants'
 import type { SubtestCode } from '@/lib/types'
+import { Skeleton } from '@/components/ui/skeleton'
 
 type Question = {
   id: string
@@ -54,35 +55,6 @@ export default function TryOutUTBKPage() {
   const TOTAL_DURATION_SECONDS = TOTAL_DURATION_MINUTES * 60
 
   // Timer effect
-  useEffect(() => {
-    if (!started || !startTime) return
-
-    const interval = setInterval(() => {
-      const now = Date.now()
-      const elapsed = Math.floor((now - startTime) / 1000)
-      setElapsedSeconds(elapsed)
-
-      // Track per-subtest time
-      const currentQuestion = questions[currentIndex]
-      if (currentQuestion) {
-        const subtestCode = currentQuestion.subtest_code
-        if (!subtestStartTimes[subtestCode]) {
-          setSubtestStartTimes(prev => ({ ...prev, [subtestCode]: now }))
-        }
-        
-        const subtestStart = subtestStartTimes[subtestCode] || now
-        const subtestElapsed = Math.floor((now - subtestStart) / 1000)
-        setSubtestElapsedTimes(prev => ({ ...prev, [subtestCode]: subtestElapsed }))
-      }
-
-      // Auto-submit when time runs out
-      if (elapsed >= TOTAL_DURATION_SECONDS) {
-        handleSubmit()
-      }
-    }, 1000)
-
-    return () => clearInterval(interval)
-  }, [started, startTime, currentIndex, questions, subtestStartTimes])
 
   // Fetch questions
   const handleStart = async () => {
@@ -144,7 +116,7 @@ export default function TryOutUTBKPage() {
     setSelectedAnswer(answers[index] || null)
   }
 
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser()
     
     if (!user) {
@@ -205,7 +177,31 @@ export default function TryOutUTBKPage() {
     } finally {
       setLoading(false)
     }
-  }
+  } 
+  , [answers, questions, elapsedSeconds, subtestElapsedTimes])
+  
+  useEffect(() => {
+    if (!started || !startTime) return
+    const interval = setInterval(() => {
+      const now = Date.now()
+      const elapsed = Math.floor((now - startTime) / 1000)
+      setElapsedSeconds(elapsed)
+      const currentQuestion = questions[currentIndex]
+      if (currentQuestion) {
+        const subtestCode = currentQuestion.subtest_code
+        if (!subtestStartTimes[subtestCode]) {
+          setSubtestStartTimes(prev => ({ ...prev, [subtestCode]: now }))
+        }
+        const subtestStart = subtestStartTimes[subtestCode] || now
+        const subtestElapsed = Math.floor((now - subtestStart) / 1000)
+        setSubtestElapsedTimes(prev => ({ ...prev, [subtestCode]: subtestElapsed }))
+      }
+      if (elapsed >= TOTAL_DURATION_SECONDS) {
+        handleSubmit()
+      }
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [started, startTime, currentIndex, questions, subtestStartTimes, TOTAL_DURATION_SECONDS, handleSubmit])
 
   // Format time display
   const formatTime = (seconds: number) => {
@@ -301,10 +297,77 @@ export default function TryOutUTBKPage() {
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Memuat soal...</p>
+      <div className="min-h-screen bg-gray-50 py-4">
+        <div className="max-w-6xl mx-auto px-4">
+          <Card className="mb-4 sticky top-4 z-10 shadow-lg">
+            <CardContent className="pt-4">
+              <div className="flex justify-between items-center mb-3">
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-6 w-6 rounded" />
+                  <div>
+                    <Skeleton className="h-4 w-40 rounded mb-1" />
+                    <Skeleton className="h-3 w-56 rounded" />
+                  </div>
+                </div>
+                <div className="text-right">
+                  <Skeleton className="h-4 w-24 rounded mb-1" />
+                  <Skeleton className="h-6 w-28 rounded" />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm text-gray-600">
+                  <Skeleton className="h-3 w-32 rounded" />
+                  <Skeleton className="h-3 w-20 rounded" />
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <Skeleton className="h-2 rounded-full" style={{ width: '40%' }} />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="mb-4">
+            <CardHeader>
+              <div className="flex justify-between items-start">
+                <CardTitle className="h-6 w-3/4">
+                  <Skeleton className="h-6 w-full rounded" />
+                </CardTitle>
+                <Badge variant="secondary" className="text-transparent">
+                  <Skeleton className="h-5 w-20 rounded" />
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="w-full p-4 rounded-lg border-2">
+                  <Skeleton className="h-4 w-full rounded" />
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          <div className="flex justify-between items-center mb-4">
+            <Skeleton className="h-9 w-28 rounded" />
+            <div className="flex gap-2">
+              <Skeleton className="h-9 w-20 rounded" />
+              <Skeleton className="h-9 w-36 rounded" />
+            </div>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="h-4 w-24">
+                <Skeleton className="h-4 w-24 rounded" />
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-10 gap-2">
+                {Array.from({ length: 20 }).map((_, i) => (
+                  <Skeleton key={i} className="p-2 rounded text-sm font-medium" />
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     )

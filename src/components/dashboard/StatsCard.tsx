@@ -9,6 +9,7 @@ interface StatsCardProps {
   loading?: boolean
   variant?: 'default' | 'primary' | 'success' | 'warning' | 'danger'
   onClick?: () => void
+  dataTestId?: string
 }
 
 export function StatsCard({ 
@@ -19,11 +20,12 @@ export function StatsCard({
   trend, 
   loading,
   variant = 'default',
-  onClick 
+  onClick,
+  dataTestId
 }: StatsCardProps) {
   if (loading) {
     return (
-      <Card className="hover:shadow-md transition-shadow">
+      <Card data-testid={dataTestId} className="hover:shadow-md transition-shadow">
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-medium text-gray-600">{title}</CardTitle>
         </CardHeader>
@@ -75,6 +77,7 @@ export function StatsCard({
 
   return (
     <Card 
+      data-testid={dataTestId}
       className={`hover:shadow-md transition-all duration-200 ${getVariantStyles()} ${onClick ? 'cursor-pointer hover:scale-[1.02]' : ''}`}
       onClick={onClick}
     >

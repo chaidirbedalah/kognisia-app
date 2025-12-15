@@ -20,10 +20,9 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { mode, subtestCode, userId } = body as {
+    const { mode, subtestCode } = body as {
       mode: DailyChallengeMode
       subtestCode?: SubtestCode
-      userId: string
     }
 
     // Validate mode
@@ -55,7 +54,8 @@ export async function POST(request: NextRequest) {
     if (mode === 'balanced') {
       // Balanced Mode: Fetch 3 questions from each of 7 subtests (21 total)
       const config = ASSESSMENT_CONFIGS.daily_challenge_balanced
-      const questions: any[] = []
+      type QuestionRow = { subtest_code: string } & Record<string, unknown>
+      const questions: QuestionRow[] = []
 
       for (const dist of config.subtestDistribution) {
         // Fetch questions for this subtest with randomization
@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Randomize and select required count
-        const shuffled = shuffleArray(data)
+        const shuffled = shuffleArray(data as QuestionRow[])
         const selected = shuffled.slice(0, dist.questionCount)
         questions.push(...selected)
       }

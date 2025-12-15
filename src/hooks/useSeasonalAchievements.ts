@@ -67,8 +67,8 @@ export function useSeasonalAchievements() {
       const data = await response.json()
       setStats(data)
       setError(null)
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch seasonal stats')
       console.error('Error fetching seasonal stats:', err)
     } finally {
       setLoading(false)
@@ -82,4 +82,3 @@ export function useSeasonalAchievements() {
     refetch: fetchSeasonalStats
   }
 }
-

@@ -50,8 +50,8 @@ export function useCosmetics() {
       const result = await response.json()
       setData(result)
       setError(null)
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch cosmetics')
       console.error('Error fetching cosmetics:', err)
     } finally {
       setLoading(false)
@@ -83,8 +83,8 @@ export function useCosmetics() {
       // Refresh cosmetics
       await fetchCosmetics()
       return true
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to equip cosmetic')
       console.error('Error equipping cosmetic:', err)
       return false
     }
@@ -98,4 +98,3 @@ export function useCosmetics() {
     refetch: fetchCosmetics
   }
 }
-

@@ -10,7 +10,6 @@ interface WeeklyComparisonProps {
     accuracy: number
   }
   improvement: number
-  improvementPercentage: number
   loading?: boolean
 }
 
@@ -18,7 +17,6 @@ export function WeeklyComparisonCard({
   thisWeek, 
   lastWeek, 
   improvement, 
-  improvementPercentage,
   loading 
 }: WeeklyComparisonProps) {
   if (loading) {

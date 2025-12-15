@@ -60,11 +60,6 @@ describe('Property 1: Seven Subtest System Configuration', () => {
         (configKey) => {
           const config = ASSESSMENT_CONFIGS[configKey]
           
-          if (configKey === 'daily_challenge_focus') {
-            // Focus mode is dynamic, skip
-            return true
-          }
-          
           // Count unique subtests in distribution
           const uniqueSubtests = new Set(
             config.subtestDistribution.map(d => d.subtestCode)

@@ -50,7 +50,7 @@ export function DailyChallengeModeSelectorComponent({
   onModeSelect 
 }: DailyChallengeModeSelectorProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 py-12">
+    <div data-testid="daily-mode-selector" className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 py-12">
       <div className="max-w-6xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12">
@@ -108,6 +108,7 @@ export function DailyChallengeModeSelectorComponent({
 
                 {/* Select Button */}
                 <Button 
+                  data-testid={option.type === 'balanced' ? 'select-mode-balanced' : 'select-mode-focus'}
                   className="w-full mt-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-6 text-lg group-hover:shadow-lg transition-all"
                   onClick={(e) => {
                     e.stopPropagation()

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { X, Trophy } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 
@@ -21,18 +21,32 @@ interface Notification {
 }
 
 export function AchievementNotification() {
-  const [notifications, setNotifications] = useState<Notification[]>([])
   const [displayedNotifications, setDisplayedNotifications] = useState<Notification[]>([])
+  const [reduceMotion, setReduceMotion] = useState(() => (
+    typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  ))
 
-  useEffect(() => {
-    fetchNotifications()
+  const removeNotification = useCallback(async (notificationId: string) => {
+    setDisplayedNotifications(prev => prev.filter(n => n.id !== notificationId))
     
-    // Poll for new notifications every 5 seconds
-    const interval = setInterval(fetchNotifications, 5000)
-    return () => clearInterval(interval)
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) return
+
+      await fetch('/api/achievements/notifications', {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ notification_id: notificationId })
+      })
+    } catch (error) {
+      console.error('Error marking notification as read:', error)
+    }
   }, [])
 
-  const fetchNotifications = async () => {
+  const fetchNotifications = useCallback(async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) return
@@ -46,7 +60,6 @@ export function AchievementNotification() {
       if (!response.ok) return
 
       const data = await response.json()
-      setNotifications(data.notifications || [])
 
       // Show new notifications
       const newNotifications = data.notifications.filter(
@@ -66,35 +79,62 @@ export function AchievementNotification() {
     } catch (error) {
       console.error('Error fetching notifications:', error)
     }
-  }
+  }, [displayedNotifications, removeNotification])
 
-  const removeNotification = async (notificationId: string) => {
-    setDisplayedNotifications(prev => prev.filter(n => n.id !== notificationId))
-    
+  useEffect(() => {
+    let mq: MediaQueryList | null = null
+    let onChange: ((event: MediaQueryListEvent) => void) | null = null
     try {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) return
-
-      await fetch('/api/achievements/notifications', {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ notification_id: notificationId })
-      })
-    } catch (error) {
-      console.error('Error marking notification as read:', error)
+      if (typeof window !== 'undefined') {
+        mq = window.matchMedia('(prefers-reduced-motion: reduce)')
+        onChange = (event: MediaQueryListEvent) => {
+          setReduceMotion(event.matches)
+        }
+        mq.addEventListener?.('change', onChange)
+      }
+    } catch {}
+    const timeout = setTimeout(() => {
+      fetchNotifications()
+    }, 0)
+    const interval = setInterval(fetchNotifications, 5000)
+    return () => {
+      if (mq && onChange) {
+        mq.removeEventListener?.('change', onChange)
+      }
+      clearTimeout(timeout)
+      clearInterval(interval)
     }
-  }
+  }, [fetchNotifications])
+
 
   return (
     <div className="fixed top-4 right-4 z-50 space-y-2 max-w-md">
       {displayedNotifications.map(notification => (
         <div
           key={notification.id}
-          className="bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg shadow-lg p-4 animate-slide-in"
+          className="relative bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg shadow-lg p-4 animate-slide-in overflow-hidden"
         >
+          {!reduceMotion && (
+            <div className="pointer-events-none absolute inset-0">
+              {Array.from({ length: 14 }).map((_, i) => {
+                const emojis = ['🎉','✨','🎊','⭐']
+                const emoji = emojis[i % emojis.length]
+                const left = Math.floor(Math.random() * 90) + 5
+                const top = Math.floor(Math.random() * 40) + 5
+                const delay = i * 80
+                return (
+                  <span
+                    key={`confetti-${notification.id}-${i}`}
+                    className="absolute text-xl opacity-80 animate-bounce"
+                    style={{ left: `${left}%`, top: `${top}%`, animationDelay: `${delay}ms` }}
+                    aria-hidden="true"
+                  >
+                    {emoji}
+                  </span>
+                )
+              })}
+            </div>
+          )}
           <div className="flex items-start gap-3">
             <div className="text-3xl">{notification.achievements.icon_emoji}</div>
             <div className="flex-1">

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { completeBattle, getBattleLeaderboard } from '@/lib/squad-api'
 import { createClient } from '@/lib/supabase-server'
+import { createClient as createAnonClient } from '@supabase/supabase-js'
 
 export async function POST(
   request: NextRequest,
@@ -10,21 +11,35 @@ export async function POST(
     // Await params (Next.js 15+ requirement)
     const resolvedParams = await params
     
-    // Get current user
-    const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
+    // Get current user with SSR cookies, fallback to Bearer
+    const ssr = await createClient()
+    const { data: { user }, error: authError } = await ssr.auth.getUser()
+    let currentUserId = user?.id || null
+    if (authError || !currentUserId) {
+      const authHeader = request.headers.get('authorization')
+      if (!authHeader?.startsWith('Bearer ')) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      }
+      const anon = createAnonClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+          global: {
+            headers: { Authorization: authHeader }
+          }
+        }
       )
+      const { data: tokenUser } = await anon.auth.getUser()
+      if (!tokenUser?.user) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      }
+      currentUserId = tokenUser.user.id
     }
 
     const battleId = resolvedParams.id
 
     // Complete battle for this user
-    await completeBattle(user.id, battleId)
+    await completeBattle(currentUserId!, battleId)
 
     // Record streak activity
     try {
@@ -45,10 +60,10 @@ export async function POST(
     }
 
     // Get final leaderboard
-    const leaderboard = await getBattleLeaderboard(battleId, user.id)
+    const leaderboard = await getBattleLeaderboard(battleId, currentUserId!)
 
     // Get user's final stats
-    const userStats = leaderboard.participants.find(p => p.user_id === user.id)
+    const userStats = leaderboard.participants.find(p => p.user_id === currentUserId)
 
     return NextResponse.json({
       success: true,
@@ -58,11 +73,9 @@ export async function POST(
       leaderboard
     })
 
-  } catch (error: any) {
-    console.error('Error completing battle:', error)
-    return NextResponse.json(
-      { error: error.message || 'Failed to complete battle' },
-      { status: 500 }
-    )
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : 'Failed to complete battle'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }

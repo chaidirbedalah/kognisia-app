@@ -72,7 +72,7 @@ export function SubtestSelectorComponent({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 py-12">
+    <div data-testid="focus-subtest-selector" className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 py-12">
       <div className="max-w-6xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-8">
@@ -142,6 +142,7 @@ export function SubtestSelectorComponent({
 
                 {/* Select Button */}
                 <Button 
+                  data-testid={`select-subtest-button-${subtest.code}`}
                   className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-5 group-hover:shadow-lg transition-all"
                   onClick={(e) => {
                     e.stopPropagation()

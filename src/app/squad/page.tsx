@@ -2,11 +2,9 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { CreateSquadDialog } from '@/components/squad/CreateSquadDialog'
 import { StartBattleDialog } from '@/components/squad/StartBattleDialog'
 import { JoinSquadDialog } from '@/components/squad/JoinSquadDialog'
 import { SquadCard } from '@/components/squad/SquadCard'
@@ -14,6 +12,7 @@ import { BattleHistoryList } from '@/components/squad/BattleHistoryList'
 import type { Squad, SquadBattleHistory } from '@/lib/squad-types'
 import { Users, Trophy, Plus, UserPlus, Swords, ArrowLeft } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
+import { Skeleton } from '@/components/ui/skeleton'
 
 export default function SquadPage() {
   const router = useRouter()
@@ -76,13 +75,55 @@ export default function SquadPage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto p-6">
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading Squad Battle...</p>
+      <div className="container mx-auto p-6 max-w-7xl">
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-2">
+            <Skeleton className="h-8 w-8 rounded" />
+            <Skeleton className="h-8 w-64 rounded" />
           </div>
+          <Skeleton className="h-4 w-96 rounded" />
         </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Card key={i}>
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Skeleton className="h-4 w-24 rounded mb-2" />
+                    <Skeleton className="h-8 w-16 rounded" />
+                  </div>
+                  <Skeleton className="h-12 w-12 rounded" />
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        <Tabs defaultValue="squads" className="mb-6">
+          <TabsList className="grid grid-cols-2 w-full">
+            <TabsTrigger value="squads">Squads</TabsTrigger>
+            <TabsTrigger value="history">Riwayat</TabsTrigger>
+          </TabsList>
+          <TabsContent value="squads">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="rounded-lg border bg-white p-4">
+                  <Skeleton className="h-6 w-40 rounded mb-2" />
+                  <Skeleton className="h-4 w-56 rounded" />
+                </div>
+              ))}
+            </div>
+          </TabsContent>
+          <TabsContent value="history">
+            <div className="space-y-3">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="rounded-lg border bg-white p-4">
+                  <Skeleton className="h-4 w-56 rounded mb-2" />
+                  <Skeleton className="h-3 w-40 rounded" />
+                </div>
+              ))}
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     )
   }

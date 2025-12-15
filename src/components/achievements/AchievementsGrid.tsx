@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { AchievementCard } from './AchievementCard'
 import { supabase } from '@/lib/supabase'
 
@@ -39,11 +39,7 @@ export function AchievementsGrid({
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    fetchAchievements()
-  }, [])
-
-  const fetchAchievements = async () => {
+  const fetchAchievements = useCallback(async () => {
     try {
       setLoading(true)
       const { data: { session } } = await supabase.auth.getSession()
@@ -72,13 +68,17 @@ export function AchievementsGrid({
       setAchievements(filtered)
       setStats(data.stats)
       setError(null)
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch achievements')
       console.error('Error fetching achievements:', err)
     } finally {
       setLoading(false)
     }
-  }
+  }, [category])
+
+  useEffect(() => {
+    fetchAchievements()
+  }, [fetchAchievements])
 
   if (loading) {
     return (

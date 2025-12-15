@@ -63,12 +63,10 @@ export async function GET(request: NextRequest) {
       unread_count: notifications?.length || 0
     })
 
-  } catch (error: any) {
-    console.error('Error fetching notifications:', error)
-    return NextResponse.json(
-      { error: error.message || 'Failed to fetch notifications' },
-      { status: 500 }
-    )
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : 'Failed to fetch notifications'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }
 
@@ -128,11 +126,9 @@ export async function PUT(request: NextRequest) {
       message: 'Notification marked as read'
     })
 
-  } catch (error: any) {
-    console.error('Error updating notification:', error)
-    return NextResponse.json(
-      { error: error.message || 'Failed to update notification' },
-      { status: 500 }
-    )
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : 'Failed to update notification'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }

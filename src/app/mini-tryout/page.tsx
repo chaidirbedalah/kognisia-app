@@ -20,6 +20,7 @@ import {
   Flag,
   AlertCircle
 } from 'lucide-react'
+import { Skeleton } from '@/components/ui/skeleton'
 
 interface Question {
   id: string
@@ -57,6 +58,47 @@ export default function MiniTryOutPage() {
   useEffect(() => {
     loadQuestions()
   }, [])
+  
+  const handleSubmit = useCallback(async () => {
+    if (isSubmitting) return
+    const unansweredCount = questions.length - Object.keys(answers).length
+    if (unansweredCount > 0 && timeRemaining > 0) {
+      const confirm = window.confirm(
+        `Kamu masih punya ${unansweredCount} soal yang belum dijawab. Yakin mau submit?`
+      )
+      if (!confirm) return
+    }
+    setIsSubmitting(true)
+    try {
+      const endTime = Date.now()
+      const totalTimeSeconds = Math.floor((endTime - startTime) / 1000)
+      const response = await fetch('/api/mini-tryout/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          questions,
+          answers,
+          totalTimeSeconds,
+          startTime,
+          endTime
+        })
+      })
+      if (!response.ok) {
+        throw new Error('Failed to submit')
+      }
+      const data = await response.json()
+      sessionStorage.setItem(
+        `mini-tryout-results-${data.sessionId}`,
+        JSON.stringify(data.results)
+      )
+      sessionStorage.setItem('mini-tryout-last-session-id', data.sessionId)
+      router.push(`/mini-tryout/results?sessionId=${data.sessionId}`)
+    } catch (error) {
+      console.error('Error submitting:', error)
+      alert('Gagal submit jawaban. Silakan coba lagi.')
+      setIsSubmitting(false)
+    }
+  }, [isSubmitting, questions, answers, timeRemaining, startTime, router])
 
   // Timer countdown (Requirement 7.5)
   useEffect(() => {
@@ -70,7 +112,7 @@ export default function MiniTryOutPage() {
     }, 1000)
 
     return () => clearInterval(timer)
-  }, [timeRemaining])
+  }, [timeRemaining, handleSubmit])
 
   const loadQuestions = async () => {
     try {
@@ -116,54 +158,6 @@ export default function MiniTryOutPage() {
     setCurrentQuestionIndex(index)
   }
 
-  const handleSubmit = async () => {
-    if (isSubmitting) return
-
-    const unansweredCount = questions.length - Object.keys(answers).length
-    if (unansweredCount > 0 && timeRemaining > 0) {
-      const confirm = window.confirm(
-        `Kamu masih punya ${unansweredCount} soal yang belum dijawab. Yakin mau submit?`
-      )
-      if (!confirm) return
-    }
-
-    setIsSubmitting(true)
-
-    try {
-      const endTime = Date.now()
-      const totalTimeSeconds = Math.floor((endTime - startTime) / 1000)
-
-      const response = await fetch('/api/mini-tryout/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          questions,
-          answers,
-          totalTimeSeconds,
-          startTime,
-          endTime
-        })
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to submit')
-      }
-
-      const data = await response.json()
-      
-      // Store results for results page
-      sessionStorage.setItem(
-        `mini-tryout-results-${data.sessionId}`,
-        JSON.stringify(data.results)
-      )
-      
-      router.push(`/mini-tryout/results?sessionId=${data.sessionId}`)
-    } catch (error) {
-      console.error('Error submitting:', error)
-      alert('Gagal submit jawaban. Silakan coba lagi.')
-      setIsSubmitting(false)
-    }
-  }
 
   // Helper functions
   const formatTime = (seconds: number) => {
@@ -188,10 +182,59 @@ export default function MiniTryOutPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Memuat soal...</p>
+      <div className="min-h-screen bg-gray-50 p-4">
+        <div className="max-w-7xl mx-auto mb-4">
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between flex-wrap gap-4">
+                <div>
+                  <Skeleton className="h-6 w-48 rounded mb-2" />
+                  <Skeleton className="h-4 w-32 rounded" />
+                </div>
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-5 w-5 rounded" />
+                  <Skeleton className="h-7 w-24 rounded" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+        <div className="max-w-7xl mx-auto">
+          <Card className="mb-4">
+            <CardHeader>
+              <CardTitle className="h-5 w-3/4">
+                <Skeleton className="h-5 w-full rounded" />
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="w-full p-4 rounded-lg border-2">
+                  <Skeleton className="h-4 w-full rounded" />
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+          <div className="flex justify-between items-center mb-4">
+            <Skeleton className="h-9 w-28 rounded" />
+            <div className="flex gap-2">
+              <Skeleton className="h-9 w-24 rounded" />
+              <Skeleton className="h-9 w-24 rounded" />
+            </div>
+          </div>
+          <Card>
+            <CardHeader>
+              <CardTitle className="h-5 w-40">
+                <Skeleton className="h-5 w-40 rounded" />
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-10 gap-2">
+                {Array.from({ length: 20 }).map((_, i) => (
+                  <Skeleton key={i} className="p-2 rounded text-sm font-medium" />
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     )

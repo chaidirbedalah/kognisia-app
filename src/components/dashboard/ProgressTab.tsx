@@ -10,7 +10,7 @@ interface ProgressTabProps {
 export function ProgressTab({ data, loading }: ProgressTabProps) {
   if (loading) {
     return (
-      <div className="space-y-6">
+      <div data-testid="progress-tab" className="space-y-6">
         <Card>
           <CardHeader>
             <div className="h-6 bg-gray-200 animate-pulse rounded w-48 mb-2"></div>
@@ -30,7 +30,7 @@ export function ProgressTab({ data, loading }: ProgressTabProps) {
 
   if (data.length === 0) {
     return (
-      <Card>
+      <Card data-testid="progress-empty">
         <CardHeader>
           <CardTitle>Progress per Subtest</CardTitle>
           <CardDescription>Belum ada data</CardDescription>
@@ -76,7 +76,7 @@ export function ProgressTab({ data, loading }: ProgressTabProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div data-testid="progress-tab" className="space-y-6">
       {/* Overview Grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card>

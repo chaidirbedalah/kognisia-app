@@ -27,7 +27,7 @@ interface Event {
     total_points: number;
     challenges_completed: number;
   };
-  userProgress: Record<string, any>;
+  userProgress: Record<string, { completed_at?: string; points_earned?: number }>;
 }
 
 interface EventProgress {

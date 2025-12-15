@@ -3,6 +3,12 @@ import * as fc from 'fast-check'
 import { createClient } from '@supabase/supabase-js'
 import { ASSESSMENT_CONFIGS, VALID_SUBTEST_CODES } from '@/lib/utbk-constants'
 
+interface QBQuestion {
+  id: string
+  question_text: string
+  subtest_code: string
+}
+
 /**
  * Property Test for Focus Mode Distribution
  * 
@@ -44,7 +50,7 @@ describe('Property 4: Focus Mode Distribution', () => {
           }
 
           // Randomize and select
-          const shuffled = shuffleArray(data)
+          const shuffled = shuffleArray<QBQuestion>(data as QBQuestion[])
           const selected = shuffled.slice(0, config.totalQuestions)
 
           // Property 1: Total count must be 10
@@ -176,6 +182,6 @@ async function fetchFocusModeQuestions(subtestCode: string) {
     return null
   }
 
-  const shuffled = shuffleArray(data)
+  const shuffled = shuffleArray<QBQuestion>(data as QBQuestion[])
   return shuffled.slice(0, config.totalQuestions)
 }

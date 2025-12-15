@@ -2,43 +2,52 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createSquad } from '@/lib/squad-api'
 import { isValidSquadName } from '@/lib/squad-types'
 import { createClient } from '@supabase/supabase-js'
+import { cookies } from 'next/headers'
+import { createServerClient } from '@supabase/ssr'
 
 export async function POST(request: NextRequest) {
   try {
-    // Get authorization header
-    const authHeader = request.headers.get('authorization')
-    
-    if (!authHeader) {
-      console.error('No authorization header found')
-      return NextResponse.json(
-        { error: 'Unauthorized - No auth header' },
-        { status: 401 }
-      )
-    }
-
-    // Create Supabase client with auth header
-    const supabase = createClient(
+    const cookieStore = await cookies()
+    let userId: string | null = null
+    // Try SSR cookies session first
+    const ssr = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
-        global: {
-          headers: {
-            Authorization: authHeader
-          }
-        }
+        cookies: {
+          getAll() {
+            return cookieStore.getAll()
+          },
+          setAll() {},
+        },
       }
     )
+    const { data: ssrSession } = await ssr.auth.getUser()
+    userId = ssrSession?.user?.id || null
+
+    // Fallback to Authorization header Bearer token
+    if (!userId) {
+      const authHeader = request.headers.get('authorization')
+      if (!authHeader?.startsWith('Bearer ')) {
+        return NextResponse.json(
+          { error: 'Unauthorized' },
+          { status: 401 }
+        )
+      }
+      const token = authHeader.substring(7)
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      )
+      const { data: tokenUser } = await supabase.auth.getUser(token)
+      userId = tokenUser?.user?.id || null
+      if (!userId) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      }
+    }
 
     // Get current user
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    
-    if (authError || !user) {
-      console.error('Auth error:', authError)
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
-    }
+    const currentUserId = userId
 
     // Parse request body
     const body = await request.json()
@@ -61,7 +70,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create squad
-    const squad = await createSquad(user.id, { name, max_members })
+    const squad = await createSquad(currentUserId, { name, max_members })
 
     return NextResponse.json({
       success: true,
@@ -69,11 +78,9 @@ export async function POST(request: NextRequest) {
       invite_code: squad.invite_code
     })
 
-  } catch (error: any) {
-    console.error('Error creating squad:', error)
-    return NextResponse.json(
-      { error: error.message || 'Failed to create squad' },
-      { status: 500 }
-    )
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : 'Failed to create squad'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }

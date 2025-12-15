@@ -1,11 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from '@/components/ui/breadcrumb'
 
 type TopicProgress = {
   topic_name: string
@@ -24,21 +25,24 @@ type RecentAnswer = {
   answered_at: string
 }
 
+type StudentInfo = {
+  id: string
+  full_name: string
+  email: string
+}
+
+
 export default function StudentDetailPage() {
   const params = useParams()
   const router = useRouter()
   const studentId = params.id as string
 
-  const [student, setStudent] = useState<any>(null)
+  const [student, setStudent] = useState<StudentInfo | null>(null)
   const [topicProgress, setTopicProgress] = useState<TopicProgress[]>([])
   const [recentAnswers, setRecentAnswers] = useState<RecentAnswer[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    loadStudentDetail()
-  }, [studentId])
-
-  const loadStudentDetail = async () => {
+  const loadStudentDetail = useCallback(async () => {
     // Get student info
     const { data: studentData } = await supabase
       .from('users')
@@ -62,11 +66,22 @@ export default function StudentDetailPage() {
 
     if (progressData) {
       // Group by topic
-      const topicMap = new Map<string, any>()
+      const topicMap = new Map<string, TopicProgress>()
       
-      progressData.forEach((p: any) => {
-        const topicName = p.question_bank.topics.name
-        const subject = p.question_bank.topics.subject
+      progressData.forEach((p) => {
+        const qb = (p as Record<string, unknown>).question_bank as Record<string, unknown>
+        const rawTopics = qb?.topics as unknown
+        let topicName = ''
+        let subject = ''
+        if (Array.isArray(rawTopics) && rawTopics.length > 0) {
+          const t0 = rawTopics[0] as Record<string, unknown>
+          topicName = typeof t0.name === 'string' ? t0.name : ''
+          subject = typeof t0.subject === 'string' ? t0.subject : ''
+        } else if (rawTopics && typeof (rawTopics as Record<string, unknown>).name === 'string') {
+          const t = rawTopics as Record<string, unknown>
+          topicName = String(t.name)
+          subject = typeof t.subject === 'string' ? String(t.subject) : ''
+        }
         
         if (!topicMap.has(topicName)) {
           topicMap.set(topicName, {
@@ -78,9 +93,10 @@ export default function StudentDetailPage() {
           })
         }
         
-        const topic = topicMap.get(topicName)
+        const topic = topicMap.get(topicName)!
         topic.total_questions++
-        if (p.is_correct) topic.correct_answers++
+        const isCorrect = Boolean((p as Record<string, unknown>).is_correct)
+        if (isCorrect) topic.correct_answers++
       })
 
       const topics = Array.from(topicMap.values()).map(t => ({
@@ -108,20 +124,39 @@ export default function StudentDetailPage() {
         .limit(10)
 
       if (recentData) {
-        const recent = recentData.map((r: any) => ({
-          question_text: r.question_bank.question_text,
-          selected_answer: r.selected_answer,
-          correct_answer: r.question_bank.correct_answer,
-          is_correct: r.is_correct,
-          topic_name: r.question_bank.topics.name,
-          answered_at: new Date(r.created_at).toLocaleString('id-ID')
-        }))
+        const recent = (recentData as unknown[]).map((r) => {
+          const obj = r as Record<string, unknown>
+          const qb = obj.question_bank as Record<string, unknown>
+          const topics = qb?.topics as unknown
+          let topicName = ''
+          if (Array.isArray(topics) && topics.length > 0) {
+            const t0 = topics[0] as Record<string, unknown>
+            topicName = typeof t0.name === 'string' ? t0.name : ''
+          } else if (topics && typeof (topics as Record<string, unknown>).name === 'string') {
+            topicName = String((topics as Record<string, unknown>).name)
+          }
+          return {
+            question_text: String(qb?.question_text ?? ''),
+            selected_answer: String(obj.selected_answer ?? ''),
+            correct_answer: String(qb?.correct_answer ?? ''),
+            is_correct: Boolean(obj.is_correct),
+            topic_name: topicName,
+            answered_at: new Date(String(obj.created_at)).toLocaleString('id-ID')
+          } as RecentAnswer
+        })
         setRecentAnswers(recent)
       }
     }
 
     setLoading(false)
-  }
+  }, [studentId])
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      loadStudentDetail()
+    }, 0)
+    return () => clearTimeout(timeout)
+  }, [loadStudentDetail])
 
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>
@@ -135,15 +170,41 @@ export default function StudentDetailPage() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <Button variant="outline" size="sm" onClick={() => router.back()}>
-            ← Kembali
-          </Button>
+        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={() => router.back()}>
+              ← Kembali
+            </Button>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => (window.location.href = '/teacher/classes')}
+            >
+              Manajemen Kelas
+            </Button>
+          </div>
         </div>
       </header>
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 py-8">
+        <Breadcrumb className="mb-4">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/teacher">Kognisia Teacher</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/teacher">Siswa</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>{student.full_name}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
         {/* Student Info */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">

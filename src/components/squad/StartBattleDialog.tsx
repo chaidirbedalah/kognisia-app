@@ -10,6 +10,18 @@ interface Subtest {
   description: string
 }
 
+interface BattleInfo {
+  battleId: string
+  squadName: string
+  inviteCode: string
+  scheduledStartAt: string
+  battleType: 'subtest' | 'mini_tryout'
+  subtestCode?: string
+  subtestName?: string
+  questionCount?: number
+  hotsMode: boolean
+}
+
 interface StartBattleDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -33,7 +45,7 @@ export function StartBattleDialog({
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [battleCreated, setBattleCreated] = useState(false)
-  const [battleInfo, setBattleInfo] = useState<any>(null)
+  const [battleInfo, setBattleInfo] = useState<BattleInfo | null>(null)
   const [copied, setCopied] = useState(false)
 
   useEffect(() => {
@@ -144,8 +156,8 @@ export function StartBattleDialog({
         questionCount,
         hotsMode
       })
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to create battle')
     } finally {
       setLoading(false)
     }
@@ -364,7 +376,7 @@ ${battleInfo.hotsMode ? 'Siap untuk tantangan ELITE? 🧠🔥' : 'Buktikan kemam
                   name="battleType"
                   value="subtest"
                   checked={battleType === 'subtest'}
-                  onChange={(e) => setBattleType(e.target.value as any)}
+                  onChange={(e) => setBattleType(e.target.value as 'subtest' | 'mini_tryout')}
                   className="mt-1"
                 />
                 <div>
@@ -378,7 +390,7 @@ ${battleInfo.hotsMode ? 'Siap untuk tantangan ELITE? 🧠🔥' : 'Buktikan kemam
                   name="battleType"
                   value="mini_tryout"
                   checked={battleType === 'mini_tryout'}
-                  onChange={(e) => setBattleType(e.target.value as any)}
+                  onChange={(e) => setBattleType(e.target.value as 'subtest' | 'mini_tryout')}
                   className="mt-1"
                 />
                 <div>
@@ -468,7 +480,7 @@ ${battleInfo.hotsMode ? 'Siap untuk tantangan ELITE? 🧠🔥' : 'Buktikan kemam
                   name="scheduleType"
                   value="10min"
                   checked={scheduleType === '10min'}
-                  onChange={(e) => setScheduleType(e.target.value as any)}
+                  onChange={(e) => setScheduleType(e.target.value as '10min' | '30min' | 'custom')}
                   className="mt-1"
                 />
                 <div>
@@ -482,7 +494,7 @@ ${battleInfo.hotsMode ? 'Siap untuk tantangan ELITE? 🧠🔥' : 'Buktikan kemam
                   name="scheduleType"
                   value="30min"
                   checked={scheduleType === '30min'}
-                  onChange={(e) => setScheduleType(e.target.value as any)}
+                  onChange={(e) => setScheduleType(e.target.value as '10min' | '30min' | 'custom')}
                   className="mt-1"
                 />
                 <div>
@@ -496,7 +508,7 @@ ${battleInfo.hotsMode ? 'Siap untuk tantangan ELITE? 🧠🔥' : 'Buktikan kemam
                   name="scheduleType"
                   value="custom"
                   checked={scheduleType === 'custom'}
-                  onChange={(e) => setScheduleType(e.target.value as any)}
+                  onChange={(e) => setScheduleType(e.target.value as '10min' | '30min' | 'custom')}
                   className="mt-1"
                 />
                 <div>

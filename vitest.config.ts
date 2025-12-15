@@ -8,6 +8,7 @@ export default defineConfig(({ mode }) => ({
     environment: 'node',
     setupFiles: ['./tests/setup.ts'],
     env: loadEnv(mode, process.cwd(), ''),
+    exclude: ['tests/e2e/**', 'node_modules/**'],
   },
   resolve: {
     alias: {

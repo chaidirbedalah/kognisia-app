@@ -1,10 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 
 type Question = {
   id: string
@@ -39,6 +38,48 @@ export default function MarathonPage() {
   const [finished, setFinished] = useState(false)
   const [score, setScore] = useState(0)
 
+  const handleFinish = useCallback(async () => {
+    let totalScore = 0
+    questions.forEach(q => {
+      if (answers[q.id] === q.correct_answer) {
+        totalScore += 10
+      }
+    })
+    setScore(totalScore)
+    setFinished(true)
+    
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) {
+      const progressData = questions.map(q => ({
+        student_id: user.id,
+        question_id: q.id,
+        selected_answer: answers[q.id] || 'skip',
+        is_correct: answers[q.id] === q.correct_answer,
+        score: answers[q.id] === q.correct_answer ? 10 : 0,
+        time_spent_seconds: 60,
+        hint_accessed: false,
+        solution_accessed: false,
+      }))
+      
+      await supabase.from('student_progress').insert(progressData)
+    }
+  }, [questions, answers])
+
+  const handleNextSubtest = useCallback(() => {
+    if (currentSubtest < SUBTESTS.length - 1) {
+      const nextSubtestCode = SUBTESTS[currentSubtest + 1].code
+      const nextQuestionIndex = questions.findIndex(q => q.subtest_utbk === nextSubtestCode)
+      
+      if (nextQuestionIndex !== -1) {
+        setCurrentQuestion(nextQuestionIndex)
+        setCurrentSubtest(currentSubtest + 1)
+        setTimeLeft(SUBTESTS[currentSubtest + 1].duration * 60)
+      }
+    } else {
+      handleFinish()
+    }
+  }, [currentSubtest, questions, handleFinish])
+
   useEffect(() => {
     if (started && timeLeft > 0) {
       const timer = setInterval(() => {
@@ -46,9 +87,9 @@ export default function MarathonPage() {
       }, 1000)
       return () => clearInterval(timer)
     } else if (started && timeLeft === 0) {
-      handleNextSubtest()
+      setTimeout(() => handleNextSubtest(), 0)
     }
-  }, [started, timeLeft])
+  }, [started, timeLeft, handleNextSubtest])
 
   const loadQuestions = async () => {
     setLoading(true)
@@ -70,11 +111,6 @@ export default function MarathonPage() {
     setLoading(false)
   }
 
-  // This useEffect to check role
-  useEffect(() => {
-    checkAccess()
-  }, [])
-
   const checkAccess = async () => {
     const { data: { user } } = await supabase.auth.getUser()
     if (user) {
@@ -90,6 +126,10 @@ export default function MarathonPage() {
       }
     }
   }
+  // This useEffect to check role
+  useEffect(() => {
+    checkAccess()
+  }, [])
 
 
   const handleStart = async () => {
@@ -122,49 +162,9 @@ export default function MarathonPage() {
     }
   }
 
-  const handleNextSubtest = () => {
-    if (currentSubtest < SUBTESTS.length - 1) {
-      // Find first question of next subtest
-      const nextSubtestCode = SUBTESTS[currentSubtest + 1].code
-      const nextQuestionIndex = questions.findIndex(q => q.subtest_utbk === nextSubtestCode)
-      
-      if (nextQuestionIndex !== -1) {
-        setCurrentQuestion(nextQuestionIndex)
-        setCurrentSubtest(currentSubtest + 1)
-        setTimeLeft(SUBTESTS[currentSubtest + 1].duration * 60)
-      }
-    } else {
-      handleFinish()
-    }
-  }
+  
 
-  const handleFinish = async () => {
-    let totalScore = 0
-    questions.forEach(q => {
-      if (answers[q.id] === q.correct_answer) {
-        totalScore += 10
-      }
-    })
-    setScore(totalScore)
-    setFinished(true)
-    
-    // Save to database
-    const { data: { user } } = await supabase.auth.getUser()
-    if (user) {
-      const progressData = questions.map(q => ({
-        student_id: user.id,
-        question_id: q.id,
-        selected_answer: answers[q.id] || 'skip',
-        is_correct: answers[q.id] === q.correct_answer,
-        score: answers[q.id] === q.correct_answer ? 10 : 0,
-        time_spent_seconds: 60,
-        hint_accessed: false,
-        solution_accessed: false,
-      }))
-      
-      await supabase.from('student_progress').insert(progressData)
-    }
-  }
+  
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60)

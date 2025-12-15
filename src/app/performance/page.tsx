@@ -22,7 +22,6 @@ export default function PerformancePage() {
     slowRequests: 0,
     errorRequests: 0
   });
-  const [refreshInterval, setRefreshInterval] = useState<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const updateStats = () => {
@@ -34,7 +33,6 @@ export default function PerformancePage() {
 
     // Refresh every 5 seconds
     const interval = setInterval(updateStats, 5000);
-    setRefreshInterval(interval);
 
     return () => {
       if (interval) clearInterval(interval);

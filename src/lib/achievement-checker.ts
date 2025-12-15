@@ -16,7 +16,7 @@ interface BattleResult {
 export async function checkAndUnlockAchievements(
   userId: string,
   battleResult: BattleResult,
-  session: any
+  session: { access_token: string }
 ) {
   const achievementsToUnlock: string[] = []
 

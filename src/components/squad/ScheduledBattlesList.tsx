@@ -1,11 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Clock, Swords, Calendar, BookOpen, Target } from 'lucide-react'
+import { toast } from 'sonner'
 
 interface ScheduledBattle {
   id: string
@@ -29,13 +30,40 @@ export function ScheduledBattlesList({ squadId }: ScheduledBattlesListProps) {
   const [loading, setLoading] = useState(true)
   const [countdown, setCountdown] = useState<{ [key: string]: string }>({})
 
+  const loadScheduledBattles = useCallback(async () => {
+    try {
+      // Get session token
+      const { data: { session } } = await (await import('@/lib/supabase')).supabase.auth.getSession()
+      
+      if (!session) {
+        console.error('No active session')
+        return
+      }
+
+      const response = await fetch(`/api/squad/${squadId}/battles`, {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`
+        }
+      })
+      
+      if (response.ok) {
+        const data = await response.json()
+        setBattles(data.battles || [])
+      }
+    } catch (error) {
+      console.error('Error loading battles:', error)
+    } finally {
+      setLoading(false)
+    }
+  }, [squadId])
+
   useEffect(() => {
     loadScheduledBattles()
     
     // Refresh every 30 seconds
     const interval = setInterval(loadScheduledBattles, 30000)
     return () => clearInterval(interval)
-  }, [squadId])
+  }, [loadScheduledBattles])
 
   useEffect(() => {
     // Update countdown every second
@@ -72,39 +100,30 @@ export function ScheduledBattlesList({ squadId }: ScheduledBattlesListProps) {
     return () => clearInterval(interval)
   }, [battles])
 
-  async function loadScheduledBattles() {
+  
+
+  const handleJoinBattle = async (battleId: string, status: string) => {
     try {
-      // Get session token
       const { data: { session } } = await (await import('@/lib/supabase')).supabase.auth.getSession()
-      
-      if (!session) {
-        console.error('No active session')
+      if (!session) return
+      const res = await fetch('/api/battle/join', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ battle_id: battleId })
+      })
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}))
+        toast.error(j.error || 'Gagal bergabung ke battle')
         return
       }
-
-      const response = await fetch(`/api/squad/${squadId}/battles`, {
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`
-        }
-      })
-      
-      if (response.ok) {
-        const data = await response.json()
-        setBattles(data.battles || [])
-      }
-    } catch (error) {
-      console.error('Error loading battles:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleJoinBattle = (battleId: string, status: string) => {
+      toast.success(status === 'active' ? 'Berhasil bergabung. Biaya Coins dipotong.' : 'Masuk Waiting Room. Biaya Coins dipotong.')
+    } catch {}
     if (status === 'active') {
-      // Battle is active, go directly to battle page
       router.push(`/squad/battle/${battleId}`)
     } else {
-      // Battle is scheduled, go to waiting room
       router.push(`/squad/battle/${battleId}/waiting`)
     }
   }

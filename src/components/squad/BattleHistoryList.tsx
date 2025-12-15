@@ -3,8 +3,8 @@
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import type { SquadBattleHistory } from '@/lib/squad-types'
-import { Trophy, Calendar, Target, Users, Medal } from 'lucide-react'
-import { getDifficultyLabel, getDifficultyColor } from '@/lib/squad-types'
+import { Trophy, Calendar, Users } from 'lucide-react'
+import { getDifficultyLabel } from '@/lib/squad-types'
 
 interface BattleHistoryListProps {
   history: SquadBattleHistory[]
@@ -45,7 +45,7 @@ export function BattleHistoryList({ history }: BattleHistoryListProps) {
 
   return (
     <div className="space-y-4">
-      {history.map((battle, index) => (
+      {history.map((battle) => (
         <Card key={battle.battle_id} className="hover:shadow-md transition-shadow">
           <CardContent className="pt-6">
             <div className="flex items-start justify-between mb-4">

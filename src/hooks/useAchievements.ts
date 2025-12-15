@@ -60,8 +60,8 @@ export function useAchievements(): UseAchievementsReturn {
       setAchievements(data.achievements)
       setStats(data.stats)
       setError(null)
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch achievements')
       console.error('Error fetching achievements:', err)
     } finally {
       setLoading(false)
@@ -98,7 +98,7 @@ export function useAchievements(): UseAchievementsReturn {
       }
       
       return false
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error unlocking achievement:', err)
       return false
     }

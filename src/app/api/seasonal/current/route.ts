@@ -104,12 +104,9 @@ export async function GET(request: NextRequest) {
       leaderboard_stats: leaderboardEntry || null
     })
 
-  } catch (error: any) {
-    console.error('Error fetching current season:', error)
-    return NextResponse.json(
-      { error: error.message || 'Failed to fetch current season' },
-      { status: 500 }
-    )
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : 'Failed to fetch current season'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }
-

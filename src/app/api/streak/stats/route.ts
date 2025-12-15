@@ -94,12 +94,10 @@ export async function GET(request: NextRequest) {
       next_milestone: getNextMilestone(streak?.current_streak || 0)
     })
 
-  } catch (error: any) {
-    console.error('Error fetching streak stats:', error)
-    return NextResponse.json(
-      { error: error.message || 'Failed to fetch streak stats' },
-      { status: 500 }
-    )
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : 'Failed to fetch streak stats'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }
 
@@ -112,4 +110,3 @@ function getNextMilestone(currentStreak: number): number {
   }
   return 365
 }
-

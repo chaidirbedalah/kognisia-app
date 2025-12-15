@@ -1,30 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { startSquadBattle } from '@/lib/squad-api'
 import { isValidDifficulty } from '@/lib/squad-types'
-import { createClient } from '@supabase/supabase-js'
+import { cookies } from 'next/headers'
+import { createServerClient } from '@supabase/ssr'
 
 export async function POST(request: NextRequest) {
   try {
-    // Get authorization header (client-side auth approach)
-    const authHeader = request.headers.get('authorization')
-    
-    if (!authHeader) {
-      return NextResponse.json(
-        { error: 'Unauthorized - No auth header' },
-        { status: 401 }
-      )
-    }
-
-    // Create Supabase client with auth header
-    const supabase = createClient(
+    const cookieStore = await cookies()
+    const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
-        global: {
-          headers: {
-            Authorization: authHeader
-          }
-        }
+        cookies: {
+          getAll() {
+            return cookieStore.getAll()
+          },
+          setAll() {},
+        },
       }
     )
 
@@ -126,10 +118,9 @@ export async function POST(request: NextRequest) {
       }))
     })
 
-  } catch (error: any) {
-    console.error('Error starting battle:', error)
-    
-    if (error.message.includes('Only squad leader')) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : ''
+    if (message.includes('Only squad leader')) {
       return NextResponse.json(
         { error: 'Only the squad leader can start battles' },
         { status: 403 }
@@ -137,7 +128,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { error: error.message || 'Failed to start battle' },
+      { error: message || 'Failed to start battle' },
       { status: 500 }
     )
   }

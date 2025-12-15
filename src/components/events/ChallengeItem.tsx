@@ -15,7 +15,6 @@ interface ChallengeItemProps {
 }
 
 export function ChallengeItem({
-  id,
   challenge_code,
   description,
   points,

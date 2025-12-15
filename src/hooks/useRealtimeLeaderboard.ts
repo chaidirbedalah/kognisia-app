@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 
@@ -16,47 +16,7 @@ export function useRealtimeLeaderboard() {
   const [error, setError] = useState<string | null>(null)
   const [channel, setChannel] = useState<RealtimeChannel | null>(null)
 
-  useEffect(() => {
-    subscribeToLeaderboard()
-
-    return () => {
-      if (channel) {
-        supabase.removeChannel(channel)
-      }
-    }
-  }, [])
-
-  const subscribeToLeaderboard = async () => {
-    try {
-      // Initial fetch
-      await fetchLeaderboard()
-
-      // Subscribe to real-time updates on user_achievements
-      const channel = supabase
-        .channel('leaderboard_updates')
-        .on(
-          'postgres_changes',
-          {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'user_achievements'
-          },
-          () => {
-            // Refresh leaderboard when new achievement is unlocked
-            fetchLeaderboard()
-          }
-        )
-        .subscribe()
-
-      setChannel(channel)
-    } catch (err: any) {
-      setError(err.message)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const fetchLeaderboard = async () => {
+  const fetchLeaderboard = useCallback(async () => {
     try {
       // Get all users with their achievement points
       const { data: users } = await supabase
@@ -102,10 +62,50 @@ export function useRealtimeLeaderboard() {
         }))
 
       setLeaderboard(sorted)
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch leaderboard')
     }
-  }
+  }, [])
+
+  const subscribeToLeaderboard = useCallback(async () => {
+    try {
+      // Initial fetch
+      await fetchLeaderboard()
+
+      // Subscribe to real-time updates on user_achievements
+      const ch = supabase
+        .channel('leaderboard_updates')
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'user_achievements'
+          },
+          () => {
+            // Refresh leaderboard when new achievement is unlocked
+            fetchLeaderboard()
+          }
+        )
+        .subscribe()
+
+      setChannel(ch)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to subscribe')
+    } finally {
+      setLoading(false)
+    }
+  }, [fetchLeaderboard])
+
+  useEffect(() => {
+    subscribeToLeaderboard()
+
+    return () => {
+      if (channel) {
+        supabase.removeChannel(channel)
+      }
+    }
+  }, [channel, subscribeToLeaderboard])
 
   return {
     leaderboard,
@@ -115,4 +115,3 @@ export function useRealtimeLeaderboard() {
     refetch: fetchLeaderboard
   }
 }
-

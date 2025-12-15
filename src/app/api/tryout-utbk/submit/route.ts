@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import type { SubtestCode } from '@/lib/types'
+import { z } from 'zod'
+export const runtime = 'nodejs'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
 /**
  * POST /api/tryout-utbk/submit
@@ -15,27 +17,20 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
  * - 8.3: Show strongest subtest (highest accuracy)
  * - 8.4: Show weakest subtest (lowest accuracy)
  */
+const BodySchema = z.object({
+  userId: z.string().min(1),
+  answers: z.record(z.string(), z.string()),
+  questions: z.array(z.object({ id: z.string().min(1) })),
+  totalTimeSeconds: z.number().int().nonnegative(),
+  subtestTimes: z.record(z.string(), z.number().int().nonnegative()).optional()
+})
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    const { 
-      userId, 
-      answers,
-      questions,
-      totalTimeSeconds,
-      subtestTimes 
-    } = body as {
-      userId: string
-      answers: Record<number, string>
-      questions: Array<{
-        id: string
-        correct_answer: string
-        subtest_code: SubtestCode
-        recommended_minutes?: number
-      }>
-      totalTimeSeconds: number
-      subtestTimes: Record<string, number>
+    const parsed = BodySchema.safeParse(await request.json())
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid body' }, { status: 400 })
     }
+    const { userId, answers, questions, totalTimeSeconds, subtestTimes } = parsed.data
 
     // Validate required fields
     if (!userId || !answers || !questions) {
@@ -45,7 +40,17 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const supabase = createClient(supabaseUrl, supabaseKey)
+    const supabase = createClient(supabaseUrl, supabaseAnonKey)
+    const admin = createClient(supabaseUrl, supabaseServiceKey)
+    const questionIds = questions.map(q => q.id)
+    const { data: dbQuestions, error: qErr } = await admin
+      .from('question_bank')
+      .select('id, correct_answer, subtest_utbk, recommended_minutes')
+      .in('id', questionIds)
+    if (qErr) {
+      return NextResponse.json({ error: 'Failed fetching questions' }, { status: 500 })
+    }
+    const byId = new Map(dbQuestions?.map(q => [q.id, q]))
 
     // Prepare progress records
     const progressRecords = []
@@ -61,9 +66,9 @@ export async function POST(request: NextRequest) {
     }> = {}
 
     for (let idx = 0; idx < questions.length; idx++) {
-      const question = questions[idx]
-      const userAnswer = answers[idx] || null
-      const isCorrect = userAnswer === question.correct_answer
+      const q = byId.get(questions[idx].id)
+      const userAnswer = answers[String(idx)] || null
+      const isCorrect = q ? userAnswer === q.correct_answer : false
       
       if (isCorrect) {
         totalCorrect++
@@ -73,13 +78,13 @@ export async function POST(request: NextRequest) {
       totalScore += questionScore
 
       // Initialize subtest breakdown
-      const code = question.subtest_code
+      const code = q?.subtest_utbk || 'UNKNOWN'
       if (!subtestBreakdown[code]) {
         subtestBreakdown[code] = {
           correct: 0,
           total: 0,
-          timeSpent: subtestTimes[code] || 0,
-          recommendedTime: (question.recommended_minutes || 0) * 60
+          timeSpent: subtestTimes?.[code] || 0,
+          recommendedTime: Number(q?.recommended_minutes ?? 0) * 60
         }
       }
       subtestBreakdown[code].total++
@@ -90,13 +95,13 @@ export async function POST(request: NextRequest) {
       // Create progress record
       progressRecords.push({
         student_id: userId,
-        question_id: question.id,
+        question_id: questions[idx].id,
         selected_answer: userAnswer,
         is_correct: isCorrect,
         score: questionScore,
         time_spent_seconds: Math.floor(totalTimeSeconds / questions.length),
         assessment_type: 'tryout_utbk',
-        subtest_code: question.subtest_code,
+        subtest_code: code,
       })
     }
 

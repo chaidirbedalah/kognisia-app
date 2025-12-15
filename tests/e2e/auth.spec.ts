@@ -6,13 +6,13 @@ import { test, expect } from '@playwright/test'
  */
 
 const TEST_STUDENT = {
-  email: 'test@kognisia.com',
-  password: 'test123456'
+  email: 'andi@siswa.id',
+  password: 'demo123456'
 }
 
 const TEST_TEACHER = {
-  email: 'guru@kognisia.com',
-  password: 'guru123456'
+  email: 'bambang@guru.id',
+  password: 'demo123456'
 }
 
 test.describe('Authentication', () => {
@@ -102,7 +102,12 @@ test.describe('Authentication', () => {
     await expect(page).toHaveURL(/.*dashboard/, { timeout: 10000 })
     
     // Find and click logout button
-    await page.click('button:has-text("Logout"), button:has-text("Keluar")')
+    const logoutButton = page.getByTestId('logout-button')
+    if (await logoutButton.isVisible({ timeout: 3000 }).catch(() => false)) {
+      await logoutButton.click()
+    } else {
+      await page.click('button:has-text("Logout"), button:has-text("Keluar")')
+    }
     
     // Should redirect to login
     await expect(page).toHaveURL(/.*login/, { timeout: 5000 })

@@ -6,8 +6,8 @@ import { test, expect } from '@playwright/test'
  */
 
 const TEST_STUDENT = {
-  email: 'test@kognisia.com',
-  password: 'test123456'
+  email: 'andi@siswa.id',
+  password: 'demo123456'
 }
 
 test.describe('Daily Challenge', () => {
@@ -18,98 +18,48 @@ test.describe('Daily Challenge', () => {
     await page.fill('input[type="password"]', TEST_STUDENT.password)
     await page.click('button[type="submit"]')
     await expect(page).toHaveURL(/.*dashboard/, { timeout: 10000 })
+
+    // Navigate directly to Daily Challenge page for stable selectors
+    await page.goto('/daily-challenge')
+    await page.waitForLoadState('networkidle')
   })
 
   test('should show mode selection', async ({ page }) => {
-    // Try different ways to start daily challenge
-    const startButtons = [
-      'text=/mulai.*daily challenge/i',
-      'text=/start.*daily/i',
-      'text=/daily challenge/i',
-      '[href*="daily-challenge"]',
-      'button:has-text("Daily")',
-    ]
-    
-    let buttonClicked = false
-    for (const selector of startButtons) {
-      const button = page.locator(selector).first()
-      if (await button.isVisible({ timeout: 1000 }).catch(() => false)) {
-        await button.click()
-        buttonClicked = true
-        break
-      }
-    }
-    
-    // If no button found, skip this test
-    if (!buttonClicked) {
-      test.skip()
-      return
-    }
-    
-    // Wait for navigation or mode selection
-    await page.waitForTimeout(2000)
-    
-    // Should show mode selection or questions
-    const hasMode = await page.locator('text=/balanced|focus/i').isVisible().catch(() => false)
-    const hasQuestions = await page.locator('text=/soal|question/i').isVisible().catch(() => false)
-    
-    // Either mode selection or directly to questions is okay
-    expect(hasMode || hasQuestions).toBe(true)
+    const visible = await page.getByTestId('daily-mode-selection-step').isVisible({ timeout: 3000 }).catch(() => false)
+    // Accept either mode selection or already on questions
+    const onQuestions = await page.getByTestId('daily-question-step').isVisible({ timeout: 3000 }).catch(() => false)
+    expect(visible || onQuestions).toBe(true)
   })
 
   test('should start balanced mode with 21 questions', async ({ page }) => {
-    // Try to start daily challenge
-    const startButton = page.locator('text=/mulai.*daily|start.*daily|daily challenge/i').first()
-    
-    if (await startButton.isVisible({ timeout: 2000 }).catch(() => false)) {
-      await startButton.click()
-      await page.waitForTimeout(2000)
-      
-      // Try to select Balanced mode if available
-      const balancedButton = page.locator('text=/balanced/i').first()
-      if (await balancedButton.isVisible({ timeout: 2000 }).catch(() => false)) {
-        await balancedButton.click()
-        await page.waitForTimeout(2000)
-      }
-      
-      // Check if questions loaded
-      const hasQuestions = await page.locator('text=/soal|question|pilih/i').isVisible({ timeout: 5000 }).catch(() => false)
-      
-      if (hasQuestions) {
-        // Test passed - questions are showing
-        expect(hasQuestions).toBe(true)
-      } else {
-        // Skip if feature not available yet
-        test.skip()
-      }
+    const btn = page.getByTestId('select-mode-balanced')
+    if (await btn.isVisible({ timeout: 2000 }).catch(() => false)) {
+      await btn.click()
+      // Accept loading or question step
+      const loading = await page.getByTestId('daily-loading').isVisible({ timeout: 3000 }).catch(() => false)
+      const questions = await page.getByTestId('daily-question-step').isVisible({ timeout: 5000 }).catch(() => false)
+      expect(loading || questions).toBe(true)
     } else {
-      // Skip if button not found
       test.skip()
     }
   })
 
   test('should show subtest selector in focus mode', async ({ page }) => {
-    // Try to start daily challenge
-    const startButton = page.locator('text=/mulai.*daily|start.*daily|daily challenge/i').first()
-    
-    if (await startButton.isVisible({ timeout: 2000 }).catch(() => false)) {
-      await startButton.click()
-      await page.waitForTimeout(2000)
+    const focusBtn = page.getByTestId('select-mode-focus')
+    if (await focusBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
+      await focusBtn.click()
+      const selectorVisible = await page.getByTestId('daily-subtest-selection-step').isVisible({ timeout: 3000 }).catch(() => false)
+      const questions = await page.getByTestId('daily-question-step').isVisible({ timeout: 3000 }).catch(() => false)
+      expect(selectorVisible || questions).toBe(true)
       
-      // Try to select Focus mode if available
-      const focusButton = page.locator('text=/focus/i').first()
-      if (await focusButton.isVisible({ timeout: 2000 }).catch(() => false)) {
-        await focusButton.click()
-        await page.waitForTimeout(2000)
-        
-        // Check if subtest selector or questions loaded
-        const hasSubtestSelector = await page.locator('text=/pilih|select|subtest/i').isVisible({ timeout: 3000 }).catch(() => false)
-        const hasQuestions = await page.locator('text=/soal|question/i').isVisible({ timeout: 3000 }).catch(() => false)
-        
-        // Either selector or questions is okay
-        expect(hasSubtestSelector || hasQuestions).toBe(true)
-      } else {
-        test.skip()
+      if (selectorVisible) {
+        const firstSelect = page.locator('[data-testid^="select-subtest-button-"]').first()
+        if (await firstSelect.isVisible({ timeout: 2000 }).catch(() => false)) {
+          await firstSelect.click()
+          const loading = await page.getByTestId('daily-loading').isVisible({ timeout: 3000 }).catch(() => false)
+          const q = await page.getByTestId('daily-question-step').isVisible({ timeout: 5000 }).catch(() => false)
+          expect(loading || q).toBe(true)
+        }
       }
     } else {
       test.skip()

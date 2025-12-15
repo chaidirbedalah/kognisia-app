@@ -1,13 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useEventHunting } from '@/hooks/useEventHunting';
 import { EventCard } from '@/components/events/EventCard';
 import { ChallengeItem } from '@/components/events/ChallengeItem';
-import { useRouter } from 'next/navigation';
 
 export default function EventsPage() {
-  const router = useRouter();
   const {
     events,
     loading,
@@ -15,26 +13,21 @@ export default function EventsPage() {
     joinEvent,
     completeChallenge,
     getEventProgress,
-    eventProgress,
     eventStats
   } = useEventHunting();
 
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
-  const [loadingEventId, setLoadingEventId] = useState<string | null>(null);
-  const [completingChallengeId, setCompletingChallengeId] = useState<string | null>(null);
 
   const selectedEvent = events.find(e => e.id === selectedEventId);
 
   const handleJoinEvent = async (eventId: string) => {
     try {
-      setLoadingEventId(eventId);
       await joinEvent(eventId);
       setSelectedEventId(eventId);
       await getEventProgress(eventId);
     } catch (err) {
       console.error('Failed to join event:', err);
     } finally {
-      setLoadingEventId(null);
     }
   };
 
@@ -42,13 +35,11 @@ export default function EventsPage() {
     if (!selectedEventId) return;
 
     try {
-      setCompletingChallengeId(challengeId);
       await completeChallenge(selectedEventId, challengeId);
       await getEventProgress(selectedEventId);
     } catch (err) {
       console.error('Failed to complete challenge:', err);
     } finally {
-      setCompletingChallengeId(null);
     }
   };
 
@@ -59,11 +50,11 @@ export default function EventsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 md:p-8">
+      <div className="min-h-screen bg-background p-4 md:p-8">
         <div className="max-w-6xl mx-auto">
           <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-            <p className="mt-4 text-gray-600">Memuat event...</p>
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            <p className="mt-4 text-muted-foreground">Memuat event...</p>
           </div>
         </div>
       </div>
@@ -71,16 +62,16 @@ export default function EventsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 md:p-8">
+    <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">🎯 Event Hunting</h1>
-          <p className="text-gray-600">Ikuti event spesial dan dapatkan poin bonus!</p>
+          <h1 className="text-4xl font-bold tracking-tight text-foreground mb-2">🎯 Event Hunting</h1>
+          <p className="text-muted-foreground">Ikuti event spesial dan dapatkan poin bonus!</p>
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+          <div className="mb-6 p-4 bg-destructive/10 border border-destructive/30 text-destructive rounded">
             {error}
           </div>
         )}
