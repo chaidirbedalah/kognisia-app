@@ -110,6 +110,59 @@ async function main() {
   let successCount = 0
   let failCount = 0
 
+  // Create specific test accounts required for manual testing
+  console.log('🔒 Creating Specific Test Accounts...')
+  const specificTests = [
+    { email: 'test@kognisia.com', role: 'student' as const, name: 'Test', password: 'test123456' },
+    { email: 'guru@kognisia.com', role: 'teacher' as const, name: 'Guru', password: 'guru123456' }
+  ]
+  for (const acc of specificTests) {
+    try {
+      const { data: existing } = await supabase
+        .from('users')
+        .select('id')
+        .eq('email', acc.email)
+        .single()
+
+      if (!existing) {
+        const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+          email: acc.email,
+          password: acc.password,
+          email_confirm: true,
+          user_metadata: { full_name: acc.name, role: acc.role }
+        })
+
+        if (authError) {
+          console.error(`❌ Failed to create ${acc.email}:`, authError.message)
+          failCount++
+        } else {
+          const { error: upsertError } = await supabase
+            .from('users')
+            .upsert({ id: authData.user.id, email: acc.email, role: acc.role, full_name: acc.name }, { onConflict: 'id' })
+          if (upsertError) {
+            console.warn(`⚠️  Created auth user ${acc.email} but failed to upsert to users table:`, upsertError.message)
+          }
+          console.log(`✅ Created test account: ${acc.email}`)
+          successCount++
+        }
+      } else {
+        // Ensure password matches expected for testing
+        if (existing?.id) {
+          const { error: updateError } = await supabase.auth.admin.updateUserById(existing.id, { password: acc.password })
+          if (updateError) {
+            console.warn(`⚠️  Failed to reset password for ${acc.email}:`, updateError.message)
+          } else {
+            console.log(`🔑 Reset password for test account: ${acc.email}`)
+          }
+        }
+        console.log(`ℹ️  Test account already exists: ${acc.email}`)
+      }
+    } catch (e: any) {
+      console.error(`❌ Error ensuring test account ${acc.email}:`, e.message)
+      failCount++
+    }
+  }
+
   // Create student accounts
   console.log('📚 Creating Student Accounts...')
   for (const username of selectedStudents) {

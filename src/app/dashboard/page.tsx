@@ -14,6 +14,9 @@ import { StreakCard } from '@/components/streak/StreakCard'
 import { Badge } from '@/components/ui/badge'
 import { useStreakSystem } from '@/hooks/useStreakSystem'
 import { AlertTriangle, Loader2, Wifi } from 'lucide-react'
+import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart'
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts'
+import { useRealtimeLeaderboard } from '@/hooks/useRealtimeLeaderboard'
 import { toast } from 'sonner'
 import { 
   fetchUserStats, 
@@ -55,6 +58,10 @@ export default function DashboardPage() {
   const { stats: streakStats, loading: streakLoading } = useStreakSystem()
   const [timeLeft, setTimeLeft] = useState<string>('')
   const [startingDC, setStartingDC] = useState(false)
+
+  const { leaderboard, loading: lbLoading, isConnected } = useRealtimeLeaderboard()
+  const topLeaderboard = leaderboard.slice(0, 8).map((e) => ({ name: (e.email || '').split('@')[0] || 'user', points: e.total_points }))
+  const dailyTrend = dailyChallengeData.slice(-14).map((d) => ({ date: new Date(d.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }), accuracy: d.accuracy }))
 
   const reasonLabelMap: Record<string, string> = {
     daily_challenge_reward: 'Daily Challenge',
@@ -510,6 +517,62 @@ export default function DashboardPage() {
               } : null}
               loading={loading}
             />
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Aktivitas Harian</CardTitle>
+                  <CardDescription>Trend akurasi 14 hari terakhir</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {dailyTrend.length > 0 ? (
+                    <ChartContainer config={{ accuracy: { label: 'Akurasi', color: '#2563eb' } }} className="aspect-[2/1]">
+                      <LineChart data={dailyTrend} margin={{ left: 12, right: 12 }}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="date" tickLine={false} axisLine={false} />
+                        <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} tickLine={false} axisLine={false} />
+                        <ChartTooltip content={<ChartTooltipContent />} />
+                        <ChartLegend content={<ChartLegendContent />} />
+                        <Line type="monotone" dataKey="accuracy" stroke="var(--color-accuracy)" strokeWidth={2} dot={false} />
+                      </LineChart>
+                    </ChartContainer>
+                  ) : (
+                    <div className="text-sm text-gray-600">Belum ada data</div>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Leaderboard Realtime</CardTitle>
+                  <CardDescription className="flex items-center gap-2">
+                    <span>Top 8 berdasarkan points</span>
+                    <span className="inline-flex items-center gap-1 text-xs bg-yellow-500/20 text-yellow-700 px-2 py-1 rounded">
+                      <Wifi className="h-3 w-3" />
+                      {isConnected ? 'Live' : 'Connecting'}
+                    </span>
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {lbLoading ? (
+                    <div className="flex items-center gap-2 text-sm text-gray-600"><Loader2 className="h-4 w-4 animate-spin" /> Memuat...</div>
+                  ) : topLeaderboard.length > 0 ? (
+                    <ChartContainer config={{ points: { label: 'Points', color: '#10b981' } }} className="aspect-[2/1]">
+                      <BarChart data={topLeaderboard} margin={{ left: 12, right: 12 }}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" tickLine={false} axisLine={false} />
+                        <YAxis tickLine={false} axisLine={false} />
+                        <ChartTooltip content={<ChartTooltipContent />} />
+                        <ChartLegend content={<ChartLegendContent />} />
+                        <Bar dataKey="points" fill="var(--color-points)" radius={[4, 4, 0, 0]} />
+                      </BarChart>
+                    </ChartContainer>
+                  ) : (
+                    <div className="text-sm text-gray-600">Belum ada data</div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
 
             {/* Coins History */}
             <Card>
