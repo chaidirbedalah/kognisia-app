@@ -19,6 +19,7 @@ import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'rec
 import { useRealtimeLeaderboard } from '@/hooks/useRealtimeLeaderboard'
 import QuestSection from '@/components/quests/QuestSection'
 import { useAnalytics } from '@/hooks/useAnalytics'
+import { AIRecommendations } from '@/components/ai/AIRecommendations'
 import { toast } from 'sonner'
 import { 
   fetchUserStats, 
@@ -49,7 +50,7 @@ export default function DashboardPage() {
   const [tryOutUTBKData, setTryOutUTBKData] = useState<TryOutUTBKData[]>([])
   const [miniTryOutData, setMiniTryOutData] = useState<TryOutData[]>([])
   const [progressData, setProgressData] = useState<ProgressData[]>([])
-  const [activeTab, setActiveTab] = useState<'overview' | 'daily' | 'marathon' | 'minitryout' | 'tryout' | 'progress'>('overview')
+  const [activeTab, setActiveTab] = useState<'overview' | 'daily' | 'marathon' | 'minitryout' | 'tryout' | 'progress' | 'ai-insights'>('overview')
   const [coins, setCoins] = useState<{ bronze: number; silver: number; gold: number; totalBronze: number } | null>(null)
   const [totalXP, setTotalXP] = useState<number>(0)
   const [coinHistory, setCoinHistory] = useState<Array<{ delta: number; reason: string; reference_id?: string | null; created_at: string }>>([])
@@ -416,6 +417,17 @@ export default function DashboardPage() {
               }`}
             >
               Progress
+            </button>
+            <button
+              data-testid="tab-ai-insights"
+              onClick={() => setActiveTab('ai-insights')}
+              className={`px-4 py-2 font-medium border-b-2 transition-colors ${
+                activeTab === 'ai-insights'
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              🤖 AI Insights
             </button>
           </div>
         </div>
@@ -958,6 +970,19 @@ export default function DashboardPage() {
         {/* Progress Tab */}
         {activeTab === 'progress' && (
           <ProgressTab data={progressData} loading={loading} />
+        )}
+
+        {/* AI Insights Tab */}
+        {activeTab === 'ai-insights' && userStats && (
+          <AIRecommendations 
+            userStats={userStats}
+            progressData={progressData}
+            tryOutData={miniTryOutData}
+            onApplyRecommendation={(recommendation) => {
+              toast.success(`Applied AI recommendation: ${recommendation.title}`)
+              // Handle recommendation application logic here
+            }}
+          />
         )}
       </main>
     </div>
