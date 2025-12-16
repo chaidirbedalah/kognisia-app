@@ -57,13 +57,22 @@ export function NotificationSettings() {
   // Template form states
   const [templateFormOpen, setTemplateFormOpen] = useState(false)
   const [editingTemplate, setEditingTemplate] = useState<NotificationTemplate | null>(null)
-  const [templateForm, setTemplateForm] = useState({
+  const [templateForm, setTemplateForm] = useState<{
+    name: string
+    type: 'assessment_reminder' | 'achievement_unlock' | 'streak_milestone' | 'class_announcement'
+    channel: 'email' | 'push' | 'sms' | 'in_app'
+    subject: string
+    message: string
+    timing: 'immediate' | 'daily' | 'weekly' | 'custom'
+    custom_days: number
+    is_active: boolean
+  }>({
     name: '',
-    type: 'assessment_reminder' as const,
-    channel: 'email' as const,
+    type: 'assessment_reminder',
+    channel: 'email',
     subject: '',
     message: '',
-    timing: 'immediate' as const,
+    timing: 'immediate',
     custom_days: 1,
     is_active: true
   })
@@ -279,7 +288,6 @@ export function NotificationSettings() {
                   <Label htmlFor="email-enabled">Email</Label>
                 </div>
                 <Switch
-                  id="email-enabled"
                   checked={settings.email_enabled}
                   onCheckedChange={(checked) => setSettings({ ...settings, email_enabled: checked })}
                 />
@@ -291,7 +299,6 @@ export function NotificationSettings() {
                   <Label htmlFor="push-enabled">Push Notification</Label>
                 </div>
                 <Switch
-                  id="push-enabled"
                   checked={settings.push_enabled}
                   onCheckedChange={(checked) => setSettings({ ...settings, push_enabled: checked })}
                 />
@@ -303,7 +310,6 @@ export function NotificationSettings() {
                   <Label htmlFor="sms-enabled">SMS</Label>
                 </div>
                 <Switch
-                  id="sms-enabled"
                   checked={settings.sms_enabled}
                   onCheckedChange={(checked) => setSettings({ ...settings, sms_enabled: checked })}
                 />
@@ -315,7 +321,6 @@ export function NotificationSettings() {
                   <Label htmlFor="in-app-enabled">In-App</Label>
                 </div>
                 <Switch
-                  id="in-app-enabled"
                   checked={settings.in_app_enabled}
                   onCheckedChange={(checked) => setSettings({ ...settings, in_app_enabled: checked })}
                 />
@@ -338,7 +343,6 @@ export function NotificationSettings() {
               <div className="grid gap-2">
                 <Label htmlFor="reminder-hours">Pengingat Ujian (jam sebelumnya)</Label>
                 <Input
-                  id="reminder-hours"
                   type="number"
                   min="1"
                   max="168"
@@ -378,7 +382,6 @@ export function NotificationSettings() {
               <div className="flex items-center justify-between">
                 <Label htmlFor="achievement-notification">Notifikasi Achievement</Label>
                 <Switch
-                  id="achievement-notification"
                   checked={settings.achievement_notification}
                   onCheckedChange={(checked) => setSettings({ ...settings, achievement_notification: checked })}
                 />
@@ -387,7 +390,6 @@ export function NotificationSettings() {
               <div className="flex items-center justify-between">
                 <Label htmlFor="streak-notification">Notifikasi Streak</Label>
                 <Switch
-                  id="streak-notification"
                   checked={settings.streak_notification}
                   onCheckedChange={(checked) => setSettings({ ...settings, streak_notification: checked })}
                 />
@@ -396,7 +398,6 @@ export function NotificationSettings() {
               <div className="flex items-center justify-between">
                 <Label htmlFor="class-announcement">Pengumuman Kelas</Label>
                 <Switch
-                  id="class-announcement"
                   checked={settings.class_announcement}
                   onCheckedChange={(checked) => setSettings({ ...settings, class_announcement: checked })}
                 />
@@ -566,7 +567,6 @@ export function NotificationSettings() {
               <div className="grid gap-2">
                 <Label htmlFor="template-name">Nama Template</Label>
                 <Input
-                  id="template-name"
                   value={templateForm.name}
                   onChange={(e) => setTemplateForm({ ...templateForm, name: e.target.value })}
                   placeholder="Contoh: Pengingat Ujian Harian"
@@ -606,7 +606,6 @@ export function NotificationSettings() {
               <div className="grid gap-2">
                 <Label htmlFor="template-subject">Subjek (untuk email)</Label>
                 <Input
-                  id="template-subject"
                   value={templateForm.subject}
                   onChange={(e) => setTemplateForm({ ...templateForm, subject: e.target.value })}
                   placeholder="Subjek notifikasi"
@@ -616,7 +615,6 @@ export function NotificationSettings() {
               <div className="grid gap-2">
                 <Label htmlFor="template-message">Pesan</Label>
                 <Textarea
-                  id="template-message"
                   value={templateForm.message}
                   onChange={(e) => setTemplateForm({ ...templateForm, message: e.target.value })}
                   placeholder="Isi pesan notifikasi"
@@ -646,7 +644,6 @@ export function NotificationSettings() {
                 <div className="grid gap-2">
                   <Label htmlFor="custom-days">Hari Kustom</Label>
                   <Input
-                    id="custom-days"
                     type="number"
                     min="1"
                     max="30"
@@ -659,7 +656,6 @@ export function NotificationSettings() {
               <div className="flex items-center justify-between">
                 <Label htmlFor="template-active">Aktif</Label>
                 <Switch
-                  id="template-active"
                   checked={templateForm.is_active}
                   onCheckedChange={(checked) => setTemplateForm({ ...templateForm, is_active: checked })}
                 />

@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase-server'
+import { createClient } from '@/lib/supabase/server'
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
     const { searchParams } = new URL(request.url)
     const timeRange = searchParams.get('timeRange') || '30d'
     
@@ -102,7 +102,7 @@ export async function GET(request: NextRequest) {
         ).data?.map(u => u.id) || [])
       
       const completedSessions = sessionData ? sessionData.filter(item => item.completed_at).length : 0
-      const completionRate = totalSessions > 0 ? (completedSessions / totalSessions) * 100 : 0
+      const completionRate = (totalSessions && totalSessions > 0) ? (completedSessions / totalSessions) * 100 : 0
       
       // Calculate average session time (simplified - using fixed values)
       const averageSessionTime = 15 // minutes (simplified for demo)

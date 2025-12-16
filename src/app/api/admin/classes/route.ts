@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase-server'
+import { createClient } from '@/lib/supabase/server'
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
     
     // Get current user and verify admin role
     const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
       id: classItem.id,
       name: classItem.name,
       grade: classItem.grade,
-      teacher: classItem.users?.name || 'Unknown',
+      teacher: (classItem.users as any)?.name || 'Unknown',
       student_count: classItem.enrollments?.[0]?.count || 0
     }))
     

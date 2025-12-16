@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase-server'
+import { createClient } from '@/lib/supabase/server'
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
     const body = await request.json()
     
     // Get current user and verify admin role
@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
     if (target_classes && target_classes.length > 0) {
       const classRelations = target_classes.map((classId: string) => ({
         assessment_id: assessment.id,
-        class_id
+        class_id: classId
       }))
       
       const { error: relationError } = await supabase

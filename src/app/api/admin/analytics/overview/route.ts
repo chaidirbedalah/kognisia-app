@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase-server'
+import { createClient } from '@/lib/supabase/server'
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
     const { searchParams } = new URL(request.url)
     const timeRange = searchParams.get('timeRange') || '30d'
     
@@ -128,7 +128,7 @@ export async function GET(request: NextRequest) {
       ).data?.map(u => u.id) || [])
     
     const uniqueStudents = completionData ? [...new Set(completionData.map(item => item.user_id))].length : 0
-    const completionRate = totalStudents > 0 ? (uniqueStudents / totalStudents) * 100 : 0
+    const completionRate = (totalStudents && totalStudents > 0) ? (uniqueStudents / totalStudents) * 100 : 0
     
     // Get engagement rate (students active in last 7 days)
     const { data: engagementData } = await supabase
@@ -144,7 +144,7 @@ export async function GET(request: NextRequest) {
       ).data?.map(u => u.id) || [])
     
     const engagedStudents = engagementData ? [...new Set(engagementData.map(item => item.user_id))].length : 0
-    const engagementRate = totalStudents > 0 ? (engagedStudents / totalStudents) * 100 : 0
+    const engagementRate = (totalStudents && totalStudents > 0) ? (engagedStudents / totalStudents) * 100 : 0
     
     const analytics = {
       totalStudents: totalStudents || 0,

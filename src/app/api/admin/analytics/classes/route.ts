@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-// @ts-nocheck
 import { createClient } from '@/lib/supabase/server'
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
     const { searchParams } = new URL(request.url)
     const timeRange = searchParams.get('timeRange') || '30d'
     
@@ -26,7 +25,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
     
-    const schoolId = userData.school_id
+    const schoolId = userData?.school_id || ''
     
     // Calculate date range
     const endDate = new Date()
@@ -65,6 +64,8 @@ export async function GET(request: NextRequest) {
       `)
       .eq('school_id', schoolId)
       .eq('users.role', 'teacher')
+      .gte('student_progress.created_at', startDate.toISOString())
+      .lte('student_progress.created_at', endDate.toISOString())
     
     if (classesError) {
       console.error('Error fetching classes:', classesError)
@@ -97,7 +98,7 @@ export async function GET(request: NextRequest) {
         id: classItem.id,
         name: classItem.name,
         grade: classItem.grade,
-        teacher: classItem.users?.name || 'Unknown',
+        teacher: (classItem.users as any)?.name || 'Unknown',
         studentCount,
         averageAccuracy,
         totalQuestions: progressData.length,
