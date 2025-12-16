@@ -13,10 +13,12 @@ import { ProgressTab } from '@/components/dashboard/ProgressTab'
 import { StreakCard } from '@/components/streak/StreakCard'
 import { Badge } from '@/components/ui/badge'
 import { useStreakSystem } from '@/hooks/useStreakSystem'
-import { AlertTriangle, Loader2, Wifi } from 'lucide-react'
+import { AlertTriangle, Loader2, Wifi, TrendingUp, Trophy, Target } from 'lucide-react'
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart'
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts'
 import { useRealtimeLeaderboard } from '@/hooks/useRealtimeLeaderboard'
+import QuestSection from '@/components/quests/QuestSection'
+import { useAnalytics } from '@/hooks/useAnalytics'
 import { toast } from 'sonner'
 import { 
   fetchUserStats, 
@@ -60,8 +62,29 @@ export default function DashboardPage() {
   const [startingDC, setStartingDC] = useState(false)
 
   const { leaderboard, loading: lbLoading, isConnected } = useRealtimeLeaderboard()
+  const { 
+    pointsTimeline, 
+    achievementTimeline, 
+    trends,
+    loading: analyticsLoading 
+  } = useAnalytics()
+  
   const topLeaderboard = leaderboard.slice(0, 8).map((e) => ({ name: (e.email || '').split('@')[0] || 'user', points: e.total_points }))
   const dailyTrend = dailyChallengeData.slice(-14).map((d) => ({ date: new Date(d.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }), accuracy: d.accuracy }))
+  
+  // Format timeline data untuk chart
+  const formattedPointsTimeline = pointsTimeline.slice(-30).map((p) => ({
+    date: new Date(p.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }),
+    cumulativePoints: p.cumulativePoints,
+    points: p.cumulativePoints
+  }))
+  
+  const formattedAchievementTimeline = achievementTimeline.slice(-14).map((a) => ({
+    date: new Date(a.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }),
+    achievement: a.achievement.name,
+    points: a.points,
+    icon: a.achievement.icon
+  }))
 
   const reasonLabelMap: Record<string, string> = {
     daily_challenge_reward: 'Daily Challenge',
@@ -569,6 +592,73 @@ export default function DashboardPage() {
                     </ChartContainer>
                   ) : (
                     <div className="text-sm text-gray-600">Belum ada data</div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Quest Section */}
+            <QuestSection />
+
+            {/* Analytics Timeline Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <TrendingUp className="h-5 w-5 text-blue-600" />
+                    Points Timeline
+                  </CardTitle>
+                  <CardDescription>Akumulasi points 30 hari terakhir</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {analyticsLoading ? (
+                    <div className="flex items-center gap-2 text-sm text-gray-600"><Loader2 className="h-4 w-4 animate-spin" /> Memuat...</div>
+                  ) : formattedPointsTimeline.length > 0 ? (
+                    <ChartContainer config={{ cumulativePoints: { label: 'Points', color: '#3b82f6' }, points: { label: 'Points', color: '#3b82f6' } }} className="aspect-[2/1]">
+                      <LineChart data={formattedPointsTimeline} margin={{ left: 12, right: 12 }}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="date" tickLine={false} axisLine={false} />
+                        <YAxis tickLine={false} axisLine={false} />
+                        <ChartTooltip content={<ChartTooltipContent />} />
+                        <ChartLegend content={<ChartLegendContent />} />
+                        <Line type="monotone" dataKey="cumulativePoints" stroke="var(--color-cumulativePoints)" strokeWidth={2} dot={false} />
+                      </LineChart>
+                    </ChartContainer>
+                  ) : (
+                    <div className="text-sm text-gray-600">Belum ada data points</div>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Trophy className="h-5 w-5 text-yellow-600" />
+                    Achievement Timeline
+                  </CardTitle>
+                  <CardDescription>Achievement terbaru 14 hari terakhir</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {analyticsLoading ? (
+                    <div className="flex items-center gap-2 text-sm text-gray-600"><Loader2 className="h-4 w-4 animate-spin" /> Memuat...</div>
+                  ) : formattedAchievementTimeline.length > 0 ? (
+                    <div className="space-y-3 max-h-64 overflow-y-auto">
+                      {formattedAchievementTimeline.map((achievement, index) => (
+                        <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                          <div className="text-2xl">{achievement.icon}</div>
+                          <div className="flex-1">
+                            <div className="font-medium text-sm">{achievement.achievement}</div>
+                            <div className="text-xs text-gray-600">{achievement.date}</div>
+                          </div>
+                          <div className="flex items-center gap-1 text-sm text-blue-600 font-medium">
+                            <Target className="h-3 w-3" />
+                            +{achievement.points}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-sm text-gray-600">Belum ada achievement terbaru</div>
                   )}
                 </CardContent>
               </Card>

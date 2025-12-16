@@ -106,10 +106,10 @@ export function EventCard({
         </div>
       )}
 
-      <div className="mb-4">
-        <p className="text-sm font-semibold text-gray-700 mb-2">Tantangan:</p>
+        <div className="mb-4">
+        <p className="text-sm font-semibold text-gray-700 mb-2">Tantangan Event:</p>
         <div className="flex flex-wrap gap-2">
-          {challenges.slice(0, 3).map(challenge => (
+          {challenges.slice(0, 3).map((challenge: Challenge) => (
             <span
               key={challenge.id}
               className={`text-xs px-2 py-1 rounded ${getDifficultyColor(challenge.difficulty)}`}
@@ -131,14 +131,14 @@ export function EventCard({
             onClick={onJoin}
             className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded transition-colors"
           >
-            Ikuti Event
+            Gabung Event Challenge
           </button>
         ) : (
           <button
             onClick={onViewDetails}
             className="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded transition-colors"
           >
-            Lihat Detail
+            Lihat Tantangan
           </button>
         )}
       </div>

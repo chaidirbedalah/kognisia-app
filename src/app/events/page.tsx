@@ -1,9 +1,36 @@
 'use client';
 
 import { useState } from 'react';
-import { useEventHunting } from '@/hooks/useEventHunting';
+import { useEventChallenge } from '@/hooks/useEventChallenge';
 import { EventCard } from '@/components/events/EventCard';
 import { ChallengeItem } from '@/components/events/ChallengeItem';
+
+interface Event {
+  id: string;
+  name: string;
+  description?: string;
+  icon?: string;
+  start_date: string;
+  end_date: string;
+  bonus_multiplier: number;
+  status: string;
+  event_challenges: Challenge[];
+  isJoined: boolean;
+  userStats: {
+    total_points: number;
+    challenges_completed: number;
+  };
+  userProgress: Record<string, { completed_at?: string; points_earned?: number }>;
+}
+
+interface Challenge {
+  id: string;
+  challenge_code: string;
+  description: string;
+  points: number;
+  difficulty: string;
+  icon?: string;
+}
 
 export default function EventsPage() {
   const {
@@ -14,11 +41,11 @@ export default function EventsPage() {
     completeChallenge,
     getEventProgress,
     eventStats
-  } = useEventHunting();
+  } = useEventChallenge();
 
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
 
-  const selectedEvent = events.find(e => e.id === selectedEventId);
+  const selectedEvent = events.find((e: Event) => e.id === selectedEventId);
 
   const handleJoinEvent = async (eventId: string) => {
     try {
@@ -66,8 +93,10 @@ export default function EventsPage() {
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold tracking-tight text-foreground mb-2">🎯 Event Hunting</h1>
-          <p className="text-muted-foreground">Ikuti event spesial dan dapatkan poin bonus!</p>
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-6 text-white">
+            <h1 className="text-4xl font-bold tracking-tight mb-2">🏆 Event Challenge</h1>
+            <p className="text-blue-100">Ikuti tantangan spesial dan dapatkan poin bonus! Nikmati pengalaman belajar yang lebih menyenangkan dengan berbagai event challenge yang menarik.</p>
+          </div>
         </div>
 
         {error && (
@@ -114,13 +143,13 @@ export default function EventsPage() {
                     <p className="text-2xl font-bold text-green-600">
                       {eventStats.challenges_completed}
                     </p>
-                    <p className="text-sm text-gray-600">Selesai</p>
+                    <p className="text-sm text-gray-600">Tantangan Selesai</p>
                   </div>
                   <div className="text-center">
                     <p className="text-2xl font-bold text-purple-600">
                       {eventStats.total_points}
                     </p>
-                    <p className="text-sm text-gray-600">Poin</p>
+                    <p className="text-sm text-gray-600">Poin Event</p>
                   </div>
                 </div>
 
@@ -134,15 +163,15 @@ export default function EventsPage() {
                     />
                   </div>
                   <p className="text-sm text-gray-600 mt-2">
-                    {eventStats.challenges_completed} dari {selectedEvent.event_challenges.length} tantangan selesai
+                    {eventStats.challenges_completed} dari {selectedEvent.event_challenges.length} tantangan event selesai
                   </p>
                 </div>
               </div>
 
               {/* Challenges */}
               <div className="space-y-4">
-                <h3 className="text-2xl font-bold text-gray-900">Tantangan</h3>
-                {selectedEvent.event_challenges.map(challenge => {
+                <h3 className="text-2xl font-bold text-gray-900">Daftar Tantangan Event</h3>
+                {selectedEvent.event_challenges.map((challenge: Challenge) => {
                   const isCompleted = !!selectedEvent.userProgress[challenge.id];
                   const pointsEarned = selectedEvent.userProgress[challenge.id]?.points_earned;
 
@@ -214,7 +243,7 @@ export default function EventsPage() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {events.map(event => (
+                {events.map((event: Event) => (
                   <EventCard
                     key={event.id}
                     id={event.id}
