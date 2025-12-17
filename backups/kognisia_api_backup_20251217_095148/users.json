@@ -1,0 +1,1015 @@
+{
+  "users": [
+    {
+      "id": "581d23b5-932b-4c89-9610-c66d1655e03b",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "lina@guru.id",
+      "email_confirmed_at": "2025-12-15T13:47:11.906319Z",
+      "phone": "",
+      "confirmed_at": "2025-12-15T13:47:11.906319Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true,
+        "full_name": "Lina",
+        "role": "teacher"
+      },
+      "identities": null,
+      "created_at": "2025-12-15T13:47:11.903703Z",
+      "updated_at": "2025-12-15T13:47:11.90696Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "364287d7-a2f5-44fd-82b3-44621c5df196",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "ratna@guru.id",
+      "email_confirmed_at": "2025-12-15T13:47:11.568735Z",
+      "phone": "",
+      "confirmed_at": "2025-12-15T13:47:11.568735Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true,
+        "full_name": "Ratna",
+        "role": "teacher"
+      },
+      "identities": null,
+      "created_at": "2025-12-15T13:47:11.565976Z",
+      "updated_at": "2025-12-15T13:47:11.569402Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "7c0442ef-d340-40b5-a276-59a64ca88538",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "sari@guru.id",
+      "email_confirmed_at": "2025-12-15T13:47:11.242825Z",
+      "phone": "",
+      "confirmed_at": "2025-12-15T13:47:11.242825Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true,
+        "full_name": "Sari",
+        "role": "teacher"
+      },
+      "identities": null,
+      "created_at": "2025-12-15T13:47:11.240522Z",
+      "updated_at": "2025-12-15T13:47:11.243449Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "e9d9c490-fe29-4b98-ac5b-0045fed6fafd",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "fitri@guru.id",
+      "email_confirmed_at": "2025-12-15T13:47:10.909945Z",
+      "phone": "",
+      "confirmed_at": "2025-12-15T13:47:10.909945Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true,
+        "full_name": "Fitri",
+        "role": "teacher"
+      },
+      "identities": null,
+      "created_at": "2025-12-15T13:47:10.90743Z",
+      "updated_at": "2025-12-15T13:47:10.910608Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "1efd203c-8ac2-4bad-91dc-ed0c940b404b",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "dewi@guru.id",
+      "email_confirmed_at": "2025-12-15T13:47:10.615015Z",
+      "phone": "",
+      "confirmed_at": "2025-12-15T13:47:10.615015Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true,
+        "full_name": "Dewi",
+        "role": "teacher"
+      },
+      "identities": null,
+      "created_at": "2025-12-15T13:47:10.611978Z",
+      "updated_at": "2025-12-15T13:47:10.615767Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "6416222f-e848-4e13-beec-7cfac0b64ccb",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "riko@siswa.id",
+      "email_confirmed_at": "2025-12-15T13:47:09.4275Z",
+      "phone": "",
+      "confirmed_at": "2025-12-15T13:47:09.4275Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true,
+        "full_name": "Riko",
+        "role": "student"
+      },
+      "identities": null,
+      "created_at": "2025-12-15T13:47:09.424667Z",
+      "updated_at": "2025-12-15T13:47:09.428205Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "3ca0de60-a088-4f56-b0b5-d6043d8eaf1a",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "zahra@siswa.id",
+      "email_confirmed_at": "2025-12-15T13:47:09.093504Z",
+      "phone": "",
+      "confirmed_at": "2025-12-15T13:47:09.093504Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true,
+        "full_name": "Zahra",
+        "role": "student"
+      },
+      "identities": null,
+      "created_at": "2025-12-15T13:47:09.090615Z",
+      "updated_at": "2025-12-15T13:47:09.094932Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "fcdf51aa-d6d4-44a2-8696-78ebf5ed04d7",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "zaki@siswa.id",
+      "email_confirmed_at": "2025-12-15T13:47:08.740326Z",
+      "phone": "",
+      "confirmed_at": "2025-12-15T13:47:08.740326Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true,
+        "full_name": "Zaki",
+        "role": "student"
+      },
+      "identities": null,
+      "created_at": "2025-12-15T13:47:08.736693Z",
+      "updated_at": "2025-12-15T13:47:08.741633Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "236ff003-42fd-4fa5-8afa-57c6053f5453",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "yudi@siswa.id",
+      "email_confirmed_at": "2025-12-15T13:47:08.3938Z",
+      "phone": "",
+      "confirmed_at": "2025-12-15T13:47:08.3938Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true,
+        "full_name": "Yudi",
+        "role": "student"
+      },
+      "identities": null,
+      "created_at": "2025-12-15T13:47:08.390877Z",
+      "updated_at": "2025-12-15T13:47:08.39447Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "937c9993-62ba-43d6-b7c9-fce2fb50bb74",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "yanti@siswa.id",
+      "email_confirmed_at": "2025-12-15T13:47:08.086382Z",
+      "phone": "",
+      "confirmed_at": "2025-12-15T13:47:08.086382Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true,
+        "full_name": "Yanti",
+        "role": "student"
+      },
+      "identities": null,
+      "created_at": "2025-12-15T13:47:08.082631Z",
+      "updated_at": "2025-12-15T13:47:08.087094Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "3f624d3c-42a5-4c3e-bdb9-54b2d5b5c0f3",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "wawan@siswa.id",
+      "email_confirmed_at": "2025-12-15T13:47:07.644954Z",
+      "phone": "",
+      "confirmed_at": "2025-12-15T13:47:07.644954Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true,
+        "full_name": "Wawan",
+        "role": "student"
+      },
+      "identities": null,
+      "created_at": "2025-12-15T13:47:07.642353Z",
+      "updated_at": "2025-12-15T13:47:07.645891Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "0c8cd73c-7822-43b1-9e7d-b4fb86bd9d07",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "vera@siswa.id",
+      "email_confirmed_at": "2025-12-15T13:47:07.300375Z",
+      "phone": "",
+      "confirmed_at": "2025-12-15T13:47:07.300375Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true,
+        "full_name": "Vera",
+        "role": "student"
+      },
+      "identities": null,
+      "created_at": "2025-12-15T13:47:07.288789Z",
+      "updated_at": "2025-12-15T13:47:07.301051Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "b9fcefbf-0cef-434c-accf-d0df0189d770",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "ujang@siswa.id",
+      "email_confirmed_at": "2025-12-15T13:47:06.949744Z",
+      "phone": "",
+      "confirmed_at": "2025-12-15T13:47:06.949744Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true,
+        "full_name": "Ujang",
+        "role": "student"
+      },
+      "identities": null,
+      "created_at": "2025-12-15T13:47:06.945425Z",
+      "updated_at": "2025-12-15T13:47:06.950415Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "2c13a19b-a566-45b9-8938-f30fb3171f63",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "tono@siswa.id",
+      "email_confirmed_at": "2025-12-15T13:47:06.619821Z",
+      "phone": "",
+      "confirmed_at": "2025-12-15T13:47:06.619821Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true,
+        "full_name": "Tono",
+        "role": "student"
+      },
+      "identities": null,
+      "created_at": "2025-12-15T13:47:06.616229Z",
+      "updated_at": "2025-12-15T13:47:06.620607Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "2b8c3b50-d0ee-4e29-b6d4-e54aa80bc4b4",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "tiara@siswa.id",
+      "email_confirmed_at": "2025-12-15T13:47:06.291638Z",
+      "phone": "",
+      "confirmed_at": "2025-12-15T13:47:06.291638Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true,
+        "full_name": "Tiara",
+        "role": "student"
+      },
+      "identities": null,
+      "created_at": "2025-12-15T13:47:06.288822Z",
+      "updated_at": "2025-12-15T13:47:06.29227Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "d86a1fd4-6348-4527-8c36-ed0924551d6b",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "sari@siswa.id",
+      "email_confirmed_at": "2025-12-15T13:47:05.910516Z",
+      "phone": "",
+      "confirmed_at": "2025-12-15T13:47:05.910516Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true,
+        "full_name": "Sari",
+        "role": "student"
+      },
+      "identities": null,
+      "created_at": "2025-12-15T13:47:05.904297Z",
+      "updated_at": "2025-12-15T13:47:05.911877Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "74bb547d-f9f9-46b6-9b50-c0900dd1e8d7",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "riski@siswa.id",
+      "email_confirmed_at": "2025-12-15T13:47:05.555547Z",
+      "phone": "",
+      "confirmed_at": "2025-12-15T13:47:05.555547Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true,
+        "full_name": "Riski",
+        "role": "student"
+      },
+      "identities": null,
+      "created_at": "2025-12-15T13:47:05.551592Z",
+      "updated_at": "2025-12-15T13:47:05.556233Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "63a270cb-9dde-4d69-8225-de15cf93408a",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "rani@siswa.id",
+      "email_confirmed_at": "2025-12-15T13:47:05.151997Z",
+      "phone": "",
+      "confirmed_at": "2025-12-15T13:47:05.151997Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true,
+        "full_name": "Rani",
+        "role": "student"
+      },
+      "identities": null,
+      "created_at": "2025-12-15T13:47:05.149607Z",
+      "updated_at": "2025-12-15T13:47:05.153271Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "fb5463ca-d5d6-4d78-b2bb-b4163888200b",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "putri@siswa.id",
+      "email_confirmed_at": "2025-12-15T13:47:04.777473Z",
+      "phone": "",
+      "confirmed_at": "2025-12-15T13:47:04.777473Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true,
+        "full_name": "Putri",
+        "role": "student"
+      },
+      "identities": null,
+      "created_at": "2025-12-15T13:47:04.769667Z",
+      "updated_at": "2025-12-15T13:47:04.778152Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "7e1e5c96-c6e9-4709-ac80-ecba13393a04",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "nanda@siswa.id",
+      "email_confirmed_at": "2025-12-15T13:47:04.416242Z",
+      "phone": "",
+      "confirmed_at": "2025-12-15T13:47:04.416242Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true,
+        "full_name": "Nanda",
+        "role": "student"
+      },
+      "identities": null,
+      "created_at": "2025-12-15T13:47:04.4117Z",
+      "updated_at": "2025-12-15T13:47:04.41714Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "04f10433-cf6d-4f45-814b-11c32e177dde",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "maya@siswa.id",
+      "email_confirmed_at": "2025-12-15T13:47:04.061265Z",
+      "phone": "",
+      "confirmed_at": "2025-12-15T13:47:04.061265Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true,
+        "full_name": "Maya",
+        "role": "student"
+      },
+      "identities": null,
+      "created_at": "2025-12-15T13:47:04.057632Z",
+      "updated_at": "2025-12-15T13:47:04.062635Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "56020992-2264-4d51-96bc-cdf2934e86bd",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "lina@siswa.id",
+      "email_confirmed_at": "2025-12-15T13:47:03.697426Z",
+      "phone": "",
+      "confirmed_at": "2025-12-15T13:47:03.697426Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true,
+        "full_name": "Lina",
+        "role": "student"
+      },
+      "identities": null,
+      "created_at": "2025-12-15T13:47:03.692496Z",
+      "updated_at": "2025-12-15T13:47:03.699063Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "feb437a2-6a3a-4a23-9272-753cc3d2936e",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "kiki@siswa.id",
+      "email_confirmed_at": "2025-12-15T13:47:03.33979Z",
+      "phone": "",
+      "confirmed_at": "2025-12-15T13:47:03.33979Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true,
+        "full_name": "Kiki",
+        "role": "student"
+      },
+      "identities": null,
+      "created_at": "2025-12-15T13:47:03.335568Z",
+      "updated_at": "2025-12-15T13:47:03.34107Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "22d6e30c-feef-4ed8-bdd8-c85fc42ea2bb",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "joko@siswa.id",
+      "email_confirmed_at": "2025-12-15T13:47:02.983386Z",
+      "phone": "",
+      "confirmed_at": "2025-12-15T13:47:02.983386Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true,
+        "full_name": "Joko",
+        "role": "student"
+      },
+      "identities": null,
+      "created_at": "2025-12-15T13:47:02.980245Z",
+      "updated_at": "2025-12-15T13:47:02.985463Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "beec324c-d36f-4336-bcf8-0c3ac1ba3346",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "indra@siswa.id",
+      "email_confirmed_at": "2025-12-15T13:47:02.601305Z",
+      "phone": "",
+      "confirmed_at": "2025-12-15T13:47:02.601305Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true,
+        "full_name": "Indra",
+        "role": "student"
+      },
+      "identities": null,
+      "created_at": "2025-12-15T13:47:02.569668Z",
+      "updated_at": "2025-12-15T13:47:02.603238Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "63d592e3-fbf7-4199-8b4a-fd0fe814a5fd",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "guru@kognisia.com",
+      "email_confirmed_at": "2025-12-15T12:16:12.688716Z",
+      "phone": "",
+      "confirmed_at": "2025-12-15T12:16:12.688716Z",
+      "last_sign_in_at": "2025-12-15T12:16:44.644129Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true,
+        "role": "teacher"
+      },
+      "identities": null,
+      "created_at": "2025-12-15T12:16:12.679588Z",
+      "updated_at": "2025-12-15T13:47:50.656429Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "04c98ede-a03b-49fb-a89b-d84b2f3126d6",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "test@kognisia.com",
+      "email_confirmed_at": "2025-12-15T12:16:11.460644Z",
+      "phone": "",
+      "confirmed_at": "2025-12-15T12:16:11.460644Z",
+      "last_sign_in_at": "2025-12-15T13:55:40.418258Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true,
+        "role": "student"
+      },
+      "identities": null,
+      "created_at": "2025-12-15T12:16:11.391333Z",
+      "updated_at": "2025-12-15T15:53:43.524971Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "ab89048e-2461-4c6a-ab58-5757eddee170",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "surya@guru.id",
+      "email_confirmed_at": "2025-12-15T03:42:08.444192Z",
+      "phone": "",
+      "confirmed_at": "2025-12-15T03:42:08.444192Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true,
+        "full_name": "Surya",
+        "role": "teacher"
+      },
+      "identities": null,
+      "created_at": "2025-12-15T03:42:08.440615Z",
+      "updated_at": "2025-12-15T03:42:08.445581Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "2592e4a9-8590-476f-8a6e-d591a2fb1117",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "rudi@guru.id",
+      "email_confirmed_at": "2025-12-15T03:42:08.150166Z",
+      "phone": "",
+      "confirmed_at": "2025-12-15T03:42:08.150166Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true,
+        "full_name": "Rudi",
+        "role": "teacher"
+      },
+      "identities": null,
+      "created_at": "2025-12-15T03:42:08.147769Z",
+      "updated_at": "2025-12-15T03:42:08.150998Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "262c19f8-81e7-4746-b396-7ec903e3cdd2",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "agus@guru.id",
+      "email_confirmed_at": "2025-12-15T03:42:07.847547Z",
+      "phone": "",
+      "confirmed_at": "2025-12-15T03:42:07.847547Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true,
+        "full_name": "Agus",
+        "role": "teacher"
+      },
+      "identities": null,
+      "created_at": "2025-12-15T03:42:07.84186Z",
+      "updated_at": "2025-12-15T03:42:07.848891Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "320fb242-dff7-4b5c-be7d-5e4d43ed4dcf",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "jaya@guru.id",
+      "email_confirmed_at": "2025-12-15T03:42:07.552006Z",
+      "phone": "",
+      "confirmed_at": "2025-12-15T03:42:07.552006Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true,
+        "full_name": "Jaya",
+        "role": "teacher"
+      },
+      "identities": null,
+      "created_at": "2025-12-15T03:42:07.548067Z",
+      "updated_at": "2025-12-15T03:42:07.552689Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "3fd4b1a4-745c-4477-89c1-86a4eb63f048",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "bambang@guru.id",
+      "email_confirmed_at": "2025-12-15T03:42:07.237511Z",
+      "phone": "",
+      "confirmed_at": "2025-12-15T03:42:07.237511Z",
+      "last_sign_in_at": "2025-12-15T07:23:59.321265Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true,
+        "full_name": "Bambang",
+        "role": "teacher"
+      },
+      "identities": null,
+      "created_at": "2025-12-15T03:42:07.233864Z",
+      "updated_at": "2025-12-15T07:23:59.323551Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "2db1c1cb-aabc-4108-aa73-a92e1b1e1442",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "hana@siswa.id",
+      "email_confirmed_at": "2025-12-15T03:42:06.932171Z",
+      "phone": "",
+      "confirmed_at": "2025-12-15T03:42:06.932171Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true,
+        "full_name": "Hana",
+        "role": "student"
+      },
+      "identities": null,
+      "created_at": "2025-12-15T03:42:06.928625Z",
+      "updated_at": "2025-12-15T03:42:06.932819Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "2539972e-a0d2-431a-9a9d-e5191cbef040",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "galih@siswa.id",
+      "email_confirmed_at": "2025-12-15T03:42:06.606799Z",
+      "phone": "",
+      "confirmed_at": "2025-12-15T03:42:06.606799Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true,
+        "full_name": "Galih",
+        "role": "student"
+      },
+      "identities": null,
+      "created_at": "2025-12-15T03:42:06.60331Z",
+      "updated_at": "2025-12-15T03:42:06.608036Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "112dc4d7-7857-4911-894a-e2ef0f0165d6",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "fitri@siswa.id",
+      "email_confirmed_at": "2025-12-15T03:42:06.291707Z",
+      "phone": "",
+      "confirmed_at": "2025-12-15T03:42:06.291707Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true,
+        "full_name": "Fitri",
+        "role": "student"
+      },
+      "identities": null,
+      "created_at": "2025-12-15T03:42:06.286926Z",
+      "updated_at": "2025-12-15T03:42:06.292426Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "a100a90f-990a-4a9b-8427-87d8ca8a8871",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "eka@siswa.id",
+      "email_confirmed_at": "2025-12-15T03:42:05.989613Z",
+      "phone": "",
+      "confirmed_at": "2025-12-15T03:42:05.989613Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true,
+        "full_name": "Eka",
+        "role": "student"
+      },
+      "identities": null,
+      "created_at": "2025-12-15T03:42:05.985337Z",
+      "updated_at": "2025-12-15T03:42:05.990326Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "fe95add8-a3cd-4197-9cb5-31d2e1dcc82a",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "dewi@siswa.id",
+      "email_confirmed_at": "2025-12-15T03:42:05.668322Z",
+      "phone": "",
+      "confirmed_at": "2025-12-15T03:42:05.668322Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true,
+        "full_name": "Dewi",
+        "role": "student"
+      },
+      "identities": null,
+      "created_at": "2025-12-15T03:42:05.66476Z",
+      "updated_at": "2025-12-15T03:42:05.670187Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "12cd90f4-770a-42ea-97d1-b4e627539e69",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "dedi@siswa.id",
+      "email_confirmed_at": "2025-12-15T03:42:05.370718Z",
+      "phone": "",
+      "confirmed_at": "2025-12-15T03:42:05.370718Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true,
+        "full_name": "Dedi",
+        "role": "student"
+      },
+      "identities": null,
+      "created_at": "2025-12-15T03:42:05.367339Z",
+      "updated_at": "2025-12-15T03:42:05.372702Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "3884cd93-4d24-4917-aca8-30b677ee204d",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "candra@siswa.id",
+      "email_confirmed_at": "2025-12-15T03:42:05.054952Z",
+      "phone": "",
+      "confirmed_at": "2025-12-15T03:42:05.054952Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true,
+        "full_name": "Candra",
+        "role": "student"
+      },
+      "identities": null,
+      "created_at": "2025-12-15T03:42:05.049776Z",
+      "updated_at": "2025-12-15T03:42:05.057232Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "baa6c384-052f-4f80-acc7-ac74830cdcab",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "budi@siswa.id",
+      "email_confirmed_at": "2025-12-15T03:42:04.749501Z",
+      "phone": "",
+      "confirmed_at": "2025-12-15T03:42:04.749501Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true,
+        "full_name": "Budi",
+        "role": "student"
+      },
+      "identities": null,
+      "created_at": "2025-12-15T03:42:04.741516Z",
+      "updated_at": "2025-12-15T03:42:04.751484Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "c6b9986c-99cd-4c0d-b49d-053ce8070656",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "bagus@siswa.id",
+      "email_confirmed_at": "2025-12-15T03:42:04.395769Z",
+      "phone": "",
+      "confirmed_at": "2025-12-15T03:42:04.395769Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true,
+        "full_name": "Bagus",
+        "role": "student"
+      },
+      "identities": null,
+      "created_at": "2025-12-15T03:42:04.390622Z",
+      "updated_at": "2025-12-15T03:42:04.397177Z",
+      "is_anonymous": false
+    },
+    {
+      "id": "1392a39c-7cb0-488d-a640-98670fc85ca8",
+      "aud": "authenticated",
+      "role": "authenticated",
+      "email": "andi@siswa.id",
+      "email_confirmed_at": "2025-12-15T03:42:03.494653Z",
+      "phone": "",
+      "confirmed_at": "2025-12-15T03:42:03.494653Z",
+      "last_sign_in_at": "2025-12-15T08:16:25.473689Z",
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "user_metadata": {
+        "email_verified": true,
+        "full_name": "Andi",
+        "role": "student"
+      },
+      "identities": null,
+      "created_at": "2025-12-15T03:42:03.424987Z",
+      "updated_at": "2025-12-15T08:16:25.476314Z",
+      "is_anonymous": false
+    }
+  ],
+  "aud": "authenticated"
+}
