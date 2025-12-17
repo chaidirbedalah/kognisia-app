@@ -1,0 +1,67 @@
+[
+  {
+    "question_text": "Jika 2x + 5 = 13, maka nilai x adalah...",
+    "option_a": "4",
+    "option_b": "5",
+    "option_c": "6",
+    "option_d": "7",
+    "option_e": "8",
+    "correct_answer": "A",
+    "subtest_utbk": "PK",
+    "is_hots": false,
+    "hint_text": "Gunakan operasi balik untuk mengisolasi x",
+    "solution_steps": "2x + 5 = 13. Kurangi 5: 2x = 8. Bagi 2: x = 4"
+  },
+  {
+    "question_text": "Sebuah toko memberikan diskon 20% untuk semua barang. Jika harga setelah diskon adalah Rp80.000, berapa harga asli barang tersebut?",
+    "option_a": "Rp96.000",
+    "option_b": "Rp100.000",
+    "option_c": "Rp104.000",
+    "option_d": "Rp108.000",
+    "option_e": "Rp120.000",
+    "correct_answer": "B",
+    "subtest_utbk": "PK",
+    "is_hots": false,
+    "hint_text": "Harga setelah diskon = 80% dari harga asli",
+    "solution_steps": "Harga asli × (100% - 20%) = Rp80.000. Harga asli × 80% = Rp80.000. Harga asli = Rp80.000 ÷ 0.8 = Rp100.000"
+  },
+  {
+    "question_text": "Jika perbandingan uang A dan B adalah 3:5 dan total uang mereka Rp240.000, berapa selisih uang A dan B?",
+    "option_a": "Rp48.000",
+    "option_b": "Rp60.000",
+    "option_c": "Rp72.000",
+    "option_d": "Rp96.000",
+    "option_e": "Rp120.000",
+    "correct_answer": "B",
+    "subtest_utbk": "PK",
+    "is_hots": true,
+    "hint_text": "Cari nilai satu bagian terlebih dahulu, kemudian hitung selisih",
+    "solution_steps": "Perbandingan 3:5 berarti total 8 bagian. 1 bagian = Rp240.000 ÷ 8 = Rp30.000. A = 3×Rp30.000 = Rp90.000. B = 5×Rp30.000 = Rp150.000. Selisih = Rp150.000 - Rp90.000 = Rp60.000"
+  },
+  {
+    "question_text": "Sebuah pekerjaan dapat diselesaikan oleh 10 pekerja dalam 15 hari. Jika ditambah 5 pekerja lagi, berapa hari pekerjaan akan selesai?",
+    "option_a": "8 hari",
+    "option_b": "9 hari",
+    "option_c": "10 hari",
+    "option_d": "12 hari",
+    "option_e": "13 hari",
+    "correct_answer": "C",
+    "subtest_utbk": "PK",
+    "is_hots": true,
+    "hint_text": "Gunakan konsep perbandingan terbalik (inverse proportion)",
+    "solution_steps": "Total pekerjaan = 10 pekerja × 15 hari = 150 pekerja-hari. Dengan 15 pekerja: 150 pekerja-hari ÷ 15 pekerja = 10 hari"
+  },
+  {
+    "question_text": "Dalam sebuah kotak ada 5 bola merah dan 3 bola biru. Jika diambil 2 bola secara acak tanpa pengembalian, berapa probabilitas kedua bola berwarna sama?",
+    "option_a": "13/28",
+    "option_b": "15/28",
+    "option_c": "17/28",
+    "option_d": "19/28",
+    "option_e": "21/28",
+    "correct_answer": "A",
+    "subtest_utbk": "PK",
+    "is_hots": true,
+    "hint_text": "Hitung probabilitas dua merah + probabilitas dua biru",
+    "solution_steps": "Total cara ambil 2 bola dari 8: C(8,2) = 28. Cara ambil 2 merah: C(5,2) = 10. Cara ambil 2 biru: C(3,2) = 3. Total cara sama warna = 10+3 = 13. Probabilitas = 13/28"
+  }
+]

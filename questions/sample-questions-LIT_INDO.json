@@ -1,0 +1,67 @@
+[
+  {
+    "question_text": "Kalimat: 'Siswa-siswa itu belajar dengan giat di perpustakaan.' Kata 'giait' dalam kalimat tersebut berarti...",
+    "option_a": "Malas",
+    "option_b": "Rajin",
+    "option_c": "Cerdas",
+    "option_d": "Pintar",
+    "option_e": "Diam",
+    "correct_answer": "B",
+    "subtest_utbk": "LIT_INDO",
+    "is_hots": false,
+    "hint_text": "Cari arti dari kata 'giait' dalam konteks belajar",
+    "solution_steps": "Kata 'giait' adalah bentukan dari 'giat' yang berarti rajin atau antusias. Dalam konteks belajar, berarti belajar dengan rajin"
+  },
+  {
+    "question_text": "Manakah kalimat yang menggunakan imbuhan 'me-' dengan benar?",
+    "option_a": "Saya masak nasi tadi pagi",
+    "option_b": "Dia masak di dapur",
+    "option_c": "Mereka sedang memasak nasi",
+    "option_d": "Kami masak bersama-sama",
+    "option_e": "Kamu masak sudah?",
+    "correct_answer": "C",
+    "subtest_utbk": "LIT_INDO",
+    "is_hots": false,
+    "hint_text": "Imbuhan 'me-' digunakan pada kata kerja aktif",
+    "solution_steps": "Imbuhan 'me-' digunakan untuk kata kerja aktif. 'Memasak' adalah bentuk yang benar. Opsi lain seharusnya 'memasak', 'memasak', 'memasak', 'sudah masak'"
+  },
+  {
+    "question_text": "Bacalah penggalan cerita: 'Hujan turun dengan derasnya. Anak-anak berlarian mencari tempat berteduh. Mereka masuk ke warung tua di pinggir jalan. Sang pemilik warung tersenyum menyambut mereka.'\n\nNilai yang terkandung dalam cerita tersebut adalah...",
+    "option_a": "Kebersihan lingkungan penting",
+    "option_b": "Gotong royong dan kebaikan hati",
+    "option_c": "Anak-anak tidak boleh main hujan",
+    "option_d": "Warung harus ramah pada anak",
+    "option_e": "Hujan selalu turun deras",
+    "correct_answer": "B",
+    "subtest_utbk": "LIT_INDO",
+    "is_hots": true,
+    "hint_text": "Cari pesan moral atau nilai sosial dari cerita",
+    "solution_steps": "Cerita menunjukkan kebaikan hati pemilik warung yang menyambut anak-anak berteduh dan anak-anak yang saling membantu. Ini mencerminkan nilai gotong royong dan kebaikan hati"
+  },
+  {
+    "question_text": "Kalimat: 'Buku tersebut sangat menarik sehingga saya membacanya dua kali.' Jenis kalimat ini adalah...",
+    "option_a": "Kalimat tunggal",
+    "option_b": "Kalimat majemuk setara",
+    "option_c": "Kalimat majemuk rapatan",
+    "option_d": "Kalimat majemuk bertingkat",
+    "option_e": "Kalimat seruan",
+    "correct_answer": "D",
+    "subtest_utbk": "LIT_INDO",
+    "is_hots": true,
+    "hint_text": "Perhatikan struktur kalimat dengan klausa penyebab-akibat",
+    "solution_steps": "Kalimat menggunakan pola 'sangat... sehingga...' yang menunjukkan hubungan sebab-akibat. Ini adalah ciri kalimat majemuk bertingkat (complex sentence)"
+  },
+  {
+    "question_text": "Dalam puisi 'Pohon tua berdiri tegang, menatap langit biru, menanti datangnya musim hujan', makna kiasan dari 'pohon tua' adalah...",
+    "option_a": "Pohon yang sudah tua usianya",
+    "option_b": "Orang tua yang bijaksana",
+    "option_c": "Manusia yang kuat dan sabar",
+    "option_d": "Pohon yang tinggi besar",
+    "option_e": "Tumbuhan yang kering",
+    "correct_answer": "C",
+    "subtest_utbk": "LIT_INDO",
+    "is_hots": true,
+    "hint_text": "Cari makna simbolis atau kiasan dari 'pohon tua'",
+    "solution_steps": "'Pohon tua' dalam puisi sering melambangkan manusia yang telah melalui banyak cobaan, kuat, dan sabar menghadapi hidup. 'Berdiri tegang' dan 'menanti' menunjukkan ketahanan dan kesabaran"
+  }
+]

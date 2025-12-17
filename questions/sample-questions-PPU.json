@@ -1,0 +1,67 @@
+[
+  {
+    "question_text": "Siapakah presiden pertama Indonesia?",
+    "option_a": "Soekarno",
+    "option_b": "Soeharto",
+    "option_c": "BJ Habibie",
+    "option_d": "Megawati",
+    "option_e": "Susilo Bambang Yudhoyono",
+    "correct_answer": "A",
+    "subtest_utbk": "PPU",
+    "is_hots": false,
+    "hint_text": "Ini adalah pengetahuan sejarah dasar Indonesia",
+    "solution_steps": "Ir. Soekarno adalah presiden pertama Indonesia yang menjabat dari 1945-1967"
+  },
+  {
+    "question_text": "Berapakah jumlah provinsi di Indonesia saat ini?",
+    "option_a": "34",
+    "option_b": "36",
+    "option_c": "38",
+    "option_d": "40",
+    "option_e": "42",
+    "correct_answer": "C",
+    "subtest_utbk": "PPU",
+    "is_hots": false,
+    "hint_text": "Pertimbangkan provinsi baru yang dibentuk dalam beberapa tahun terakhir",
+    "solution_steps": "Sampai tahun 2024, Indonesia memiliki 38 provinsi termasuk provinsi baru seperti Papua Selatan, Papua Tengah, Papua Pegunungan, dan Papua Barat Daya"
+  },
+  {
+    "question_text": "Jika GDP suatu negara tumbuh 5% per tahun secara konsisten, berapa lama waktu yang dibutuhkan untuk GDP menjadi dua kali lipat?",
+    "option_a": "10 tahun",
+    "option_b": "12 tahun",
+    "option_c": "14 tahun",
+    "option_d": "16 tahun",
+    "option_e": "18 tahun",
+    "correct_answer": "C",
+    "subtest_utbk": "PPU",
+    "is_hots": true,
+    "hint_text": "Gunakan rumus compound growth dan logaritma natural",
+    "solution_steps": "Gunakan Rule of 70: doubling time ≈ 70/growth rate = 70/5 = 14 tahun. Atau secara eksak: 2 = (1.05)^t, ln(2) = t×ln(1.05), t = ln(2)/ln(1.05) ≈ 14.2 tahun"
+  },
+  {
+    "question_text": "Sebuah negara mengalami inflasi 10% dan pertumbuhan ekonomi 3%. Jika gaji rata-rata naik 5%, berapa dampak real terhadap daya beli masyarakat?",
+    "option_a": "Naik 8%",
+    "option_b": "Naik 5%",
+    "option_c": "Turun 2%",
+    "option_d": "Turun 5%",
+    "option_e": "Tidak berubah",
+    "correct_answer": "D",
+    "subtest_utbk": "PPU",
+    "is_hots": true,
+    "hint_text": "Hitung pertumbuhan daya beli riil dengan mengurangi inflasi dari kenaikan gaji",
+    "solution_steps": "Daya beli riil = kenaikan gaji - inflasi = 5% - 10% = -5%. Pertumbuhan ekonomi 3% tidak langsung mempengaruhi daya beli individu. Jadi daya beli turun sekitar 5%"
+  },
+  {
+    "question_text": "Manakah fenomena alam yang paling mungkin terjadi di Indonesia berdasarkan posisi geografisnya?",
+    "option_a": "Salju permanen di dataran rendah",
+    "option_b": "Gempa bumi dan tsunami",
+    "option_c": "Aurora borealis",
+    "option_d": "Gurun pasir luas",
+    "option_e": "Four seasons yang jelas",
+    "correct_answer": "B",
+    "subtest_utbk": "PPU",
+    "is_hots": false,
+    "hint_text": "Indonesia berada di Ring of Fire dan jalur gempa aktif",
+    "solution_steps": "Indonesia terletak di pertemuan lempeng tektonik Pasifik dan Eurasia, membuatnya rentan terhadap gempa bumi dan tsunami. Fenomena lain tidak sesuai dengan iklim tropis Indonesia"
+  }
+]

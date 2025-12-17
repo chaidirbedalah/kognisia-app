@@ -15,6 +15,7 @@
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
     "import-questions": "npx tsx scripts/import-questions.ts",
+    "import-simple": "npx tsx scripts/import-questions-simple.ts",
     "convert-csv": "npx tsx scripts/convert-csv-to-json.ts",
     "question-stats": "npx tsx scripts/import-questions.ts --stats",
     "test:e2e:debug": "playwright test --debug",

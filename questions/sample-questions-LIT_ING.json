@@ -1,0 +1,67 @@
+[
+  {
+    "question_text": "Read the following text: 'Climate change represents one of the greatest challenges facing humanity today. Rising global temperatures have led to melting ice caps, rising sea levels, and extreme weather events. Scientists agree that immediate action is necessary to prevent catastrophic consequences.'\n\nWhat is the main idea of the text?",
+    "option_a": "Climate change is not a serious problem",
+    "option_b": "Climate change is a major challenge requiring immediate action",
+    "option_c": "Scientists disagree about climate change",
+    "option_d": "Ice caps are melting naturally",
+    "option_e": "Weather events are becoming normal",
+    "correct_answer": "B",
+    "subtest_utbk": "LIT_ING",
+    "is_hots": false,
+    "hint_text": "Look for the sentence that summarizes the main point",
+    "solution_steps": "The first sentence 'Climate change represents one of the greatest challenges' establishes the main idea. Other sentences support this main point"
+  },
+  {
+    "question_text": "The word 'sustainable' in the sentence 'We need sustainable energy sources' most nearly means...",
+    "option_a": "Expensive",
+    "option_b": "Temporary",
+    "option_c": "Able to continue for long time",
+    "option_d": "Difficult to implement",
+    "option_e": "Quick solution",
+    "correct_answer": "C",
+    "subtest_utbk": "LIT_ING",
+    "is_hots": false,
+    "hint_text": "Think about the root word 'sustain' - what does it mean?",
+    "solution_steps": "'Sustainable' comes from 'sustain' meaning to maintain or support. In this context, it means energy sources that can continue for a long time without depletion"
+  },
+  {
+    "question_text": "Text: 'Although online learning offers flexibility, many students struggle with motivation and time management. Successful online learners typically have strong self-discipline and good study habits.'\n\nThe author's attitude toward online learning is...",
+    "option_a": "Completely positive",
+    "option_b": "Completely negative",
+    "option_c": "Balanced and realistic",
+    "option_d": "Uncertain and confused",
+    "option_e": "Indifferent",
+    "correct_answer": "C",
+    "subtest_utbk": "LIT_ING",
+    "is_hots": true,
+    "hint_text": "Look for words that show both positive and negative aspects",
+    "solution_steps": "The author uses 'Although' to show contrast, acknowledging both benefits ('flexibility') and challenges ('struggle with motivation'). This shows a balanced, realistic attitude"
+  },
+  {
+    "question_text": "In the sentence 'The research revealed surprising results that contradicted previous assumptions,' the word 'contradicted' most nearly means...",
+    "option_a": "Supported",
+    "option_b": "Explained",
+    "option_c": "Opposed or conflicted with",
+    "option_d": "Repeated",
+    "option_e": "Improved",
+    "correct_answer": "C",
+    "subtest_utbk": "LIT_ING",
+    "is_hots": false,
+    "hint_text": "Think about what happens when something contradicts something else",
+    "solution_steps": "'Contradicted' means to be in opposition to or conflict with. If results contradict assumptions, they go against or disagree with previous beliefs"
+  },
+  {
+    "question_text": "Read the passage: 'The digital revolution has transformed how we communicate, work, and live. While it has brought unprecedented connectivity and efficiency, it has also created new challenges including privacy concerns, digital divide, and information overload. Society must navigate these complexities carefully.'\n\nWhat can be inferred about the author's view on technology?",
+    "option_a": "Technology is purely beneficial",
+    "option_b": "Technology should be rejected",
+    "option_c": "Technology has both benefits and challenges requiring careful management",
+    "option_d": "Digital divide is the main problem",
+    "option_e": "Information overload is not serious",
+    "correct_answer": "C",
+    "subtest_utbk": "LIT_ING",
+    "is_hots": true,
+    "hint_text": "Look for the overall message about technology's impact",
+    "solution_steps": "The author presents both positive ('connectivity', 'efficiency') and negative aspects ('privacy concerns', 'digital divide', 'information overload') and concludes with 'navigate these complexities carefully', indicating a balanced view that recognizes both benefits and challenges"
+  }
+]

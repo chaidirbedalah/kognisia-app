@@ -1,0 +1,67 @@
+[
+  {
+    "question_text": "Jika semua burung adalah hewan, dan beberapa hewan bisa terbang, maka dapat disimpulkan bahwa:",
+    "option_a": "Semua hewan bisa terbang",
+    "option_b": "Beberapa burung bisa terbang",
+    "option_c": "Tidak ada burung yang bisa terbang",
+    "option_d": "Semua hewan adalah burung",
+    "option_e": "Beberapa hewan tidak bisa terbang",
+    "correct_answer": "B",
+    "subtest_utbk": "PU",
+    "is_hots": false,
+    "hint_text": "Gunakan logika kategorisasi: burung → hewan, tapi tidak semua hewan punya sifat yang sama",
+    "solution_steps": "Premis 1: Semua burung adalah hewan. Premis 2: Beberapa hewan bisa terbang. Konklusi yang valid: Beberapa burung bisa terbang (karena burung adalah subset dari hewan)"
+  },
+  {
+    "question_text": "Sebuah perusahaan menemukan bahwa 80% karyawan yang produktif memiliki jam tidur cukup, dan 60% karyawan dengan jam tidur cukup merasa bahagia. Jika 70% karyawan produktif dan 50% karyawan merasa bahagia, berapa persen karyawan yang produktif dan merasa bahagia dengan jam tidur cukup?",
+    "option_a": "24%",
+    "option_b": "30%",
+    "option_c": "36%",
+    "option_d": "42%",
+    "option_e": "48%",
+    "correct_answer": "B",
+    "subtest_utbk": "PU",
+    "is_hots": true,
+    "hint_text": "Gunakan prinsip inklusi-eksklusi dan diagram Venn untuk menghitung irisan tiga himpunan",
+    "solution_steps": "Misal total karyawan = 100. Produktif&tidur_cukup = 80%×70% = 56. Tidur_cukup&bahagia = 60%×50% = 30. Produktif&bahagia = 70%×50% = 35. Dengan prinsip inklusi-eksklusi: |A∩B∩C| = |A|+|B|+|C|-|A∪B|-|A∪C|-|B∪C|+|A∪B∪C| = 56+30+35-70-50-60+100 = 30"
+  },
+  {
+    "question_text": "Dalam debat calon presiden, kandidat A menyatakan: 'Jika ekonomi tumbuh, maka pengangguran berkurang'. Kandidat B membantah: 'Pengangguran tidak berkurang meskipun ekonomi tumbuh'. Untuk membantah kandidat A, kandidat B perlu menunjukkan contoh:",
+    "option_a": "Ekonomi tumbuh dan pengangguran berkurang",
+    "option_b": "Ekonomi tidak tumbuh dan pengangguran tidak berkurang",
+    "option_c": "Ekonomi tumbuh tetapi pengangguran tidak berkurang",
+    "option_d": "Ekonomi tidak tumbuh tetapi pengangguran berkurang",
+    "option_e": "Ekonomi dan pengangguran tidak berubah",
+    "correct_answer": "C",
+    "subtest_utbk": "PU",
+    "is_hots": true,
+    "hint_text": "Cari contoh yang mematahkan implikasi 'jika P maka Q' dengan menunjukkan 'P benar tapi Q salah'",
+    "solution_steps": "Pernyataan A: P→Q (Ekonomi tumbuh→Pengangguran berkurang). Untuk membantah, perlu contoh counterexample: P true tapi Q false, yaitu ekonomi tumbuh tetapi pengangguran tidak berkurang"
+  },
+  {
+    "question_text": "Polisi menyelidiki 3 tersangka A, B, C. A berkata 'B yang mencuri'. B berkata 'A yang berbohong'. C berkata 'Saya tidak mencuri'. Jika hanya satu yang berbohong, siapa pencuri?",
+    "option_a": "A",
+    "option_b": "B",
+    "option_c": "C",
+    "option_d": "Tidak ada yang mencuri",
+    "option_e": "Data tidak cukup",
+    "correct_answer": "A",
+    "subtest_utbk": "PU",
+    "is_hots": false,
+    "hint_text": "Asumsikan setiap orang berbohong secara bergantian dan cari kontradiksi",
+    "solution_steps": "Jika A berbohong: B tidak mencuri. B berkata jujur: A berbohong (konsisten). C berkata jujur: C tidak mencuri. Tersisa A yang mencuri. Jika B berbohong: A jujur→B mencuri, tapi B berbohong→B tidak mencuri (kontradiksi). Jika C berbohong: C mencuri, tapi A jujur→B mencuri (dua pencuri). Jadi A pencuri dan A berbohong"
+  },
+  {
+    "question_text": "Penelitian menunjukkan korelasi positif antara jumlah jam belajar dan nilai ujian. Seorang siswa menyimpulkan: 'Saya akan belajar 10 jam sehari agar dapat nilai sempurna'. Kesalahan logika apa yang paling mungkin?",
+    "option_a": "Post hoc ergo propter hoc",
+    "option_b": "Correlation does not imply causation",
+    "option_c": "Hasty generalization",
+    "option_d": "False dilemma",
+    "option_e": "Ad hominem",
+    "correct_answer": "B",
+    "subtest_utbk": "PU",
+    "is_hots": true,
+    "hint_text": "Pertimbangkan perbedaan antara korelasi dan kausalitas",
+    "solution_steps": "Korelasi positif hanya menunjukkan kecenderungan bersamaan, bukan hubungan sebab-akibat. Banyak faktor lain affecting nilai ujian: kemampuan dasar, kualitas belajar, kondisi tes, dll. Jam belajar berlebihan justru bisa menurunkan performa"
+  }
+]

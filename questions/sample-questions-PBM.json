@@ -1,0 +1,67 @@
+[
+  {
+    "question_text": "Bacalah teks berikut: 'Pendidikan adalah kunci kemajuan bangsa. Melalui pendidikan, seseorang dapat mengembangkan potensi diri dan berkontribusi pada masyarakat. Negara yang menginvestasikan sumber daya di bidang pendidikan akan menuai hasil dalam jangka panjang.'\n\nApa ide utama paragraf tersebut?",
+    "option_a": "Pendidikan mahal untuk negara",
+    "option_b": "Pendidikan penting untuk kemajuan bangsa",
+    "option_c": "Setiap orang harus berkontribusi pada masyarakat",
+    "option_d": "Potensi diri hanya bisa dikembangkan lewat pendidikan",
+    "option_e": "Investasi pendidikan hasilnya cepat",
+    "correct_answer": "B",
+    "subtest_utbk": "PBM",
+    "is_hots": false,
+    "hint_text": "Cari kalimat utama yang mewakili keseluruhan paragraf",
+    "solution_steps": "Kalimat pertama 'Pendidikan adalah kunci kemajuan bangsa' adalah ide utama. Kalimat lain mendukung dan menjelaskan ide ini"
+  },
+  {
+    "question_text": "Teks: 'Meskipun teknologi modern membawa banyak kemudahan, ketergantungan berlebihan pada gadget dapat mengurangi interaksi sosial langsung. Anak-anak yang lebih banyak waktu di depan layar cenderung memiliki kemampuan komunikasi tatap muka yang lebih lemah.'\n\nStruktur paragraf tersebut adalah...",
+    "option_a": "Sebab-akibat",
+    "option_b": "Perbandingan dan pertentangan",
+    "option_c": "Kronologis",
+    "option_d": "Definisi dan contoh",
+    "option_e": "Klasifikasi",
+    "correct_answer": "B",
+    "subtest_utbk": "PBM",
+    "is_hots": true,
+    "hint_text": "Perhatikan konjungsi 'meskipun' yang menunjukkan pertentangan",
+    "solution_steps": "Struktur menggunakan pola pertentangan: 'Meskipun A (positif), B (negatif)'. Ini menunjukkan perbandingan antara manfaat teknologi dan dampak negatif ketergantungan"
+  },
+  {
+    "question_text": "Kalimat yang paling efektif untuk mengakhiri paragraf argumentasi tentang pentingnya lingkungan hijau adalah:",
+    "option_a": "Jadi, itu saja pembahasan saya",
+    "option_b": "Karena itu, mari kita jaga lingkungan",
+    "option_c": "Oleh karena itu, investasi dalam ruang hijau bukan hanya pilihan, melainkan keharusan demi keberlanjutan planet kita",
+    "option_d": "Saya pikir lingkungan itu penting",
+    "option_e": "Terima kasih telah membaca",
+    "correct_answer": "C",
+    "subtest_utbk": "PBM",
+    "is_hots": true,
+    "hint_text": "Kalimat penutup yang efektif harus kuat, persuasif, dan memberikan kesimpulan yang jelas",
+    "solution_steps": "Opsi C menggunakan kata-kata kuat ('keharusan', 'keberlanjutan planet'), memberikan kesimpulan tegas, dan memiliki impact emosional. Opsi lain terlalu lemah atau tidak memberikan kesimpulan yang kuat"
+  },
+  {
+    "question_text": "Dalam surat lamaran kerja, kalimat 'Saya sangat tertarik dengan posisi ini karena perusahaan Anda memiliki reputasi excellent dalam industri' mengandung kesalahan...",
+    "option_a": "Ejaan",
+    "option_b": "Tata bahasa",
+    "option_c": "Penggunaan kata asing",
+    "option_d": "Struktur kalimat",
+    "option_e": "Tanda baca",
+    "correct_answer": "C",
+    "subtest_utbk": "PBM",
+    "is_hots": false,
+    "hint_text": "Perhatikan kata 'excellent' - apakah ini bahasa Indonesia yang baku?",
+    "solution_steps": "Kata 'excellent' adalah bahasa Inggris. Dalam bahasa Indonesia yang baik, seharusnya menggunakan 'sangat baik' atau 'unggul'"
+  },
+  {
+    "question_text": "Teks: 'Globalisasi membawa dampak ganda. Di satu sisi, membuka peluang ekonomi baru. Di sisi lain, meningkatkan kompetisi yang tidak sehat. Solusinya adalah mempersiapkan sumber daya manusia berkualitas.'\n\nHubungan antar kalimat dalam paragraf tersebut menggunakan pola...",
+    "option_a": "Tambahkan",
+    "option_b": "Sebab-akibat",
+    "option_c": "Deskripsi",
+    "option_d": "Masalah-solusi",
+    "option_e": "Perbandingan",
+    "correct_answer": "D",
+    "subtest_utbk": "PBM",
+    "is_hots": true,
+    "hint_text": "Identifikasi pola: masalah → solusi",
+    "solution_steps": "Paragraf mengikuti struktur masalah-solusi: 1) Identifikasi dampak ganda globalisasi (masalah), 2) Memberikan solusi (persiapan SDM berkualitas)"
+  }
+]
