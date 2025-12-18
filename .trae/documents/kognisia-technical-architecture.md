@@ -16,25 +16,30 @@
 ```
 
 ## 2.Technology Description
-- Frontend: React@18 + Tailwind CSS@3 + Vite + Framer Motion
-- Backend: Supabase (Authentication + Database + Storage)
-- Deployment: Vercel (Frontend) + Supabase (Backend)
+
+* Frontend: React\@18 + Tailwind CSS\@3 + Vite + Framer Motion
+
+* Backend: Supabase (Authentication + Database + Storage)
+
+* Deployment: Vercel (Frontend) + Supabase (Backend)
 
 ## 3.Route definitions
-| Route | Purpose |
-|-------|---------|
-| / | Halaman beranda dengan hero section dan fitur unggulan |
-| /tentang | Halaman tentang kami dengan visi misi dan tim |
-| /fitur | Halaman detail fitur pembelajaran |
-| /testimoni | Halaman koleksi testimoni siswa |
-| /kontak | Halaman kontak dan informasi layanan |
-| /dashboard | Dashboard pribadi siswa (memerlukan autentikasi) |
-| /login | Halaman login siswa |
-| /register | Halaman registrasi siswa baru |
+
+| Route      | Purpose                                                |
+| ---------- | ------------------------------------------------------ |
+| /          | Halaman beranda dengan hero section dan fitur unggulan |
+| /tentang   | Halaman tentang kami dengan visi misi dan tim          |
+| /fitur     | Halaman detail fitur pembelajaran                      |
+| /testimoni | Halaman koleksi testimoni siswa                        |
+| /kontak    | Halaman kontak dan informasi layanan                   |
+| /dashboard | Dashboard pribadi siswa (memerlukan autentikasi)       |
+| /login     | Halaman login siswa                                    |
+| /register  | Halaman registrasi siswa baru                          |
 
 ## 4.API definitions
 
 ### 4.1 Authentication API
+
 ```
 POST /auth/v1/signup
 POST /auth/v1/token?grant_type=password
@@ -43,6 +48,7 @@ GET /auth/v1/user
 ```
 
 ### 4.2 Testimoni API
+
 ```
 GET /rest/v1/testimoni
 POST /rest/v1/testimoni
@@ -51,6 +57,7 @@ DELETE /rest/v1/testimoni/:id
 ```
 
 ### 4.3 User Progress API
+
 ```
 GET /rest/v1/user_progress
 POST /rest/v1/user_progress
@@ -58,6 +65,7 @@ PUT /rest/v1/user_progress/:id
 ```
 
 ## 5.Server architecture diagram
+
 ```mermaid
   graph TD
     A[Client / Frontend] --> B[Supabase Client SDK]
@@ -75,6 +83,7 @@ PUT /rest/v1/user_progress/:id
 ## 6.Data model
 
 ### 6.1 Data model definition
+
 ```mermaid
 erDiagram
     USERS ||--o{ TESTIMONI : creates
@@ -123,7 +132,9 @@ erDiagram
 ```
 
 ### 6.2 Data Definition Language
+
 Users Table
+
 ```sql
 CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -139,6 +150,7 @@ CREATE INDEX idx_users_email ON users(email);
 ```
 
 Testimoni Table
+
 ```sql
 CREATE TABLE testimoni (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -156,6 +168,7 @@ CREATE INDEX idx_testimoni_rating ON testimoni(rating DESC);
 ```
 
 User Progress Table
+
 ```sql
 CREATE TABLE user_progress (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -171,6 +184,7 @@ CREATE INDEX idx_user_progress_subject ON user_progress(subject);
 ```
 
 Learning Materials Table
+
 ```sql
 CREATE TABLE learning_materials (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -188,6 +202,7 @@ CREATE INDEX idx_learning_materials_published ON learning_materials(is_published
 ```
 
 ### 6.3 Row Level Security (RLS)
+
 ```sql
 -- Enable RLS on all tables
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
@@ -214,6 +229,7 @@ CREATE POLICY "Anyone can view published materials" ON learning_materials FOR SE
 ```
 
 ### 6.4 Initial Data
+
 ```sql
 -- Insert sample learning materials
 INSERT INTO learning_materials (title, description, category, difficulty_level, estimated_duration_minutes, is_published) VALUES
@@ -228,3 +244,4 @@ INSERT INTO testimoni (user_id, content, rating, category, is_approved) VALUES
 ('550e8400-e29b-41d4-a716-446655440002', 'Saya berhasil masuk PTN impian berkat bimbingan dari Kognisia. Terima kasih!', 5, 'success', true),
 ('550e8400-e29b-41d4-a716-446655440003', 'Fitur tracking progress sangat membantu saya untuk melihat perkembangan belajar.', 4, 'feature', true);
 ```
+
