@@ -7,6 +7,7 @@ import MobileCard, { MobileCardHeader, MobileCardContent } from '@/components/mo
 import MobileButton from '@/components/mobile/MobileButton'
 import { useMobileDetection } from '@/hooks/useMobileDetection'
 import { useStreakSystem } from '@/hooks/useStreakSystem'
+import AIRecommendations from '@/components/ai/AIRecommendationsMobile'
 import { 
   fetchUserStats, 
   fetchDailyChallengeData, 
@@ -305,6 +306,16 @@ export default function MobileDashboard() {
             </MobileCard>
           </div>
         )}
+
+        {/* AI Recommendations Section */}
+        <div className="mt-6">
+          <AIRecommendations 
+            userId={user.id}
+            onApplyRecommendation={(recommendation) => {
+              toast.success(`AI recommendation applied: ${recommendation.subtest}`)
+            }}
+          />
+        </div>
 
         {/* Bottom Padding */}
         <div className="h-20" />
