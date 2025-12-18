@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
+import { useMobileDetection } from '@/hooks/useMobileDetection'
 import { supabase } from '@/lib/supabase'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -43,6 +44,14 @@ import {
 } from '@/lib/dashboard-calculations'
 
 export default function DashboardPage() {
+  const { isMobile } = useMobileDetection()
+  
+  // Redirect to mobile version if on mobile device
+  if (isMobile) {
+    window.location.href = '/dashboard/mobile'
+    return null
+  }
+
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const [userStats, setUserStats] = useState<UserStats | null>(null)
